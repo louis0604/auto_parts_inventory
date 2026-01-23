@@ -194,14 +194,14 @@ export default function Parts() {
                     <div className="space-y-2">
                       <Label htmlFor="categoryId">分类</Label>
                       <Select
-                        value={watch("categoryId")?.toString() || ""}
-                        onValueChange={(value) => setValue("categoryId", value ? parseInt(value) : undefined)}
+                        value={watch("categoryId")?.toString() || "none"}
+                        onValueChange={(value) => setValue("categoryId", value === "none" ? undefined : parseInt(value))}
                       >
                         <SelectTrigger className="neon-border-cyan">
                           <SelectValue placeholder="选择分类" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">无分类</SelectItem>
+                          <SelectItem value="none">无分类</SelectItem>
                           {categories?.map((cat) => (
                             <SelectItem key={cat.id} value={cat.id.toString()}>
                               {cat.name}
@@ -213,14 +213,14 @@ export default function Parts() {
                     <div className="space-y-2">
                       <Label htmlFor="supplierId">供应商</Label>
                       <Select
-                        value={watch("supplierId")?.toString() || ""}
-                        onValueChange={(value) => setValue("supplierId", value ? parseInt(value) : undefined)}
+                        value={watch("supplierId")?.toString() || "none"}
+                        onValueChange={(value) => setValue("supplierId", value === "none" ? undefined : parseInt(value))}
                       >
                         <SelectTrigger className="neon-border-cyan">
                           <SelectValue placeholder="选择供应商" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">无供应商</SelectItem>
+                          <SelectItem value="none">无供应商</SelectItem>
                           {suppliers?.map((sup) => (
                             <SelectItem key={sup.id} value={sup.id.toString()}>
                               {sup.name}
