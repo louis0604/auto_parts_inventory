@@ -4,32 +4,39 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Home from "./pages/Home";
+import DashboardLayout from "./components/DashboardLayout";
+import Dashboard from "./pages/Dashboard";
+import Parts from "./pages/Parts";
+import Suppliers from "./pages/Suppliers";
+import Customers from "./pages/Customers";
+import PurchaseOrders from "./pages/PurchaseOrders";
+import SalesInvoices from "./pages/SalesInvoices";
+import InventoryLedger from "./pages/InventoryLedger";
+import AIRestocking from "./pages/AIRestocking";
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
-    <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
-      <Route component={NotFound} />
-    </Switch>
+    <DashboardLayout>
+      <Switch>
+        <Route path={"/"} component={Dashboard} />
+        <Route path={"/parts"} component={Parts} />
+        <Route path={"/suppliers"} component={Suppliers} />
+        <Route path={"/customers"} component={Customers} />
+        <Route path={"/purchase-orders"} component={PurchaseOrders} />
+        <Route path={"/sales-invoices"} component={SalesInvoices} />
+        <Route path={"/inventory-ledger"} component={InventoryLedger} />
+        <Route path={"/ai-restocking"} component={AIRestocking} />
+        <Route path={"/404"} component={NotFound} />
+        <Route component={NotFound} />
+      </Switch>
+    </DashboardLayout>
   );
 }
-
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
           <Router />

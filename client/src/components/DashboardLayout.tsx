@@ -21,15 +21,21 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: LayoutDashboard, label: "Page 1", path: "/" },
-  { icon: Users, label: "Page 2", path: "/some-path" },
+  { icon: LayoutDashboard, label: "仪表盘", path: "/" },
+  { icon: Package, label: "配件管理", path: "/parts" },
+  { icon: TruckIcon, label: "供应商", path: "/suppliers" },
+  { icon: Users, label: "客户", path: "/customers" },
+  { icon: ShoppingCart, label: "采购订单", path: "/purchase-orders" },
+  { icon: FileText, label: "销售发票", path: "/sales-invoices" },
+  { icon: BarChart3, label: "库存记录", path: "/inventory-ledger" },
+  { icon: Sparkles, label: "AI补货建议", path: "/ai-restocking" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -170,8 +176,8 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center gap-2 min-w-0">
-                  <span className="font-semibold tracking-tight truncate">
-                    Navigation
+                  <span className="font-semibold tracking-tight truncate neon-text-cyan">
+                    库存管理系统
                   </span>
                 </div>
               ) : null}
