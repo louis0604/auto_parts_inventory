@@ -296,9 +296,9 @@ export default function SalesInvoices() {
                     <TableRow>
                       <TableHead className="w-12">#</TableHead>
                       <TableHead>配件</TableHead>
-                      <TableHead className="w-24">数量</TableHead>
-                      <TableHead className="w-32">单价</TableHead>
-                      <TableHead className="w-32">小计</TableHead>
+                      <TableHead className="w-32">数量</TableHead>
+                      <TableHead className="w-40">单价</TableHead>
+                      <TableHead className="w-36">小计</TableHead>
                       <TableHead className="w-16"></TableHead>
                     </TableRow>
                   </TableHeader>
