@@ -75,11 +75,13 @@ export default function Parts() {
   const { data: suppliers } = trpc.suppliers.list.useQuery();
   const { data: lineCodes } = trpc.lineCodes.list.useQuery();
   
+  const utils = trpc.useUtils();
+  
   const createMutation = trpc.parts.create.useMutation({
     onSuccess: () => {
       toast.success("配件添加成功");
       setIsAddDialogOpen(false);
-      refetch();
+      utils.parts.list.invalidate(); // 强制失效缓存
       reset();
     },
     onError: (error) => {
@@ -90,6 +92,7 @@ export default function Parts() {
   const updateMutation = trpc.parts.update.useMutation({
     onSuccess: () => {
       toast.success("配件更新成功");
+      utils.parts.list.invalidate();
       setEditingPart(null);
       setIsAddDialogOpen(false);
       refetch();
@@ -102,6 +105,7 @@ export default function Parts() {
   const deleteMutation = trpc.parts.delete.useMutation({
     onSuccess: () => {
       toast.success("配件删除成功");
+      utils.parts.list.invalidate();
       refetch();
     },
     onError: (error) => {

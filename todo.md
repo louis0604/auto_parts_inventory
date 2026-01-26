@@ -158,3 +158,8 @@
 - [x] 将空字符串转换为undefined
 - [x] 确保所有可选字段都能接受空值
 - [x] 修夏字段命名不一致问题（list -> listPrice）
+
+## 配件添加后列表不刷新问题修复
+- [x] 检查createMutation的onSuccess回调
+- [x] 添加trpc缓存失效逻辑（utils.parts.list.invalidate）
+- [x] 确保添加、更新、删除成功后列表自动刷新
