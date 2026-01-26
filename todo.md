@@ -163,3 +163,8 @@
 - [x] 检查createMutation的onSuccess回调
 - [x] 添加trpc缓存失效逻辑（utils.parts.list.invalidate）
 - [x] 确保添加、更新、删除成功后列表自动刷新
+
+## 配件编辑后数据不更新问题修复
+- [x] 检查updateMutation传递的数据字段
+- [x] 修复onSubmit中编辑模式的数据传递，传递cleanData而不是部分字段
+- [x] 更新parts.update接口的输入验证规则，添加所有新字段

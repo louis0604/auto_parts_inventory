@@ -262,14 +262,40 @@ export const appRouter = router({
       .input(z.object({
         id: z.number(),
         data: z.object({
+          // Basic info
+          lineCodeId: z.number().nullable().optional(),
           sku: z.string().min(1).optional(),
           name: z.string().min(1).optional(),
-          categoryId: z.number().optional(),
-          supplierId: z.number().optional(),
           description: z.string().optional(),
-          unitPrice: z.string().optional(),
+          categoryId: z.number().nullable().optional(),
+          supplierId: z.number().nullable().optional(),
+          
+          // Inventory
+          stockQuantity: z.number().optional(),
           minStockThreshold: z.number().optional(),
+          orderQty: z.number().nullable().optional(),
+          
+          // Pricing
+          listPrice: z.string().nullable().optional(),
+          cost: z.string().nullable().optional(),
+          retail: z.string().nullable().optional(),
+          unitPrice: z.string().optional(),
+          coreCost: z.string().nullable().optional(),
+          coreRetail: z.string().nullable().optional(),
+          
+          // Order info
+          orderMultiple: z.number().nullable().optional(),
+          
+          // Units
+          stockingUnit: z.string().nullable().optional(),
+          purchaseUnit: z.string().nullable().optional(),
           unit: z.string().optional(),
+          
+          // Additional
+          manufacturer: z.string().nullable().optional(),
+          mfgPartNumber: z.string().nullable().optional(),
+          weight: z.string().nullable().optional(),
+          imageUrl: z.string().nullable().optional(),
         }),
       }))
       .mutation(async ({ input }) => {

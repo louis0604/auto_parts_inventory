@@ -163,16 +163,7 @@ export default function Parts() {
     if (editingPart) {
       updateMutation.mutate({
         id: editingPart,
-        data: {
-          sku: cleanData.sku,
-          name: cleanData.name,
-          categoryId: cleanData.categoryId,
-          supplierId: cleanData.supplierId,
-          description: cleanData.description,
-          unitPrice: cleanData.unitPrice,
-          minStockThreshold: cleanData.minStockThreshold,
-          unit: cleanData.unit,
-        },
+        data: cleanData, // 传递所有字段
       });
     } else {
       createMutation.mutate(cleanData);
