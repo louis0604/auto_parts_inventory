@@ -252,6 +252,25 @@ export async function updatePart(id: number, data: Partial<Part>): Promise<void>
 export async function deletePart(id: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  
+  // Check if part is referenced in purchase order items
+  const poItems = await db.select().from(purchaseOrderItems).where(eq(purchaseOrderItems.partId, id)).limit(1);
+  if (poItems.length > 0) {
+    throw new Error("该配件已被采购订单引用，无法删除。请先删除相关订单。");
+  }
+  
+  // Check if part is referenced in sales invoice items
+  const siItems = await db.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.partId, id)).limit(1);
+  if (siItems.length > 0) {
+    throw new Error("该配件已被销售发票引用，无法删除。请先删除相关发票。");
+  }
+  
+  // Check if part has inventory ledger entries
+  const ledgerEntries = await db.select().from(inventoryLedger).where(eq(inventoryLedger.partId, id)).limit(1);
+  if (ledgerEntries.length > 0) {
+    throw new Error("该配件已有库存变动记录，无法删除。请联系管理员处理。");
+  }
+  
   await db.delete(parts).where(eq(parts.id, id));
 }
 
