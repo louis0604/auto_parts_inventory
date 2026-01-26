@@ -607,6 +607,36 @@ ${JSON.stringify(partsData, null, 2)}
       }
     }),
   }),
+
+  // Storage (Image Upload)
+  storage: router({
+    uploadImage: protectedProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.string(), // base64
+        contentType: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const { storagePut } = await import("./storage.js");
+        
+        // 生成随机后缀防止文件名冲突
+        const randomSuffix = Math.random().toString(36).substring(2, 10);
+        const ext = input.fileName.split(".").pop();
+        const fileKey = `parts/${Date.now()}-${randomSuffix}.${ext}`;
+        
+        // 将base64转为Buffer
+        const base64Data = input.fileData.split(",")[1];
+        const buffer = Buffer.from(base64Data, "base64");
+        
+        // 上传到S3
+        const result = await storagePut(fileKey, buffer, input.contentType);
+        
+        return {
+          url: result.url,
+          key: result.key,
+        };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

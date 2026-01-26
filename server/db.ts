@@ -265,6 +265,7 @@ export async function getAllParts(): Promise<(Part & { lineCode?: string | null 
       manufacturer: parts.manufacturer,
       mfgPartNumber: parts.mfgPartNumber,
       weight: parts.weight,
+      imageUrl: parts.imageUrl,
       createdAt: parts.createdAt,
       updatedAt: parts.updatedAt,
     })

@@ -117,6 +117,7 @@ export const parts = mysqlTable("parts", {
   manufacturer: varchar("manufacturer", { length: 200 }), // Manufacturer
   mfgPartNumber: varchar("mfgPartNumber", { length: 100 }), // Mfg Part #
   weight: decimal("weight", { precision: 10, scale: 2 }), // Weight
+  imageUrl: varchar("imageUrl", { length: 500 }), // Part Image URL
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

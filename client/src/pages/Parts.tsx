@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import ERPToolbar from "@/components/ERPToolbar";
 import { BulkImportParts } from "@/components/BulkImportParts";
+import { ImageUpload } from "@/components/ImageUpload";
 import LineCodeManagement from "@/components/LineCodeManagement";
 import { Edit, Trash2, Upload } from "lucide-react";
 
@@ -56,6 +57,7 @@ type PartFormData = {
   manufacturer?: string; // Manufacturer
   mfgPartNumber?: string; // Mfg Part #
   weight?: string; // Weight
+  imageUrl?: string; // Part Image
 };
 
 export default function Parts() {
@@ -179,6 +181,7 @@ export default function Parts() {
     setValue("manufacturer", part.manufacturer || "");
     setValue("mfgPartNumber", part.mfgPartNumber || "");
     setValue("weight", part.weight || "");
+    setValue("imageUrl", part.imageUrl || "");
     setIsAddDialogOpen(true);
   };
 
@@ -300,6 +303,7 @@ export default function Parts() {
                 <table className="erp-table">
                   <thead>
                     <tr>
+                      <th className="w-16">图片</th>
                       <th className="w-28">Line Code</th>
                       <th className="w-32">SKU</th>
                       <th>配件名称</th>
@@ -315,6 +319,19 @@ export default function Parts() {
                   <tbody>
                     {filteredParts.map((part) => (
                       <tr key={part.id}>
+                        <td>
+                          {part.imageUrl ? (
+                            <img
+                              src={part.imageUrl}
+                              alt={part.name}
+                              className="w-12 h-12 object-cover rounded border"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-100 rounded border flex items-center justify-center">
+                              <span className="text-gray-400 text-xs">无图</span>
+                            </div>
+                          )}
+                        </td>
                         <td className="text-gray-600 font-mono text-xs">{part.lineCode || "-"}</td>
                         <td className="font-mono text-xs">{part.sku}</td>
                         <td className="font-medium">{part.name}</td>
@@ -568,6 +585,14 @@ export default function Parts() {
 
               {/* 右列 */}
               <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Part Image</Label>
+                  <ImageUpload
+                    value={watch("imageUrl")}
+                    onChange={(url) => setValue("imageUrl", url)}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="stockingUnit">Stocking Unit</Label>
                   <Select
