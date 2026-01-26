@@ -171,7 +171,8 @@ export default function Parts() {
   const filteredParts = parts?.filter(
     (part) =>
       part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      part.sku.toLowerCase().includes(searchQuery.toLowerCase())
+      part.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (part.lineCode && part.lineCode.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   return (
@@ -201,7 +202,7 @@ export default function Parts() {
           <div className="flex items-center gap-4">
             <Label className="text-sm font-medium w-16">搜索:</Label>
             <Input
-              placeholder="输入配件名称或SKU..."
+              placeholder="输入配件名称、SKU或Line Code..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="max-w-md"
@@ -236,6 +237,7 @@ export default function Parts() {
                     <tr>
                       <th className="w-32">SKU</th>
                       <th>配件名称</th>
+                      <th className="w-28">Line Code</th>
                       <th className="w-32">分类</th>
                       <th className="w-32">供应商</th>
                       <th className="w-24">库存数量</th>
@@ -250,6 +252,7 @@ export default function Parts() {
                       <tr key={part.id}>
                         <td className="font-mono text-xs">{part.sku}</td>
                         <td className="font-medium">{part.name}</td>
+                        <td className="text-gray-600 font-mono text-xs">{part.lineCode || "-"}</td>
                         <td className="text-gray-600">
                           {categories?.find((c) => c.id === part.categoryId)?.name || "-"}
                         </td>
@@ -261,7 +264,7 @@ export default function Parts() {
                         </td>
                         <td className="text-right text-gray-600">{part.minStockThreshold}</td>
                         <td className="text-center">{part.unit}</td>
-                        <td className="text-right">¥{part.unitPrice}</td>
+                        <td className="text-right">${part.unitPrice}</td>
                         <td>
                           <div className="flex items-center justify-center gap-1">
                             <Button
