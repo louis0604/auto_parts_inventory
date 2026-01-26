@@ -219,7 +219,7 @@ export const appRouter = router({
         orderQty: z.number().nullable().optional(),
         
         // Pricing
-        list: z.string().nullable().optional(),
+        listPrice: z.string().nullable().optional(),
         cost: z.string().nullable().optional(),
         retail: z.string().nullable().optional(),
         unitPrice: z.string(),

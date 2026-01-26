@@ -134,22 +134,44 @@ export default function Parts() {
   });
 
   const onSubmit = (data: PartFormData) => {
+    // 将空字符串转换为undefined，确保后端验证通过
+    const cleanData = {
+      ...data,
+      lineCodeId: data.lineCodeId || undefined,
+      categoryId: data.categoryId || undefined,
+      supplierId: data.supplierId || undefined,
+      description: data.description || undefined,
+      listPrice: data.listPrice || undefined,
+      cost: data.cost || undefined,
+      retail: data.retail || undefined,
+      coreCost: data.coreCost || undefined,
+      coreRetail: data.coreRetail || undefined,
+      orderQty: data.orderQty || undefined,
+      orderMultiple: data.orderMultiple || undefined,
+      stockingUnit: data.stockingUnit || undefined,
+      purchaseUnit: data.purchaseUnit || undefined,
+      manufacturer: data.manufacturer || undefined,
+      mfgPartNumber: data.mfgPartNumber || undefined,
+      weight: data.weight || undefined,
+      imageUrl: data.imageUrl || undefined,
+    };
+
     if (editingPart) {
       updateMutation.mutate({
         id: editingPart,
         data: {
-          sku: data.sku,
-          name: data.name,
-          categoryId: data.categoryId,
-          supplierId: data.supplierId,
-          description: data.description,
-          unitPrice: data.unitPrice,
-          minStockThreshold: data.minStockThreshold,
-          unit: data.unit,
+          sku: cleanData.sku,
+          name: cleanData.name,
+          categoryId: cleanData.categoryId,
+          supplierId: cleanData.supplierId,
+          description: cleanData.description,
+          unitPrice: cleanData.unitPrice,
+          minStockThreshold: cleanData.minStockThreshold,
+          unit: cleanData.unit,
         },
       });
     } else {
-      createMutation.mutate(data);
+      createMutation.mutate(cleanData);
     }
   };
 

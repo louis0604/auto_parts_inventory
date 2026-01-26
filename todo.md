@@ -152,3 +152,9 @@
 - [x] 检查后端parts.create接口的输入验证规则
 - [x] 修复categoryId和supplierId字段的null值处理
 - [x] 确保表单提交时所有必填字段都有有效值
+
+## 表单空值处理问题修复
+- [x] 检查前端Parts.tsx中表单提交逻辑
+- [x] 将空字符串转换为undefined
+- [x] 确保所有可选字段都能接受空值
+- [x] 修夏字段命名不一致问题（list -> listPrice）

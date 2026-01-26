@@ -308,7 +308,7 @@ export async function createPart(data: {
   orderQty?: number | null;
   
   // Pricing
-  list?: string | null;
+  listPrice?: string | null;
   cost?: string | null;
   retail?: string | null;
   unitPrice: string;
