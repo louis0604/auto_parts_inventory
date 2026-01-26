@@ -294,15 +294,40 @@ export async function searchParts(query: string): Promise<Part[]> {
 }
 
 export async function createPart(data: {
+  // Basic info
+  lineCodeId?: number | null;
   sku: string;
   name: string;
-  categoryId?: number;
-  supplierId?: number;
   description?: string;
-  unitPrice: string;
+  categoryId?: number | null;
+  supplierId?: number | null;
+  
+  // Inventory
   stockQuantity?: number;
   minStockThreshold?: number;
+  orderQty?: number | null;
+  
+  // Pricing
+  list?: string | null;
+  cost?: string | null;
+  retail?: string | null;
+  unitPrice: string;
+  coreCost?: string | null;
+  coreRetail?: string | null;
+  
+  // Order info
+  orderMultiple?: number | null;
+  
+  // Units
+  stockingUnit?: string | null;
+  purchaseUnit?: string | null;
   unit?: string;
+  
+  // Additional
+  manufacturer?: string | null;
+  mfgPartNumber?: string | null;
+  weight?: string | null;
+  imageUrl?: string | null;
 }): Promise<Part> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

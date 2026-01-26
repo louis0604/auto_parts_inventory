@@ -205,15 +205,40 @@ export const appRouter = router({
       }),
     create: protectedProcedure
       .input(z.object({
+        // Basic info
+        lineCodeId: z.number().nullable().optional(),
         sku: z.string().min(1),
         name: z.string().min(1),
-        categoryId: z.number().optional(),
-        supplierId: z.number().optional(),
         description: z.string().optional(),
-        unitPrice: z.string(),
+        categoryId: z.number().nullable().optional(),
+        supplierId: z.number().nullable().optional(),
+        
+        // Inventory
         stockQuantity: z.number().default(0),
         minStockThreshold: z.number().default(10),
+        orderQty: z.number().nullable().optional(),
+        
+        // Pricing
+        list: z.string().nullable().optional(),
+        cost: z.string().nullable().optional(),
+        retail: z.string().nullable().optional(),
+        unitPrice: z.string(),
+        coreCost: z.string().nullable().optional(),
+        coreRetail: z.string().nullable().optional(),
+        
+        // Order info
+        orderMultiple: z.number().nullable().optional(),
+        
+        // Units
+        stockingUnit: z.string().nullable().optional(),
+        purchaseUnit: z.string().nullable().optional(),
         unit: z.string().default("件"),
+        
+        // Additional
+        manufacturer: z.string().nullable().optional(),
+        mfgPartNumber: z.string().nullable().optional(),
+        weight: z.string().nullable().optional(),
+        imageUrl: z.string().nullable().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const part = await db.createPart(input);
