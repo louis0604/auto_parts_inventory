@@ -160,6 +160,20 @@ export const appRouter = router({
     lowStock: protectedProcedure.query(async () => {
       return await db.getLowStockParts();
     }),
+    bulkCreate: protectedProcedure
+      .input(z.array(z.object({
+        sku: z.string().min(1),
+        name: z.string().min(1),
+        categoryId: z.number().nullable().optional(),
+        supplierId: z.number().nullable().optional(),
+        description: z.string().optional(),
+        unitPrice: z.string(),
+        currentStock: z.number().optional(),
+        minStock: z.number().optional(),
+      })))
+      .mutation(async ({ input }) => {
+        return await db.bulkCreateParts(input);
+      }),
     create: protectedProcedure
       .input(z.object({
         sku: z.string().min(1),

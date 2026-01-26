@@ -20,7 +20,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import ERPToolbar from "@/components/ERPToolbar";
-import { Edit, Trash2 } from "lucide-react";
+import { BulkImportParts } from "@/components/BulkImportParts";
+import { Edit, Trash2, Upload } from "lucide-react";
 
 type PartFormData = {
   sku: string;
@@ -41,6 +42,7 @@ export default function Parts() {
   const [activeTab, setActiveTab] = useState("stocking");
   const [forceDeleteDialogOpen, setForceDeleteDialogOpen] = useState(false);
   const [partToDelete, setPartToDelete] = useState<{id: number, name: string, sku: string} | null>(null);
+  const [bulkImportDialogOpen, setBulkImportDialogOpen] = useState(false);
 
   const { data: parts, isLoading, refetch } = trpc.parts.list.useQuery();
   const { data: categories } = trpc.partCategories.list.useQuery();
@@ -173,12 +175,22 @@ export default function Parts() {
   return (
     <div className="flex flex-col h-full">
       {/* ERP Toolbar */}
-      <ERPToolbar
-        onAdd={handleAdd}
-        onRefresh={() => refetch()}
-        showAdd={true}
-        showRefresh={true}
-      />
+      <div className="flex items-center gap-2">
+        <ERPToolbar
+          onAdd={handleAdd}
+          onRefresh={() => refetch()}
+          showAdd={true}
+          showRefresh={true}
+        />
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setBulkImportDialogOpen(true)}
+        >
+          <Upload className="h-4 w-4 mr-1" />
+          批量导入
+        </Button>
+      </div>
 
       {/* Main Content Area */}
       <div className="flex-1 bg-gray-50 p-4">
@@ -497,6 +509,13 @@ export default function Parts() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 批量导入对话框 */}
+      <BulkImportParts
+        open={bulkImportDialogOpen}
+        onOpenChange={setBulkImportDialogOpen}
+        onSuccess={() => refetch()}
+      />
     </div>
   );
 }

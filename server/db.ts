@@ -243,6 +243,45 @@ export async function createPart(data: {
   return (await db.select().from(parts).where(eq(parts.id, Number(result.insertId))))[0]!;
 }
 
+export async function bulkCreateParts(partsData: Array<{
+  sku: string;
+  name: string;
+  categoryId?: number | null;
+  supplierId?: number | null;
+  description?: string;
+  unitPrice: string;
+  currentStock?: number;
+  minStock?: number;
+}>): Promise<{ success: number; failed: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  let success = 0;
+  let failed = 0;
+
+  for (const partData of partsData) {
+    try {
+      await db.insert(parts).values({
+        sku: partData.sku,
+        name: partData.name,
+        categoryId: partData.categoryId || undefined,
+        supplierId: partData.supplierId || undefined,
+        description: partData.description || "",
+        unitPrice: partData.unitPrice,
+        stockQuantity: partData.currentStock || 0,
+        minStockThreshold: partData.minStock || 0,
+        unit: "个",
+      });
+      success++;
+    } catch (error) {
+      console.error(`Failed to create part ${partData.sku}:`, error);
+      failed++;
+    }
+  }
+
+  return { success, failed };
+}
+
 export async function updatePart(id: number, data: Partial<Part>): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

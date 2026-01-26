@@ -90,3 +90,10 @@
 - [x] 在db.ts中添加forceDeleteCustomer函数
 - [x] 在routers.ts中添加customers.forceDelete API
 - [x] 在Customers.tsx中添加强制删除对话框
+
+## 批量导入和快速批量添加功能
+- [x] 为配件管理添加Excel批量导入功能
+- [x] 添加Excel模板下载功能
+- [x] 解析Excel文件并批量创建配件
+- [ ] 为配件管理添加AI辅助导入功能
+- [ ] 优化采购订单批量添加配件体验
