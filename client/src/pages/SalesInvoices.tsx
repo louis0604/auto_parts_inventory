@@ -341,13 +341,13 @@ export default function SalesInvoices() {
                             <Input
                               type="number"
                               min="1"
-                              className="w-full"
+                              className="w-full text-center"
                               {...register(`items.${index}.quantity` as const, { valueAsNumber: true })}
                             />
                           </TableCell>
                           <TableCell>
                             <Input
-                              className="w-full"
+                              className="w-full text-right"
                               {...register(`items.${index}.unitPrice` as const)}
                             />
                           </TableCell>
