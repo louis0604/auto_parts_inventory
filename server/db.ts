@@ -274,6 +274,31 @@ export async function deletePart(id: number): Promise<void> {
   await db.delete(parts).where(eq(parts.id, id));
 }
 
+/**
+ * Force delete a part and all its related records (admin only)
+ * This will delete:
+ * - The part itself
+ * - All inventory ledger entries
+ * - All purchase order items (and their parent orders if empty)
+ * - All sales invoice items (and their parent invoices if empty)
+ */
+export async function forceDeletePart(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  // Delete inventory ledger entries
+  await db.delete(inventoryLedger).where(eq(inventoryLedger.partId, id));
+  
+  // Delete purchase order items
+  await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.partId, id));
+  
+  // Delete sales invoice items
+  await db.delete(salesInvoiceItems).where(eq(salesInvoiceItems.partId, id));
+  
+  // Finally delete the part
+  await db.delete(parts).where(eq(parts.id, id));
+}
+
 export async function getLowStockParts(): Promise<Part[]> {
   const db = await getDb();
   if (!db) return [];

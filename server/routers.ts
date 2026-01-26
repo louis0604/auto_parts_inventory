@@ -193,6 +193,16 @@ export const appRouter = router({
         await db.deletePart(input);
         return { success: true };
       }),
+    forceDelete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        // Only admin can force delete
+        if (ctx.user.role !== 'admin') {
+          throw new Error("只有管理员才能强制删除配件");
+        }
+        await db.forceDeletePart(input);
+        return { success: true };
+      }),
     adjustStock: protectedProcedure
       .input(z.object({
         partId: z.number(),

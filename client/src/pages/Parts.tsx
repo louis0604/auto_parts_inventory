@@ -39,6 +39,8 @@ export default function Parts() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("stocking");
+  const [forceDeleteDialogOpen, setForceDeleteDialogOpen] = useState(false);
+  const [partToDelete, setPartToDelete] = useState<{id: number, name: string, sku: string} | null>(null);
 
   const { data: parts, isLoading, refetch } = trpc.parts.list.useQuery();
   const { data: categories } = trpc.partCategories.list.useQuery();
@@ -75,6 +77,18 @@ export default function Parts() {
     },
     onError: (error) => {
       toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const forceDeleteMutation = trpc.parts.forceDelete.useMutation({
+    onSuccess: () => {
+      toast.success("配件已强制删除，所有相关记录已清除");
+      setForceDeleteDialogOpen(false);
+      setPartToDelete(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`强制删除失败: ${error.message}`);
     },
   });
 
@@ -124,9 +138,23 @@ export default function Parts() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (part: any) => {
     if (confirm("确定要删除这个配件吗？此操作无法撤销。")) {
-      deleteMutation.mutate(id);
+      deleteMutation.mutate(part.id, {
+        onError: (error) => {
+          // If delete fails due to references, offer force delete option
+          if (error.message.includes("库存变动记录") || error.message.includes("引用")) {
+            setPartToDelete({ id: part.id, name: part.name, sku: part.sku });
+            setForceDeleteDialogOpen(true);
+          }
+        },
+      });
+    }
+  };
+
+  const handleForceDelete = () => {
+    if (partToDelete) {
+      forceDeleteMutation.mutate(partToDelete.id);
     }
   };
 
@@ -233,7 +261,7 @@ export default function Parts() {
                             <Button
                               variant="ghost"
                               size="sm"
-                              onClick={() => handleDelete(part.id)}
+                              onClick={() => handleDelete(part)}
                               className="h-7 px-2 hover:bg-red-50"
                             >
                               <Trash2 className="h-4 w-4 text-red-600" />
@@ -411,6 +439,62 @@ export default function Parts() {
               </Button>
             </div>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Force Delete Confirmation Dialog */}
+      <Dialog open={forceDeleteDialogOpen} onOpenChange={setForceDeleteDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-red-600 text-lg font-bold">⚠️ 强制删除确认</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+              <p className="text-sm text-gray-700 mb-2">
+                您尝试删除的配件已被其他记录引用，无法直接删除。
+              </p>
+              {partToDelete && (
+                <div className="mt-2 p-2 bg-white rounded border">
+                  <p className="text-sm font-semibold">SKU: {partToDelete.sku}</p>
+                  <p className="text-sm">名称: {partToDelete.name}</p>
+                </div>
+              )}
+            </div>
+            
+            <div className="bg-red-50 border border-red-200 rounded p-3">
+              <p className="text-sm font-bold text-red-700 mb-2">强制删除将会：</p>
+              <ul className="text-sm text-gray-700 space-y-1 ml-4 list-disc">
+                <li>删除该配件的所有库存变动记录</li>
+                <li>删除相关的采购订单明细</li>
+                <li>删除相关的销售发票明细</li>
+                <li>删除配件本身</li>
+              </ul>
+              <p className="text-sm font-bold text-red-700 mt-3">
+                ⚠️ 此操作不可逆，请谨慎确认！
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => {
+                  setForceDeleteDialogOpen(false);
+                  setPartToDelete(null);
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                type="button"
+                onClick={handleForceDelete}
+                className="bg-red-600 hover:bg-red-700 text-white"
+                disabled={forceDeleteMutation.isPending}
+              >
+                {forceDeleteMutation.isPending ? "删除中..." : "确认强制删除"}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </div>
