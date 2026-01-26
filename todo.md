@@ -77,3 +77,8 @@
 - [x] 在routers.ts中添加forceDelete API端点，仅管理员可用
 - [x] 在Parts.tsx中添加二次确认对话框
 - [x] 测试强制删除功能
+
+## 仪表盘快速操作404错误修复
+- [x] 检查Dashboard.tsx中的快速操作按钮路由
+- [x] 检查App.tsx中的路由配置
+- [x] 修复路由跳转问题

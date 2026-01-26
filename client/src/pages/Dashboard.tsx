@@ -138,17 +138,17 @@ export default function Dashboard() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="/parts/new">
+            <Link href="/parts">
               <Button className="w-full" variant="default">
                 添加配件
               </Button>
             </Link>
-            <Link href="/purchase-orders/new">
+            <Link href="/purchase-orders">
               <Button className="w-full" variant="secondary">
                 创建采购订单
               </Button>
             </Link>
-            <Link href="/sales-invoices/new">
+            <Link href="/sales-invoices">
               <Button className="w-full" variant="secondary">
                 创建销售发票
               </Button>
