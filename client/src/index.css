@@ -1,6 +1,3 @@
-/* Import Cyberpunk Fonts - Must be first */
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap');
-
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -35,7 +32,7 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
+  --color-sidebar-background: var(--sidebar-background);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
@@ -46,274 +43,171 @@
 }
 
 :root {
-  /* Cyberpunk Color Palette */
   --radius: 0.25rem;
-  --background: oklch(0.12 0.02 270);
-  --foreground: oklch(0.8 0.2 195);
-  --card: oklch(0.15 0.02 270);
-  --card-foreground: oklch(0.8 0.2 195);
-  --popover: oklch(0.18 0.02 270);
-  --popover-foreground: oklch(0.8 0.2 195);
-  --primary: oklch(0.75 0.25 350);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.65 0.25 240);
-  --secondary-foreground: oklch(0.98 0 0);
-  --muted: oklch(0.25 0.02 270);
-  --muted-foreground: oklch(0.45 0.02 270);
-  --accent: oklch(0.8 0.2 195);
-  --accent-foreground: oklch(0.12 0.02 270);
-  --destructive: oklch(0.65 0.25 25);
-  --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.3 0.1 270);
-  --input: oklch(0.3 0.1 270);
-  --ring: oklch(0.75 0.25 350);
-  --chart-1: oklch(0.75 0.25 350);
-  --chart-2: oklch(0.8 0.2 195);
-  --chart-3: oklch(0.65 0.25 240);
-  --chart-4: oklch(0.7 0.2 300);
-  --chart-5: oklch(0.6 0.2 60);
-  --sidebar: oklch(0.15 0.02 270);
-  --sidebar-foreground: oklch(0.8 0.2 195);
-  --sidebar-primary: oklch(0.75 0.25 350);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.25 0.02 270);
-  --sidebar-accent-foreground: oklch(0.8 0.2 195);
-  --sidebar-border: oklch(0.3 0.1 270);
-  --sidebar-ring: oklch(0.75 0.25 350);
+  
+  /* Traditional ERP Color Scheme - Light Gray/Blue Tones */
+  --background: 240 10% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 210 100% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 16% 93%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 16% 95%;
+  --muted-foreground: 215 16% 47%;
+  --accent: 210 16% 93%;
+  --accent-foreground: 222 47% 11%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 214 32% 91%;
+  --input: 214 32% 91%;
+  --ring: 210 100% 45%;
+  --chart-1: 210 100% 45%;
+  --chart-2: 173 58% 39%;
+  --chart-3: 197 37% 24%;
+  --chart-4: 43 74% 66%;
+  --chart-5: 27 87% 67%;
+  --sidebar-background: 0 0% 100%;
+  --sidebar-foreground: 222 47% 11%;
+  --sidebar-primary: 210 100% 45%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 210 16% 93%;
+  --sidebar-accent-foreground: 222 47% 11%;
+  --sidebar-border: 214 32% 91%;
+  --sidebar-ring: 210 100% 45%;
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground antialiased;
-    font-family: 'Rajdhani', sans-serif;
-  }
-
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-  }
-
-  button:not(:disabled),
-  [role="button"]:not([aria-disabled="true"]),
-  [type="button"]:not(:disabled),
-  [type="submit"]:not(:disabled),
-  [type="reset"]:not(:disabled),
-  a[href],
-  select:not(:disabled),
-  input[type="checkbox"]:not(:disabled),
-  input[type="radio"]:not(:disabled) {
-    @apply cursor-pointer;
-  }
-
-  /* Neon Glow Effects */
-  .neon-text {
-    text-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      0 0 20px currentColor,
-      0 0 40px currentColor;
-  }
-
-  .neon-text-pink {
-    color: oklch(0.75 0.25 350);
-    text-shadow: 
-      0 0 5px oklch(0.75 0.25 350),
-      0 0 10px oklch(0.75 0.25 350),
-      0 0 20px oklch(0.75 0.25 350),
-      0 0 40px oklch(0.75 0.25 350);
-  }
-
-  .neon-text-cyan {
-    color: oklch(0.8 0.2 195);
-    text-shadow: 
-      0 0 5px oklch(0.8 0.2 195),
-      0 0 10px oklch(0.8 0.2 195),
-      0 0 20px oklch(0.8 0.2 195),
-      0 0 40px oklch(0.8 0.2 195);
-  }
-
-  .neon-border {
-    border: 1px solid currentColor;
-    box-shadow: 
-      0 0 5px currentColor,
-      0 0 10px currentColor,
-      inset 0 0 5px currentColor;
-  }
-
-  .neon-border-pink {
-    border-color: oklch(0.75 0.25 350);
-    box-shadow: 
-      0 0 5px oklch(0.75 0.25 350),
-      0 0 10px oklch(0.75 0.25 350),
-      inset 0 0 5px oklch(0.75 0.25 350);
-  }
-
-  .neon-border-cyan {
-    border-color: oklch(0.8 0.2 195);
-    box-shadow: 
-      0 0 5px oklch(0.8 0.2 195),
-      0 0 10px oklch(0.8 0.2 195),
-      inset 0 0 5px oklch(0.8 0.2 195);
-  }
-
-  /* HUD Corner Brackets */
-  .hud-corners {
-    position: relative;
-  }
-
-  .hud-corners::before,
-  .hud-corners::after {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border: 2px solid oklch(0.8 0.2 195);
-    pointer-events: none;
-  }
-
-  .hud-corners::before {
-    top: -1px;
-    left: -1px;
-    border-right: none;
-    border-bottom: none;
-  }
-
-  .hud-corners::after {
-    bottom: -1px;
-    right: -1px;
-    border-left: none;
-    border-top: none;
-  }
-
-  /* Tech Lines */
-  .tech-line-h {
-    position: relative;
-  }
-
-  .tech-line-h::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 1px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      oklch(0.8 0.2 195) 50%, 
-      transparent 100%);
-  }
-
-  /* Glitch Effect */
-  @keyframes glitch {
-    0% {
-      transform: translate(0);
-    }
-    20% {
-      transform: translate(-2px, 2px);
-    }
-    40% {
-      transform: translate(-2px, -2px);
-    }
-    60% {
-      transform: translate(2px, 2px);
-    }
-    80% {
-      transform: translate(2px, -2px);
-    }
-    100% {
-      transform: translate(0);
-    }
-  }
-
-  .glitch:hover {
-    animation: glitch 0.3s infinite;
-  }
-
-  /* Scan Line Effect */
-  @keyframes scan {
-    0% {
-      transform: translateY(-100%);
-    }
-    100% {
-      transform: translateY(100%);
-    }
-  }
-
-  .scan-line {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .scan-line::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, 
-      transparent 0%, 
-      oklch(0.8 0.2 195) 50%, 
-      transparent 100%);
-    animation: scan 3s linear infinite;
-    opacity: 0.3;
-    pointer-events: none;
-  }
-
-  /* Custom Scrollbar */
-  ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: oklch(0.12 0.02 270);
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: oklch(0.8 0.2 195);
-    border-radius: 4px;
-    box-shadow: 0 0 5px oklch(0.8 0.2 195);
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: oklch(0.75 0.25 350);
-    box-shadow: 0 0 10px oklch(0.75 0.25 350);
-  }
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 210 40% 98%;
+  --card: 222 47% 11%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 100% 45%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 217 33% 17%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217 33% 17%;
+  --muted-foreground: 215 20% 65%;
+  --accent: 217 33% 17%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62% 30%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217 33% 17%;
+  --input: 217 33% 17%;
+  --ring: 210 100% 45%;
+  --chart-1: 220 70% 50%;
+  --chart-2: 160 60% 45%;
+  --chart-3: 30 80% 55%;
+  --chart-4: 280 65% 60%;
+  --chart-5: 340 75% 55%;
+  --sidebar-background: 222 47% 11%;
+  --sidebar-foreground: 210 40% 98%;
+  --sidebar-primary: 210 100% 45%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 217 33% 17%;
+  --sidebar-accent-foreground: 210 40% 98%;
+  --sidebar-border: 217 33% 17%;
+  --sidebar-ring: 210 100% 45%;
 }
 
-@layer components {
-  .container {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
-  }
+* {
+  border-color: hsl(var(--border));
+}
 
-  .flex {
-    min-height: 0;
-    min-width: 0;
-  }
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
 
-  @media (min-width: 640px) {
-    .container {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-  }
+/* Container customization */
+.container {
+  @apply mx-auto px-4 sm:px-6 lg:px-8;
+}
 
-  @media (min-width: 1024px) {
-    .container {
-      padding-left: 2rem;
-      padding-right: 2rem;
-      max-width: 1280px;
-    }
-  }
+/* Flex min-width fix */
+.flex {
+  min-width: 0;
+  min-height: 0;
+}
+
+/* Traditional ERP Toolbar Styles */
+.erp-toolbar {
+  @apply bg-gradient-to-b from-gray-100 to-gray-200 border-b border-gray-300 px-2 py-1.5 flex items-center gap-1;
+}
+
+.erp-toolbar-button {
+  @apply flex flex-col items-center justify-center px-3 py-1.5 rounded hover:bg-gray-300/50 transition-colors cursor-pointer;
+}
+
+.erp-toolbar-button-icon {
+  @apply w-8 h-8 mb-0.5;
+}
+
+.erp-toolbar-button-label {
+  @apply text-xs text-gray-700;
+}
+
+.erp-toolbar-separator {
+  @apply w-px h-10 bg-gray-300 mx-1;
+}
+
+/* Tab Styles */
+.erp-tabs {
+  @apply bg-gray-50 border-b border-gray-300;
+}
+
+.erp-tab {
+  @apply px-4 py-2 border-r border-gray-300 bg-gray-200 hover:bg-gray-100 cursor-pointer transition-colors;
+}
+
+.erp-tab-active {
+  @apply bg-white border-b-2 border-b-white -mb-px;
+}
+
+/* Form Field Styles */
+.erp-field-label {
+  @apply text-sm font-medium text-gray-700 mb-1;
+}
+
+.erp-field-input {
+  @apply w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500;
+}
+
+/* Table Styles */
+.erp-table {
+  @apply w-full border-collapse;
+}
+
+.erp-table th {
+  @apply bg-gray-100 border border-gray-300 px-3 py-2 text-left text-sm font-semibold text-gray-700;
+}
+
+.erp-table td {
+  @apply border border-gray-300 px-3 py-2 text-sm;
+}
+
+.erp-table tbody tr:hover {
+  @apply bg-blue-50;
+}
+
+/* Status Bar */
+.erp-status-bar {
+  @apply bg-gray-200 border-t border-gray-300 px-4 py-1 text-sm text-gray-600 flex items-center justify-between;
+}
+
+/* Remove cyberpunk effects */
+.neon-text,
+.neon-text-cyan,
+.neon-text-pink,
+.neon-border-cyan,
+.neon-border-pink {
+  @apply shadow-none;
+  text-shadow: none;
+  box-shadow: none;
 }
