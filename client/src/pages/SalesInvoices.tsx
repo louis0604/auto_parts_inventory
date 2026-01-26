@@ -188,7 +188,7 @@ export default function SalesInvoices() {
                     <TableRow key={invoice.id}>
                       <TableCell className="font-mono">{invoice.invoiceNumber}</TableCell>
                       <TableCell>{customer?.name || "-"}</TableCell>
-                      <TableCell className="font-semibold">¥{parseFloat(invoice.totalAmount).toFixed(2)}</TableCell>
+                       <TableCell className="font-semibold">${parseFloat(invoice.totalAmount).toFixed(2)}</TableCell>
                       <TableCell>
                         <Badge variant={invoice.status === "completed" ? "default" : "secondary"}>
                           {invoice.status === "completed" ? "已完成" : "已取消"}
@@ -341,16 +341,18 @@ export default function SalesInvoices() {
                             <Input
                               type="number"
                               min="1"
+                              className="w-full"
                               {...register(`items.${index}.quantity` as const, { valueAsNumber: true })}
                             />
                           </TableCell>
                           <TableCell>
                             <Input
+                              className="w-full"
                               {...register(`items.${index}.unitPrice` as const)}
                             />
                           </TableCell>
                           <TableCell className="font-semibold">
-                            ¥{subtotal.toFixed(2)}
+                            ${subtotal.toFixed(2)}
                           </TableCell>
                           <TableCell>
                             {fields.length > 1 && (
@@ -372,7 +374,7 @@ export default function SalesInvoices() {
               </div>
               <div className="flex justify-end pt-2">
                 <div className="text-lg font-bold">
-                  总金额: ¥{calculateTotal().toFixed(2)}
+                  总金额: ${calculateTotal().toFixed(2)}
                 </div>
               </div>
             </div>
@@ -485,13 +487,13 @@ export default function SalesInvoices() {
                           <TableCell className="border-r border-gray-300 text-center">{item.quantity}</TableCell>
                           <TableCell className="border-r border-gray-300 text-center">{item.quantity}</TableCell>
                           <TableCell className="border-r border-gray-300 text-right">
-                            ¥{parseFloat(item.unitPrice).toFixed(2)}
+                            ${parseFloat(item.unitPrice).toFixed(2)}
                           </TableCell>
                           <TableCell className="border-r border-gray-300 text-right">
-                            ¥{parseFloat(item.unitPrice).toFixed(2)}
+                            ${parseFloat(item.unitPrice).toFixed(2)}
                           </TableCell>
                           <TableCell className="text-right font-semibold">
-                            ¥{parseFloat(item.subtotal).toFixed(2)}
+                            ${parseFloat(item.subtotal).toFixed(2)}
                           </TableCell>
                         </TableRow>
                       );
@@ -505,7 +507,7 @@ export default function SalesInvoices() {
                 <div className="w-64 space-y-2">
                   <div className="flex justify-between text-lg font-bold border-t-2 border-black pt-2">
                     <span>总计:</span>
-                    <span>¥{parseFloat(viewInvoiceDetails.totalAmount).toFixed(2)}</span>
+                    <span>${parseFloat(viewInvoiceDetails.totalAmount).toFixed(2)}</span>
                   </div>
                 </div>
               </div>
