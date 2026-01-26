@@ -87,16 +87,37 @@ export type InsertCustomer = typeof customers.$inferInsert;
  */
 export const parts = mysqlTable("parts", {
   id: int("id").autoincrement().primaryKey(),
-  sku: varchar("sku", { length: 100 }).notNull(),
-  name: varchar("name", { length: 200 }).notNull(),
-  lineCodeId: int("lineCodeId").references(() => lineCodes.id),
+  sku: varchar("sku", { length: 100 }).notNull(), // Part
+  name: varchar("name", { length: 200 }).notNull(), // Description
+  lineCodeId: int("lineCodeId").references(() => lineCodes.id), // Line
   categoryId: int("categoryId").references(() => partCategories.id),
-  supplierId: int("supplierId").references(() => suppliers.id),
+  supplierId: int("supplierId").references(() => suppliers.id), // Vendor
   description: text("description"),
-  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(),
+  
+  // Pricing fields
+  listPrice: decimal("listPrice", { precision: 15, scale: 2 }), // List
+  cost: decimal("cost", { precision: 15, scale: 2 }), // Cost
+  retail: decimal("retail", { precision: 15, scale: 2 }), // Retail
+  coreCost: decimal("coreCost", { precision: 15, scale: 2 }), // Core Cost
+  coreRetail: decimal("coreRetail", { precision: 15, scale: 2 }), // Core Retail
+  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(), // 保留兼容性
+  
+  // Inventory fields
   stockQuantity: int("stockQuantity").default(0).notNull(),
   minStockThreshold: int("minStockThreshold").default(10).notNull(),
-  unit: varchar("unit", { length: 50 }).default("件").notNull(),
+  orderQty: int("orderQty").default(0), // Order Qty
+  orderMultiple: int("orderMultiple").default(1), // Order Multiple
+  
+  // Units
+  stockingUnit: varchar("stockingUnit", { length: 20 }).default("EA"), // Stocking Unit
+  purchaseUnit: varchar("purchaseUnit", { length: 20 }).default("EA"), // Purchase Unit
+  unit: varchar("unit", { length: 50 }).default("件").notNull(), // 保留兼容性
+  
+  // Additional fields
+  manufacturer: varchar("manufacturer", { length: 200 }), // Manufacturer
+  mfgPartNumber: varchar("mfgPartNumber", { length: 100 }), // Mfg Part #
+  weight: decimal("weight", { precision: 10, scale: 2 }), // Weight
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

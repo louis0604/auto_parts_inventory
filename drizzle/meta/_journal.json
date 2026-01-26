@@ -29,6 +29,13 @@
       "when": 1769454421377,
       "tag": "0003_illegal_talkback",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1769455239091,
+      "tag": "0004_ordinary_shotgun",
+      "breakpoints": true
     }
   ]
 }

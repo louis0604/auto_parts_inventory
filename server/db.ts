@@ -245,10 +245,26 @@ export async function getAllParts(): Promise<(Part & { lineCode?: string | null 
       categoryId: parts.categoryId,
       supplierId: parts.supplierId,
       description: parts.description,
+      // Pricing fields
+      listPrice: parts.listPrice,
+      cost: parts.cost,
+      retail: parts.retail,
+      coreCost: parts.coreCost,
+      coreRetail: parts.coreRetail,
       unitPrice: parts.unitPrice,
+      // Inventory fields
       stockQuantity: parts.stockQuantity,
       minStockThreshold: parts.minStockThreshold,
+      orderQty: parts.orderQty,
+      orderMultiple: parts.orderMultiple,
+      // Units
+      stockingUnit: parts.stockingUnit,
+      purchaseUnit: parts.purchaseUnit,
       unit: parts.unit,
+      // Additional fields
+      manufacturer: parts.manufacturer,
+      mfgPartNumber: parts.mfgPartNumber,
+      weight: parts.weight,
       createdAt: parts.createdAt,
       updatedAt: parts.updatedAt,
     })

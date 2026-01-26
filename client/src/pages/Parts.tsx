@@ -25,16 +25,37 @@ import LineCodeManagement from "@/components/LineCodeManagement";
 import { Edit, Trash2, Upload } from "lucide-react";
 
 type PartFormData = {
-  sku: string;
-  name: string;
-  lineCodeId?: number;
+  // Basic info
+  sku: string; // Part
+  name: string; // Description
+  lineCodeId?: number; // Line
   categoryId?: number;
-  supplierId?: number;
+  supplierId?: number; // Vendor
   description?: string;
-  unitPrice: string;
+  
+  // Pricing
+  listPrice?: string; // List
+  cost?: string; // Cost
+  retail?: string; // Retail
+  coreCost?: string; // Core Cost
+  coreRetail?: string; // Core Retail
+  unitPrice: string; // 保留兼容性
+  
+  // Inventory
   stockQuantity: number;
   minStockThreshold: number;
-  unit: string;
+  orderQty?: number; // Order Qty
+  orderMultiple?: number; // Order Multiple
+  
+  // Units
+  stockingUnit?: string; // Stocking Unit
+  purchaseUnit?: string; // Purchase Unit
+  unit: string; // 保留兼容性
+  
+  // Additional
+  manufacturer?: string; // Manufacturer
+  mfgPartNumber?: string; // Mfg Part #
+  weight?: string; // Weight
 };
 
 export default function Parts() {
@@ -138,10 +159,26 @@ export default function Parts() {
     setValue("categoryId", part.categoryId);
     setValue("supplierId", part.supplierId);
     setValue("description", part.description || "");
+    // Pricing
+    setValue("listPrice", part.listPrice || "");
+    setValue("cost", part.cost || "");
+    setValue("retail", part.retail || "");
+    setValue("coreCost", part.coreCost || "");
+    setValue("coreRetail", part.coreRetail || "");
     setValue("unitPrice", part.unitPrice);
+    // Inventory
     setValue("stockQuantity", part.stockQuantity);
     setValue("minStockThreshold", part.minStockThreshold);
+    setValue("orderQty", part.orderQty || 0);
+    setValue("orderMultiple", part.orderMultiple || 1);
+    // Units
+    setValue("stockingUnit", part.stockingUnit || "EA");
+    setValue("purchaseUnit", part.purchaseUnit || "EA");
     setValue("unit", part.unit);
+    // Additional
+    setValue("manufacturer", part.manufacturer || "");
+    setValue("mfgPartNumber", part.mfgPartNumber || "");
+    setValue("weight", part.weight || "");
     setIsAddDialogOpen(true);
   };
 
@@ -352,147 +389,266 @@ export default function Parts() {
 
       {/* Add/Edit Dialog */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>{editingPart ? "编辑配件" : "添加配件"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="sku">SKU <span className="text-red-500">*</span></Label>
-                <Input
-                  id="sku"
-                  {...register("sku", { required: true })}
-                  placeholder="例如: DL3614"
-                  className="erp-field-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="name">配件名称 <span className="text-red-500">*</span></Label>
-                <Input
-                  id="name"
-                  {...register("name", { required: true })}
-                  placeholder="例如: Oil filter"
-                  className="erp-field-input"
-                />
-              </div>
-            </div>
+            {/* 左右两列布局 */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* 左列 */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="lineCodeId">Line</Label>
+                  <Select
+                    value={watch("lineCodeId")?.toString() || "none"}
+                    onValueChange={(value) => setValue("lineCodeId", value === "none" ? undefined : parseInt(value))}
+                  >
+                    <SelectTrigger className="erp-field-input">
+                      <SelectValue placeholder="选择Line" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">-</SelectItem>
+                      {lineCodes?.map((lc) => (
+                        <SelectItem key={lc.id} value={lc.id.toString()}>
+                          {lc.code}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="lineCodeId">Line Code</Label>
-                <Select
-                  value={watch("lineCodeId")?.toString() || "none"}
-                  onValueChange={(value) => setValue("lineCodeId", value === "none" ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="erp-field-input">
-                    <SelectValue placeholder="选择Line Code" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">无Line Code</SelectItem>
-                    {lineCodes?.map((lc) => (
-                      <SelectItem key={lc.id} value={lc.id.toString()}>
-                        {lc.code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                {/* 空占位保持布局 */}
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="sku">Part <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="sku"
+                    {...register("sku", { required: true })}
+                    placeholder="60091003"
+                    className="erp-field-input"
+                  />
+                </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="categoryId">分类</Label>
-                <Select
-                  value={watch("categoryId")?.toString() || "none"}
-                  onValueChange={(value) => setValue("categoryId", value === "none" ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="erp-field-input">
-                    <SelectValue placeholder="选择分类" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">无分类</SelectItem>
-                    {categories?.map((cat) => (
-                      <SelectItem key={cat.id} value={cat.id.toString()}>
-                        {cat.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="supplierId">供应商</Label>
-                <Select
-                  value={watch("supplierId")?.toString() || "none"}
-                  onValueChange={(value) => setValue("supplierId", value === "none" ? undefined : parseInt(value))}
-                >
-                  <SelectTrigger className="erp-field-input">
-                    <SelectValue placeholder="选择供应商" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">无供应商</SelectItem>
-                    {suppliers?.map((sup) => (
-                      <SelectItem key={sup.id} value={sup.id.toString()}>
-                        {sup.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="name">Description <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="name"
+                    {...register("name", { required: true })}
+                    placeholder="配件描述"
+                    className="erp-field-input"
+                  />
+                </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="description">描述</Label>
-              <Input
-                id="description"
-                {...register("description")}
-                placeholder="配件描述..."
-                className="erp-field-input"
-              />
-            </div>
+                <div className="space-y-2">
+                  <Label htmlFor="orderQty">Order Qty</Label>
+                  <Input
+                    id="orderQty"
+                    {...register("orderQty", { valueAsNumber: true })}
+                    type="number"
+                    placeholder="0"
+                    className="erp-field-input"
+                  />
+                </div>
 
-            <div className="grid grid-cols-4 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="unitPrice">单价 <span className="text-red-500">*</span></Label>
-                <Input
-                  id="unitPrice"
-                  {...register("unitPrice", { required: true })}
-                  type="text"
-                  placeholder="0.00"
-                  className="erp-field-input"
-                />
+                <div className="space-y-2">
+                  <Label htmlFor="listPrice">List</Label>
+                  <Input
+                    id="listPrice"
+                    {...register("listPrice")}
+                    type="text"
+                    placeholder="0.00"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="cost">Cost</Label>
+                  <Input
+                    id="cost"
+                    {...register("cost")}
+                    type="text"
+                    placeholder="0.00"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="retail">Retail <span className="text-red-500">*</span></Label>
+                  <Input
+                    id="retail"
+                    {...register("retail")}
+                    type="text"
+                    placeholder="0"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="coreCost">Core Cost</Label>
+                  <Input
+                    id="coreCost"
+                    {...register("coreCost")}
+                    type="text"
+                    placeholder="0.00"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="coreRetail">Core Retail</Label>
+                  <Input
+                    id="coreRetail"
+                    {...register("coreRetail")}
+                    type="text"
+                    placeholder="0.00"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="supplierId">Vendor</Label>
+                  <Select
+                    value={watch("supplierId")?.toString() || "none"}
+                    onValueChange={(value) => setValue("supplierId", value === "none" ? undefined : parseInt(value))}
+                  >
+                    <SelectTrigger className="erp-field-input">
+                      <SelectValue placeholder="选择Vendor" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">-</SelectItem>
+                      {suppliers?.map((sup) => (
+                        <SelectItem key={sup.id} value={sup.id.toString()}>
+                          {sup.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="manufacturer">Manufacturer</Label>
+                  <Select value="none" disabled>
+                    <SelectTrigger className="erp-field-input">
+                      <SelectValue placeholder="-" />
+                    </SelectTrigger>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="mfgPartNumber">Mfg Part #</Label>
+                  <Input
+                    id="mfgPartNumber"
+                    {...register("mfgPartNumber")}
+                    placeholder=""
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="orderMultiple">Order Multiple</Label>
+                  <Input
+                    id="orderMultiple"
+                    {...register("orderMultiple", { valueAsNumber: true })}
+                    type="number"
+                    placeholder="1"
+                    className="erp-field-input"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="weight">Weight</Label>
+                  <Input
+                    id="weight"
+                    {...register("weight")}
+                    type="text"
+                    placeholder="0.00"
+                    className="erp-field-input"
+                  />
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="stockQuantity">库存数量</Label>
-                <Input
-                  id="stockQuantity"
-                  {...register("stockQuantity", { valueAsNumber: true })}
-                  type="number"
-                  placeholder="0"
-                  className="erp-field-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="minStockThreshold">最低库存</Label>
-                <Input
-                  id="minStockThreshold"
-                  {...register("minStockThreshold", { valueAsNumber: true })}
-                  type="number"
-                  placeholder="10"
-                  className="erp-field-input"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="unit">单位</Label>
-                <Input
-                  id="unit"
-                  {...register("unit")}
-                  placeholder="件"
-                  className="erp-field-input"
-                />
+
+              {/* 右列 */}
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="stockingUnit">Stocking Unit</Label>
+                  <Select
+                    value={watch("stockingUnit") || "EA"}
+                    onValueChange={(value) => setValue("stockingUnit", value)}
+                  >
+                    <SelectTrigger className="erp-field-input">
+                      <SelectValue placeholder="EA" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EA">EA</SelectItem>
+                      <SelectItem value="BOX">BOX</SelectItem>
+                      <SelectItem value="CASE">CASE</SelectItem>
+                      <SelectItem value="PAIR">PAIR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="purchaseUnit">Purchase Unit</Label>
+                  <Select
+                    value={watch("purchaseUnit") || "EA"}
+                    onValueChange={(value) => setValue("purchaseUnit", value)}
+                  >
+                    <SelectTrigger className="erp-field-input">
+                      <SelectValue placeholder="EA" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="EA">EA</SelectItem>
+                      <SelectItem value="BOX">BOX</SelectItem>
+                      <SelectItem value="CASE">CASE</SelectItem>
+                      <SelectItem value="PAIR">PAIR</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2 pt-8">
+                  <Label>库存信息</Label>
+                  <div className="border border-gray-300 rounded p-3 space-y-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="stockQuantity" className="text-sm">库存数量</Label>
+                      <Input
+                        id="stockQuantity"
+                        {...register("stockQuantity", { valueAsNumber: true })}
+                        type="number"
+                        placeholder="0"
+                        className="erp-field-input"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="minStockThreshold" className="text-sm">最低库存</Label>
+                      <Input
+                        id="minStockThreshold"
+                        {...register("minStockThreshold", { valueAsNumber: true })}
+                        type="number"
+                        placeholder="10"
+                        className="erp-field-input"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <Label htmlFor="unitPrice" className="text-sm">单价 (Retail) <span className="text-red-500">*</span></Label>
+                      <Input
+                        id="unitPrice"
+                        {...register("unitPrice", { required: true })}
+                        type="text"
+                        placeholder="0.00"
+                        className="erp-field-input"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">备注</Label>
+                  <textarea
+                    id="description"
+                    {...register("description")}
+                    placeholder="备注信息..."
+                    className="erp-field-input min-h-[100px] resize-none"
+                  />
+                </div>
               </div>
             </div>
 

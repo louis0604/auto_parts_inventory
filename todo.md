@@ -133,3 +133,10 @@
 - [x] 在配件管理页面添加Line Code下拉筛选器
 - [x] 更新配件添加/编辑表单，使用Line Code下拉选择
 - [x] 更新Excel导入功能，支持Line Code名称匹配
+
+## 配件表单重新设计（按照参考图格式）
+- [x] 更新数据库schema添加新字段（Cost成本价、Retail零售价、CoreCost、CoreRetail、Manufacturer、MfgPartNumber、OrderMultiple、Weight、StockingUnit、PurchaseUnit等）
+- [x] 更新后端接口支持新字段
+- [x] 重新设计配件添加/编辑表单，采用左右两列布局
+- [x] 更新配件列表显示，保持核心字段显示
+- [x] 更新Excel导入模板，支持新字段

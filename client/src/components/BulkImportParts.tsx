@@ -44,15 +44,24 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
   const downloadTemplate = () => {
     const template = [
       {
-        "SKU编号": "DL3614",
-        "配件名称": "Oil filter",
         "Line Code": "SUBARU",
-        "配件描述": "这是一个示例配件",
-        "分类名称": "发动机部件",
+        "SKU编号": "60091003",
+        "配件名称": "Oil filter",
+        "Order Qty": "0",
+        "List Price": "15.00",
+        "Cost": "10.00",
+        "Retail": "13.56",
+        "Core Cost": "0.00",
+        "Core Retail": "0.00",
         "供应商名称": "示例供应商",
-        "单价": "13.56",
+        "Mfg Part Number": "",
+        "Order Multiple": "1",
+        "Weight": "0.50",
+        "Stocking Unit": "EA",
+        "Purchase Unit": "EA",
         "当前库存": "10",
         "最低库存": "5",
+        "备注": "这是一个示例配件",
       },
     ];
 
@@ -62,15 +71,24 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
     
     // 设置列宽
     ws['!cols'] = [
+      { wch: 12 }, // Line Code
       { wch: 15 }, // SKU编号
-      { wch: 20 }, // 配件名称
-      { wch: 15 }, // Line Code
-      { wch: 30 }, // 配件描述
-      { wch: 15 }, // 分类名称
+      { wch: 25 }, // 配件名称
+      { wch: 10 }, // Order Qty
+      { wch: 10 }, // List Price
+      { wch: 10 }, // Cost
+      { wch: 10 }, // Retail
+      { wch: 10 }, // Core Cost
+      { wch: 10 }, // Core Retail
       { wch: 20 }, // 供应商名称
-      { wch: 10 }, // 单价
+      { wch: 15 }, // Mfg Part Number
+      { wch: 12 }, // Order Multiple
+      { wch: 10 }, // Weight
+      { wch: 12 }, // Stocking Unit
+      { wch: 12 }, // Purchase Unit
       { wch: 10 }, // 当前库存
       { wch: 10 }, // 最低库存
+      { wch: 30 }, // 备注
     ];
 
     XLSX.writeFile(wb, "配件导入模板.xlsx");
@@ -116,12 +134,27 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
             sku: row["SKU编号"] || row["sku"] || "",
             name: row["配件名称"] || row["name"] || "",
             lineCodeId: lineCode?.id || null,
-            description: row["配件描述"] || row["description"] || "",
+            description: row["备注"] || row["配件描述"] || row["description"] || "",
             categoryId: category?.id || null,
             supplierId: supplier?.id || null,
-            unitPrice: String(row["单价"] || row["price"] || "0"),
+            // Pricing
+            listPrice: String(row["List Price"] || row["listPrice"] || ""),
+            cost: String(row["Cost"] || row["cost"] || ""),
+            retail: String(row["Retail"] || row["retail"] || ""),
+            coreCost: String(row["Core Cost"] || row["coreCost"] || ""),
+            coreRetail: String(row["Core Retail"] || row["coreRetail"] || ""),
+            unitPrice: String(row["Retail"] || row["单价"] || row["price"] || "0"),
+            // Inventory
             currentStock: Number(row["当前库存"] || row["stock"] || 0),
             minStock: Number(row["最低库存"] || row["minStock"] || 0),
+            orderQty: Number(row["Order Qty"] || row["orderQty"] || 0),
+            orderMultiple: Number(row["Order Multiple"] || row["orderMultiple"] || 1),
+            // Units
+            stockingUnit: String(row["Stocking Unit"] || row["stockingUnit"] || "EA"),
+            purchaseUnit: String(row["Purchase Unit"] || row["purchaseUnit"] || "EA"),
+            // Additional
+            mfgPartNumber: String(row["Mfg Part Number"] || row["mfgPartNumber"] || ""),
+            weight: String(row["Weight"] || row["weight"] || ""),
           };
         });
 
