@@ -43,14 +43,15 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
   const downloadTemplate = () => {
     const template = [
       {
-        "SKU编号": "PART-001",
-        "配件名称": "示例配件",
+        "SKU编号": "DL3614",
+        "配件名称": "Oil filter",
+        "Line Code": "SUBARU",
         "配件描述": "这是一个示例配件",
         "分类名称": "发动机部件",
         "供应商名称": "示例供应商",
-        "单价": "100.00",
-        "当前库存": "50",
-        "最低库存": "10",
+        "单价": "13.56",
+        "当前库存": "10",
+        "最低库存": "5",
       },
     ];
 
@@ -62,6 +63,7 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
     ws['!cols'] = [
       { wch: 15 }, // SKU编号
       { wch: 20 }, // 配件名称
+      { wch: 15 }, // Line Code
       { wch: 30 }, // 配件描述
       { wch: 15 }, // 分类名称
       { wch: 20 }, // 供应商名称
@@ -108,6 +110,7 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
           return {
             sku: row["SKU编号"] || row["sku"] || "",
             name: row["配件名称"] || row["name"] || "",
+            lineCode: row["Line Code"] || row["lineCode"] || "",
             description: row["配件描述"] || row["description"] || "",
             categoryId: category?.id || null,
             supplierId: supplier?.id || null,

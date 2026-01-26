@@ -15,6 +15,13 @@
       "when": 1769150239412,
       "tag": "0001_bent_vermin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1769453709187,
+      "tag": "0002_hesitant_albert_cleary",
+      "breakpoints": true
     }
   ]
 }

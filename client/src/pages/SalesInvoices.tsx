@@ -314,28 +314,47 @@ export default function SalesInvoices() {
                         <TableRow key={field.id}>
                           <TableCell>{index + 1}</TableCell>
                           <TableCell>
-                            <Select
-                              value={String(selectedPartId || "")}
-                              onValueChange={(value) => {
-                                const partId = Number(value);
-                                setValue(`items.${index}.partId`, partId);
-                                const part = parts?.find(p => p.id === partId);
-                                if (part) {
-                                  setValue(`items.${index}.unitPrice`, part.unitPrice);
-                                }
-                              }}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="选择配件" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {parts?.map((part) => (
-                                  <SelectItem key={part.id} value={String(part.id)}>
-                                    {part.sku} - {part.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            {selectedPart ? (
+                              <div className="space-y-1">
+                                <div className="font-mono font-semibold">{selectedPart.sku}</div>
+                                <div className="text-sm text-muted-foreground">{selectedPart.name}</div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 px-2 text-xs"
+                                  onClick={() => setValue(`items.${index}.partId`, 0)}
+                                >
+                                  更换
+                                </Button>
+                              </div>
+                            ) : (
+                              <Select
+                                value={String(selectedPartId || "")}
+                                onValueChange={(value) => {
+                                  const partId = Number(value);
+                                  setValue(`items.${index}.partId`, partId);
+                                  const part = parts?.find(p => p.id === partId);
+                                  if (part) {
+                                    setValue(`items.${index}.unitPrice`, part.unitPrice);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="选择配件" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {parts?.map((part) => (
+                                    <SelectItem key={part.id} value={String(part.id)}>
+                                      <div className="flex flex-col">
+                                        <span className="font-mono font-semibold">{part.sku}</span>
+                                        <span className="text-xs text-muted-foreground">{part.name}</span>
+                                      </div>
+                                    </SelectItem>
+                                  ))}
+                                </SelectContent>
+                              </Select>
+                            )}
                           </TableCell>
                           <TableCell>
                             <Input

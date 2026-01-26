@@ -75,6 +75,7 @@ export const parts = mysqlTable("parts", {
   id: int("id").autoincrement().primaryKey(),
   sku: varchar("sku", { length: 100 }).notNull().unique(),
   name: varchar("name", { length: 200 }).notNull(),
+  lineCode: varchar("lineCode", { length: 50 }),
   categoryId: int("categoryId").references(() => partCategories.id),
   supplierId: int("supplierId").references(() => suppliers.id),
   description: text("description"),

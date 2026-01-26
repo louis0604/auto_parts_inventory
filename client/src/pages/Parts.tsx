@@ -26,6 +26,7 @@ import { Edit, Trash2, Upload } from "lucide-react";
 type PartFormData = {
   sku: string;
   name: string;
+  lineCode?: string;
   categoryId?: number;
   supplierId?: number;
   description?: string;
@@ -130,6 +131,7 @@ export default function Parts() {
     setEditingPart(part.id);
     setValue("sku", part.sku);
     setValue("name", part.name);
+    setValue("lineCode", part.lineCode || "");
     setValue("categoryId", part.categoryId);
     setValue("supplierId", part.supplierId);
     setValue("description", part.description || "");
@@ -326,7 +328,7 @@ export default function Parts() {
                 <Input
                   id="sku"
                   {...register("sku", { required: true })}
-                  placeholder="例如: P-001"
+                  placeholder="例如: DL3614"
                   className="erp-field-input"
                 />
               </div>
@@ -335,9 +337,24 @@ export default function Parts() {
                 <Input
                   id="name"
                   {...register("name", { required: true })}
-                  placeholder="例如: 刹车片"
+                  placeholder="例如: Oil filter"
                   className="erp-field-input"
                 />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="lineCode">Line Code</Label>
+                <Input
+                  id="lineCode"
+                  {...register("lineCode")}
+                  placeholder="例如: SUBARU"
+                  className="erp-field-input"
+                />
+              </div>
+              <div className="space-y-2">
+                {/* 空占位保持布局 */}
               </div>
             </div>
 
