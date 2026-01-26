@@ -19,6 +19,35 @@ export const appRouter = router({
     }),
   }),
 
+  // Line Codes
+  lineCodes: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllLineCodes();
+    }),
+    create: protectedProcedure
+      .input(z.object({
+        code: z.string().min(1),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createLineCode(input);
+      }),
+    update: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        code: z.string().min(1),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.updateLineCode(input);
+      }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        return await db.deleteLineCode(input);
+      }),
+  }),
+
   // Part Categories
   partCategories: router({
     list: protectedProcedure.query(async () => {

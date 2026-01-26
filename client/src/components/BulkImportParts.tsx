@@ -24,6 +24,7 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
 
   const { data: categories } = trpc.partCategories.list.useQuery();
   const { data: suppliers } = trpc.suppliers.list.useQuery();
+  const { data: lineCodes } = trpc.lineCodes.list.useQuery();
 
   const bulkCreateMutation = trpc.parts.bulkCreate.useMutation({
     onSuccess: (result) => {
@@ -107,10 +108,14 @@ export function BulkImportParts({ open, onOpenChange, onSuccess }: BulkImportPar
           const supplierName = row["供应商名称"] || row["supplier"] || "";
           const supplier = suppliers?.find(s => s.name === supplierName);
 
+          // 查找Line Code ID
+          const lineCodeStr = row["Line Code"] || row["lineCode"] || "";
+          const lineCode = lineCodes?.find(lc => lc.code === lineCodeStr);
+
           return {
             sku: row["SKU编号"] || row["sku"] || "",
             name: row["配件名称"] || row["name"] || "",
-            lineCode: row["Line Code"] || row["lineCode"] || "",
+            lineCodeId: lineCode?.id || null,
             description: row["配件描述"] || row["description"] || "",
             categoryId: category?.id || null,
             supplierId: supplier?.id || null,

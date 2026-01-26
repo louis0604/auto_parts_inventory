@@ -19,6 +19,20 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
+ * Line codes table
+ */
+export const lineCodes = mysqlTable("line_codes", {
+  id: int("id").autoincrement().primaryKey(),
+  code: varchar("code", { length: 50 }).notNull().unique(),
+  description: text("description"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type LineCode = typeof lineCodes.$inferSelect;
+export type InsertLineCode = typeof lineCodes.$inferInsert;
+
+/**
  * Part categories table
  */
 export const partCategories = mysqlTable("part_categories", {
@@ -73,9 +87,9 @@ export type InsertCustomer = typeof customers.$inferInsert;
  */
 export const parts = mysqlTable("parts", {
   id: int("id").autoincrement().primaryKey(),
-  sku: varchar("sku", { length: 100 }).notNull().unique(),
+  sku: varchar("sku", { length: 100 }).notNull(),
   name: varchar("name", { length: 200 }).notNull(),
-  lineCode: varchar("lineCode", { length: 50 }),
+  lineCodeId: int("lineCodeId").references(() => lineCodes.id),
   categoryId: int("categoryId").references(() => partCategories.id),
   supplierId: int("supplierId").references(() => suppliers.id),
   description: text("description"),

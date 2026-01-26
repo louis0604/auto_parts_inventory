@@ -21,12 +21,13 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import ERPToolbar from "@/components/ERPToolbar";
 import { BulkImportParts } from "@/components/BulkImportParts";
+import LineCodeManagement from "@/components/LineCodeManagement";
 import { Edit, Trash2, Upload } from "lucide-react";
 
 type PartFormData = {
   sku: string;
   name: string;
-  lineCode?: string;
+  lineCodeId?: number;
   categoryId?: number;
   supplierId?: number;
   description?: string;
@@ -38,6 +39,7 @@ type PartFormData = {
 
 export default function Parts() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedLineCodeFilter, setSelectedLineCodeFilter] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("stocking");
@@ -48,6 +50,7 @@ export default function Parts() {
   const { data: parts, isLoading, refetch } = trpc.parts.list.useQuery();
   const { data: categories } = trpc.partCategories.list.useQuery();
   const { data: suppliers } = trpc.suppliers.list.useQuery();
+  const { data: lineCodes } = trpc.lineCodes.list.useQuery();
   
   const createMutation = trpc.parts.create.useMutation({
     onSuccess: () => {
@@ -131,7 +134,7 @@ export default function Parts() {
     setEditingPart(part.id);
     setValue("sku", part.sku);
     setValue("name", part.name);
-    setValue("lineCode", part.lineCode || "");
+    setValue("lineCodeId", part.lineCodeId);
     setValue("categoryId", part.categoryId);
     setValue("supplierId", part.supplierId);
     setValue("description", part.description || "");
@@ -169,10 +172,19 @@ export default function Parts() {
   };
 
   const filteredParts = parts?.filter(
-    (part) =>
-      part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      part.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (part.lineCode && part.lineCode.toLowerCase().includes(searchQuery.toLowerCase()))
+    (part) => {
+      // 搜索过滤
+      const matchesSearch = part.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        part.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (part.lineCode && part.lineCode.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Line Code筛选
+      const matchesLineCode = selectedLineCodeFilter === "all" || 
+        (selectedLineCodeFilter === "none" && !part.lineCode) ||
+        part.lineCode === selectedLineCodeFilter;
+      
+      return matchesSearch && matchesLineCode;
+    }
   );
 
   return (
@@ -197,7 +209,7 @@ export default function Parts() {
 
       {/* Main Content Area */}
       <div className="flex-1 bg-gray-50 p-4">
-        {/* Search Bar */}
+        {/* Search and Filter Bar */}
         <div className="bg-white border border-gray-300 rounded p-3 mb-3">
           <div className="flex items-center gap-4">
             <Label className="text-sm font-medium w-16">搜索:</Label>
@@ -207,6 +219,19 @@ export default function Parts() {
               onChange={(e) => setSearchQuery(e.target.value)}
               className="max-w-md"
             />
+            <Label className="text-sm font-medium whitespace-nowrap">Line Code:</Label>
+            <Select value={selectedLineCodeFilter} onValueChange={setSelectedLineCodeFilter}>
+              <SelectTrigger className="w-48">
+                <SelectValue placeholder="选择Line Code" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">全部</SelectItem>
+                <SelectItem value="none">未设置</SelectItem>
+                {lineCodes?.map((lc) => (
+                  <SelectItem key={lc.id} value={lc.code}>{lc.code}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
@@ -219,11 +244,14 @@ export default function Parts() {
             <TabsTrigger value="pricing" className={`erp-tab ${activeTab === "pricing" ? "erp-tab-active" : ""}`}>
               2. 定价
             </TabsTrigger>
+            <TabsTrigger value="linecodes" className={`erp-tab ${activeTab === "linecodes" ? "erp-tab-active" : ""}`}>
+              3. Line Code管理
+            </TabsTrigger>
             <TabsTrigger value="codes" className={`erp-tab ${activeTab === "codes" ? "erp-tab-active" : ""}`}>
-              3. 编码
+              4. 编码
             </TabsTrigger>
             <TabsTrigger value="history" className={`erp-tab ${activeTab === "history" ? "erp-tab-active" : ""}`}>
-              4. 历史
+              5. 历史
             </TabsTrigger>
           </TabsList>
 
@@ -235,9 +263,9 @@ export default function Parts() {
                 <table className="erp-table">
                   <thead>
                     <tr>
+                      <th className="w-28">Line Code</th>
                       <th className="w-32">SKU</th>
                       <th>配件名称</th>
-                      <th className="w-28">Line Code</th>
                       <th className="w-32">分类</th>
                       <th className="w-32">供应商</th>
                       <th className="w-24">库存数量</th>
@@ -250,9 +278,9 @@ export default function Parts() {
                   <tbody>
                     {filteredParts.map((part) => (
                       <tr key={part.id}>
+                        <td className="text-gray-600 font-mono text-xs">{part.lineCode || "-"}</td>
                         <td className="font-mono text-xs">{part.sku}</td>
                         <td className="font-medium">{part.name}</td>
-                        <td className="text-gray-600 font-mono text-xs">{part.lineCode || "-"}</td>
                         <td className="text-gray-600">
                           {categories?.find((c) => c.id === part.categoryId)?.name || "-"}
                         </td>
@@ -302,6 +330,10 @@ export default function Parts() {
             <div className="text-center py-12 text-gray-500">定价信息</div>
           </TabsContent>
 
+          <TabsContent value="linecodes" className="p-0">
+            <LineCodeManagement />
+          </TabsContent>
+
           <TabsContent value="codes" className="p-4">
             <div className="text-center py-12 text-gray-500">编码信息</div>
           </TabsContent>
@@ -348,13 +380,23 @@ export default function Parts() {
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="lineCode">Line Code</Label>
-                <Input
-                  id="lineCode"
-                  {...register("lineCode")}
-                  placeholder="例如: SUBARU"
-                  className="erp-field-input"
-                />
+                <Label htmlFor="lineCodeId">Line Code</Label>
+                <Select
+                  value={watch("lineCodeId")?.toString() || "none"}
+                  onValueChange={(value) => setValue("lineCodeId", value === "none" ? undefined : parseInt(value))}
+                >
+                  <SelectTrigger className="erp-field-input">
+                    <SelectValue placeholder="选择Line Code" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">无Line Code</SelectItem>
+                    {lineCodes?.map((lc) => (
+                      <SelectItem key={lc.id} value={lc.id.toString()}>
+                        {lc.code}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 {/* 空占位保持布局 */}

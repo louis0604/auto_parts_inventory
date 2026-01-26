@@ -7,6 +7,7 @@ import {
   suppliers, 
   customers, 
   partCategories,
+  lineCodes,
   purchaseOrders,
   purchaseOrderItems,
   salesInvoices,
@@ -17,6 +18,8 @@ import {
   type Supplier,
   type Customer,
   type PartCategory,
+  type LineCode,
+  type InsertLineCode,
   type PurchaseOrder,
   type SalesInvoice,
   type InventoryLedgerEntry,
@@ -107,6 +110,33 @@ export async function getUserByOpenId(openId: string) {
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
 
   return result.length > 0 ? result[0] : undefined;
+}
+
+// ===== Line Codes =====
+export async function getAllLineCodes(): Promise<LineCode[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(lineCodes).orderBy(lineCodes.code);
+}
+
+export async function createLineCode(data: { code: string; description?: string }): Promise<LineCode> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(lineCodes).values(data);
+  return (await db.select().from(lineCodes).where(eq(lineCodes.id, Number(result.insertId))))[0]!;
+}
+
+export async function updateLineCode(data: { id: number; code: string; description?: string }): Promise<LineCode> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(lineCodes).set({ code: data.code, description: data.description }).where(eq(lineCodes.id, data.id));
+  return (await db.select().from(lineCodes).where(eq(lineCodes.id, data.id)))[0]!;
+}
+
+export async function deleteLineCode(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(lineCodes).where(eq(lineCodes.id, id));
 }
 
 // ===== Part Categories =====
@@ -202,10 +232,30 @@ export async function deleteCustomer(id: number): Promise<void> {
 }
 
 // ===== Parts =====
-export async function getAllParts(): Promise<Part[]> {
+export async function getAllParts(): Promise<(Part & { lineCode?: string | null })[]> {
   const db = await getDb();
   if (!db) return [];
-  return await db.select().from(parts).orderBy(desc(parts.createdAt));
+  const result = await db
+    .select({
+      id: parts.id,
+      sku: parts.sku,
+      name: parts.name,
+      lineCodeId: parts.lineCodeId,
+      lineCode: lineCodes.code,
+      categoryId: parts.categoryId,
+      supplierId: parts.supplierId,
+      description: parts.description,
+      unitPrice: parts.unitPrice,
+      stockQuantity: parts.stockQuantity,
+      minStockThreshold: parts.minStockThreshold,
+      unit: parts.unit,
+      createdAt: parts.createdAt,
+      updatedAt: parts.updatedAt,
+    })
+    .from(parts)
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .orderBy(desc(parts.createdAt));
+  return result as any;
 }
 
 export async function getPartById(id: number): Promise<Part | undefined> {

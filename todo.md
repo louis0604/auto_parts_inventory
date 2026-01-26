@@ -123,3 +123,13 @@
 ## 配件管理页面Line Code显示和搜索
 - [x] 在配件列表表格中添加Line Code列
 - [x] 实现按Line Code搜索和筛选配件功能
+
+## Line Code管理和筛选功能
+- [x] 创廻line_codes数据表
+- [x] 调整配件表，将lineCode改为外键关联line_codes表
+- [x] 创建Line Code管理的后端接口（增删改查）
+- [x] 调整配件列表表格，将Line Code列移到SKU前面
+- [x] 创建Line Code管理界面（可添加、编辑、删除Line Code）
+- [x] 在配件管理页面添加Line Code下拉筛选器
+- [x] 更新配件添加/编辑表单，使用Line Code下拉选择
+- [x] 更新Excel导入功能，支持Line Code名称匹配
