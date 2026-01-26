@@ -35,6 +35,8 @@ type CustomerFormData = {
 export default function Customers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingCustomer, setEditingCustomer] = useState<number | null>(null);
+  const [forceDeleteDialogOpen, setForceDeleteDialogOpen] = useState(false);
+  const [customerToDelete, setCustomerToDelete] = useState<any>(null);
 
   const { data: customers, isLoading, refetch } = trpc.customers.list.useQuery();
   
@@ -68,6 +70,22 @@ export default function Customers() {
     },
     onError: (error) => {
       toast.error(`删除失败: ${error.message}`);
+      // 如果删除失败，打开强制删除对话框
+      if (customerToDelete) {
+        setForceDeleteDialogOpen(true);
+      }
+    },
+  });
+
+  const forceDeleteMutation = trpc.customers.forceDelete.useMutation({
+    onSuccess: () => {
+      toast.success("客户已强制删除");
+      setForceDeleteDialogOpen(false);
+      setCustomerToDelete(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`强制删除失败: ${error.message}`);
     },
   });
 
@@ -102,9 +120,10 @@ export default function Customers() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (customer: any) => {
     if (confirm("确定要删除这个客户吗？")) {
-      deleteMutation.mutate(id);
+      setCustomerToDelete(customer);
+      deleteMutation.mutate(customer.id);
     }
   };
 
@@ -245,7 +264,7 @@ export default function Customers() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(customer.id)}
+                            onClick={() => handleDelete(customer)}
                             className="hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -262,6 +281,58 @@ export default function Customers() {
           )}
         </CardContent>
       </Card>
+
+      {/* 强制删除确认对话框 */}
+      <Dialog open={forceDeleteDialogOpen} onOpenChange={setForceDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive">强制删除客户</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              该客户已有相关记录，无法直接删除。
+            </p>
+            {customerToDelete && (
+              <div className="p-4 border rounded-lg space-y-2">
+                <p><strong>客户名称：</strong>{customerToDelete.name}</p>
+                <p><strong>联系人：</strong>{customerToDelete.contactPerson || "-"}</p>
+                <p><strong>联系电话：</strong>{customerToDelete.phone || "-"}</p>
+              </div>
+            )}
+            <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+              <p className="text-sm font-semibold text-destructive mb-2">强制删除将会：</p>
+              <ul className="text-sm space-y-1 list-disc list-inside">
+                <li>删除该客户的所有销售发票</li>
+                <li>删除客户本身</li>
+              </ul>
+              <p className="text-sm text-destructive mt-2 font-semibold">
+                此操作不可恢复！
+              </p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setForceDeleteDialogOpen(false);
+                  setCustomerToDelete(null);
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (customerToDelete) {
+                    forceDeleteMutation.mutate(customerToDelete.id);
+                  }
+                }}
+              >
+                确认强制删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

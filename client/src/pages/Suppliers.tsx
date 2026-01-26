@@ -35,6 +35,8 @@ type SupplierFormData = {
 export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingSupplier, setEditingSupplier] = useState<number | null>(null);
+  const [forceDeleteDialogOpen, setForceDeleteDialogOpen] = useState(false);
+  const [supplierToDelete, setSupplierToDelete] = useState<any>(null);
 
   const { data: suppliers, isLoading, refetch } = trpc.suppliers.list.useQuery();
   
@@ -68,6 +70,22 @@ export default function Suppliers() {
     },
     onError: (error) => {
       toast.error(`删除失败: ${error.message}`);
+      // 如果删除失败，打开强制删除对话框
+      if (supplierToDelete) {
+        setForceDeleteDialogOpen(true);
+      }
+    },
+  });
+
+  const forceDeleteMutation = trpc.suppliers.forceDelete.useMutation({
+    onSuccess: () => {
+      toast.success("供应商已强制删除");
+      setForceDeleteDialogOpen(false);
+      setSupplierToDelete(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`强制删除失败: ${error.message}`);
     },
   });
 
@@ -102,9 +120,10 @@ export default function Suppliers() {
     setIsAddDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = (supplier: any) => {
     if (confirm("确定要删除这个供应商吗？")) {
-      deleteMutation.mutate(id);
+      setSupplierToDelete(supplier);
+      deleteMutation.mutate(supplier.id);
     }
   };
 
@@ -245,7 +264,7 @@ export default function Suppliers() {
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleDelete(supplier.id)}
+                            onClick={() => handleDelete(supplier)}
                             className="hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -262,6 +281,59 @@ export default function Suppliers() {
           )}
         </CardContent>
       </Card>
+
+      {/* 强制删除确认对话框 */}
+      <Dialog open={forceDeleteDialogOpen} onOpenChange={setForceDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-destructive">强制删除供应商</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              该供应商已有相关记录，无法直接删除。
+            </p>
+            {supplierToDelete && (
+              <div className="p-4 border rounded-lg space-y-2">
+                <p><strong>供应商名称：</strong>{supplierToDelete.name}</p>
+                <p><strong>联系人：</strong>{supplierToDelete.contactPerson || "-"}</p>
+                <p><strong>联系电话：</strong>{supplierToDelete.phone || "-"}</p>
+              </div>
+            )}
+            <div className="p-4 bg-destructive/10 border border-destructive rounded-lg">
+              <p className="text-sm font-semibold text-destructive mb-2">强制删除将会：</p>
+              <ul className="text-sm space-y-1 list-disc list-inside">
+                <li>删除该供应商的所有采购订单</li>
+                <li>删除该供应商的所有配件</li>
+                <li>删除供应商本身</li>
+              </ul>
+              <p className="text-sm text-destructive mt-2 font-semibold">
+                此操作不可恢复！
+              </p>
+            </div>
+            <div className="flex gap-2 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setForceDeleteDialogOpen(false);
+                  setSupplierToDelete(null);
+                }}
+              >
+                取消
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  if (supplierToDelete) {
+                    forceDeleteMutation.mutate(supplierToDelete.id);
+                  }
+                }}
+              >
+                确认强制删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

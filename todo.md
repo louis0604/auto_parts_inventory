@@ -82,3 +82,11 @@
 - [x] 检查Dashboard.tsx中的快速操作按钮路由
 - [x] 检查App.tsx中的路由配置
 - [x] 修复路由跳转问题
+
+## 供应商和客户强制删除功能
+- [x] 在db.ts中添加forceDeleteSupplier函数
+- [x] 在routers.ts中添加suppliers.forceDelete API
+- [x] 在Suppliers.tsx中添加强制删除对话框
+- [x] 在db.ts中添加forceDeleteCustomer函数
+- [x] 在routers.ts中添加customers.forceDelete API
+- [x] 在Customers.tsx中添加强制删除对话框

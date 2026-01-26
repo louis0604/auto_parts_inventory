@@ -2,6 +2,7 @@ import { COOKIE_NAME } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
@@ -75,6 +76,16 @@ export const appRouter = router({
         await db.deleteSupplier(input);
         return { success: true };
       }),
+    forceDelete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        // Only admin can force delete
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: '仅管理员可以强制删除' });
+        }
+        await db.forceDeleteSupplier(input);
+        return { success: true };
+      }),
   }),
 
   // Customers
@@ -117,6 +128,16 @@ export const appRouter = router({
       .input(z.number())
       .mutation(async ({ input }) => {
         await db.deleteCustomer(input);
+        return { success: true };
+      }),
+    forceDelete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input, ctx }) => {
+        // Only admin can force delete
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: '仅管理员可以强制删除' });
+        }
+        await db.forceDeleteCustomer(input);
         return { success: true };
       }),
   }),

@@ -275,28 +275,49 @@ export async function deletePart(id: number): Promise<void> {
 }
 
 /**
- * Force delete a part and all its related records (admin only)
- * This will delete:
- * - The part itself
- * - All inventory ledger entries
- * - All purchase order items (and their parent orders if empty)
- * - All sales invoice items (and their parent invoices if empty)
+ * Force delete a supplier and all its related records (admin only)
  */
-export async function forceDeletePart(id: number): Promise<void> {
+export async function forceDeleteSupplier(supplierId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  // 删除所有相关记录
+  await db.delete(purchaseOrders).where(eq(purchaseOrders.supplierId, supplierId));
+  await db.delete(parts).where(eq(parts.supplierId, supplierId));
+  
+  // 删除供应商
+  await db.delete(suppliers).where(eq(suppliers.id, supplierId));
+}
+
+export async function forceDeleteCustomer(customerId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("数据库连接失败");
+
+  // 删除所有相关记录
+  await db.delete(salesInvoices).where(eq(salesInvoices.customerId, customerId));
+  
+  // 删除客户
+  await db.delete(customers).where(eq(customers.id, customerId));
+}
+
+/**
+ * Force delete a part and all its related records (admin only)
+ */
+export async function forceDeletePart(partId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
   // Delete inventory ledger entries
-  await db.delete(inventoryLedger).where(eq(inventoryLedger.partId, id));
+  await db.delete(inventoryLedger).where(eq(inventoryLedger.partId, partId));
   
   // Delete purchase order items
-  await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.partId, id));
+  await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.partId, partId));
   
   // Delete sales invoice items
-  await db.delete(salesInvoiceItems).where(eq(salesInvoiceItems.partId, id));
+  await db.delete(salesInvoiceItems).where(eq(salesInvoiceItems.partId, partId));
   
-  // Finally delete the part
-  await db.delete(parts).where(eq(parts.id, id));
+  // Delete the part
+  await db.delete(parts).where(eq(parts.id, partId));
 }
 
 export async function getLowStockParts(): Promise<Part[]> {
