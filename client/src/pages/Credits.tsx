@@ -394,6 +394,9 @@ function CreditDetail({ creditId, onClose }: { creditId: number; onClose: () => 
     return (
       <Dialog open={true} onOpenChange={onClose}>
         <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>退货单详情</DialogTitle>
+          </DialogHeader>
           <div className="text-center py-8">加载中...</div>
         </DialogContent>
       </Dialog>

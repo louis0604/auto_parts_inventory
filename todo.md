@@ -227,3 +227,9 @@
 - [ ] 在退货单详情页显示原始销售单号
 - [ ] 在保修单详情页显示原始销售单号
 - [ ] 在前端添加删除退货单和保修单的按钮
+
+## 可访问性错误修复
+- [x] 修夏Credits.tsx中加载状态Dialog缺少DialogTitle的错误
+- [x] 修夏Warranties.tsx中加载状态Dialog缺少DialogTitle的错误
+- [x] 修夏SalesInvoices.tsx中打印预览Dialog缺少DialogTitle的错误
+- [x] 检查所有其他页面的Dialog组件，确保符合可访问性标准

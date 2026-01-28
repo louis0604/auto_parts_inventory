@@ -429,6 +429,9 @@ export default function SalesInvoices() {
       {viewingInvoice && viewInvoiceDetails && (
         <Dialog open={!!viewingInvoice} onOpenChange={() => setViewingInvoice(null)}>
           <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto print:max-w-full print:h-auto">
+            <DialogHeader className="print:hidden">
+              <DialogTitle>销售发票打印预览</DialogTitle>
+            </DialogHeader>
             <div className="print:p-8" id="invoice-print">
               {/* 公司信息头部 */}
               <div className="border-b-2 border-black pb-4 mb-4 flex justify-between items-start">
