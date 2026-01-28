@@ -30,7 +30,6 @@ import { Plus, Shield, Trash2, X, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
-import { WarrantyFormWithSalesHistory } from "@/components/WarrantyFormWithSalesHistory";
 
 type WarrantyFormData = {
   warrantyNumber: string;
@@ -246,13 +245,7 @@ export default function Warranties() {
         </CardContent>
       </Card>
 
-      {/* 创建保修单对话框 - 集成销售历史功能 */}
-      <WarrantyFormWithSalesHistory
-        open={isAddDialogOpen}
-        onClose={() => setIsAddDialogOpen(false)}
-        onSuccess={refetch}
-      />
-      {/* Old Dialog - Commented out
+      {/* 创建保修单对话框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
@@ -410,8 +403,7 @@ export default function Warranties() {
             </div>
           </form>
         </DialogContent>
-       </Dialog>
-      End of Old Dialog */}
+      </Dialog>
 
       {/* 保修单详情对话框 */}
       {detailWarrantyId && (
@@ -461,18 +453,9 @@ function WarrantyDetail({ warrantyId, onClose }: { warrantyId: number; onClose: 
               <Label className="text-muted-foreground">客户编号</Label>
               <div className="font-medium">{warranty.customerNumber || "-"}</div>
             </div>
-            <div className="col-span-2">
-              <Label className="text-muted-foreground">原始销售单号</Label>
-              {warranty.originalInvoiceNumber ? (
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant="outline" className="bg-green-50 border-green-500 text-green-700 font-mono text-base px-3 py-1">
-                    {warranty.originalInvoiceNumber}
-                  </Badge>
-                  <span className="text-xs text-muted-foreground">关联的销售记录</span>
-                </div>
-              ) : (
-                <div className="text-muted-foreground">未关联销售单</div>
-              )}
+            <div>
+              <Label className="text-muted-foreground">原始发票号</Label>
+              <div className="font-medium font-mono">{warranty.originalInvoiceNumber || "-"}</div>
             </div>
             <div>
               <Label className="text-muted-foreground">保修日期</Label>
