@@ -562,6 +562,15 @@ export const appRouter = router({
         await db.updateSalesInvoiceStatus(input, "cancelled");
         return { success: true };
       }),
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["pending", "completed", "cancelled"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateSalesInvoiceStatus(input.id, input.status);
+        return { success: true };
+      }),
     delete: protectedProcedure
       .input(z.number())
       .mutation(async ({ input }) => {

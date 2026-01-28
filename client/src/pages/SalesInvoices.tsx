@@ -77,6 +77,16 @@ export default function SalesInvoices() {
     },
   });
 
+  const updateStatusMutation = trpc.salesInvoices.updateStatus.useMutation({
+    onSuccess: () => {
+      toast.success("状态已更新");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`状态更新失败: ${error.message}`);
+    },
+  });
+
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<InvoiceFormData>({
     defaultValues: {
       invoiceNumber: `INV-${Date.now()}`,
@@ -199,9 +209,36 @@ export default function SalesInvoices() {
                       <TableCell>{customer?.name || "-"}</TableCell>
                        <TableCell className="font-semibold">${parseFloat(invoice.totalAmount).toFixed(2)}</TableCell>
                       <TableCell>
-                        <Badge variant={invoice.status === "completed" ? "default" : "secondary"}>
-                          {invoice.status === "completed" ? "已完成" : "已取消"}
-                        </Badge>
+                        <Select
+                          value={invoice.status}
+                          onValueChange={(value) => {
+                            updateStatusMutation.mutate({
+                              id: invoice.id,
+                              status: value as "pending" | "completed" | "cancelled",
+                            });
+                          }}
+                        >
+                          <SelectTrigger className="w-[120px]">
+                            <SelectValue>
+                              <Badge 
+                                variant={
+                                  invoice.status === "completed" ? "default" : 
+                                  invoice.status === "pending" ? "secondary" : 
+                                  "destructive"
+                                }
+                              >
+                                {invoice.status === "completed" ? "已完成" : 
+                                 invoice.status === "pending" ? "待处理" : 
+                                 "已取消"}
+                              </Badge>
+                            </SelectValue>
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="pending">待处理</SelectItem>
+                            <SelectItem value="completed">已完成</SelectItem>
+                            <SelectItem value="cancelled">已取消</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </TableCell>
                       <TableCell>{new Date(invoice.createdAt).toLocaleDateString()}</TableCell>
                       <TableCell className="text-right space-x-2">
