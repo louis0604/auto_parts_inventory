@@ -516,10 +516,52 @@ export async function getAllPurchaseOrders(): Promise<PurchaseOrder[]> {
 export async function getPurchaseOrderById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const [order] = await db.select().from(purchaseOrders).where(eq(purchaseOrders.id, id)).limit(1);
+  
+  // Get order with supplier and creator info
+  const [order] = await db
+    .select({
+      id: purchaseOrders.id,
+      orderNumber: purchaseOrders.orderNumber,
+      supplierId: purchaseOrders.supplierId,
+      supplierName: suppliers.name,
+      orderDate: purchaseOrders.orderDate,
+      orderTime: purchaseOrders.orderTime,
+      type: purchaseOrders.type,
+      totalAmount: purchaseOrders.totalAmount,
+      status: purchaseOrders.status,
+      notes: purchaseOrders.notes,
+      createdBy: purchaseOrders.createdBy,
+      createdByName: users.name,
+      createdAt: purchaseOrders.createdAt,
+      updatedAt: purchaseOrders.updatedAt,
+    })
+    .from(purchaseOrders)
+    .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+    .leftJoin(users, eq(purchaseOrders.createdBy, users.id))
+    .where(eq(purchaseOrders.id, id))
+    .limit(1);
+  
   if (!order) return undefined;
   
-  const items = await db.select().from(purchaseOrderItems).where(eq(purchaseOrderItems.purchaseOrderId, id));
+  // Get items with part details
+  const items = await db
+    .select({
+      id: purchaseOrderItems.id,
+      purchaseOrderId: purchaseOrderItems.purchaseOrderId,
+      partId: purchaseOrderItems.partId,
+      partSku: parts.sku,
+      partName: parts.name,
+      lineCode: lineCodes.code,
+      quantity: purchaseOrderItems.quantity,
+      unitPrice: purchaseOrderItems.unitPrice,
+      subtotal: purchaseOrderItems.subtotal,
+      createdAt: purchaseOrderItems.createdAt,
+    })
+    .from(purchaseOrderItems)
+    .leftJoin(parts, eq(purchaseOrderItems.partId, parts.id))
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(eq(purchaseOrderItems.purchaseOrderId, id));
+  
   return { ...order, items };
 }
 
@@ -564,10 +606,54 @@ export async function getAllSalesInvoices(): Promise<SalesInvoice[]> {
 export async function getSalesInvoiceById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
-  const [invoice] = await db.select().from(salesInvoices).where(eq(salesInvoices.id, id)).limit(1);
+  
+  // Get invoice with customer and creator info
+  const [invoice] = await db
+    .select({
+      id: salesInvoices.id,
+      invoiceNumber: salesInvoices.invoiceNumber,
+      customerId: salesInvoices.customerId,
+      customerName: customers.name,
+      customerNumber: salesInvoices.customerNumber,
+      invoiceDate: salesInvoices.invoiceDate,
+      invoiceTime: salesInvoices.invoiceTime,
+      type: salesInvoices.type,
+      totalAmount: salesInvoices.totalAmount,
+      status: salesInvoices.status,
+      notes: salesInvoices.notes,
+      createdBy: salesInvoices.createdBy,
+      createdByName: users.name,
+      createdAt: salesInvoices.createdAt,
+      updatedAt: salesInvoices.updatedAt,
+    })
+    .from(salesInvoices)
+    .leftJoin(customers, eq(salesInvoices.customerId, customers.id))
+    .leftJoin(users, eq(salesInvoices.createdBy, users.id))
+    .where(eq(salesInvoices.id, id))
+    .limit(1);
+  
   if (!invoice) return undefined;
   
-  const items = await db.select().from(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, id));
+  // Get items with part details
+  const items = await db
+    .select({
+      id: salesInvoiceItems.id,
+      salesInvoiceId: salesInvoiceItems.salesInvoiceId,
+      partId: salesInvoiceItems.partId,
+      partSku: parts.sku,
+      partName: parts.name,
+      partCost: parts.cost,
+      lineCode: lineCodes.code,
+      quantity: salesInvoiceItems.quantity,
+      unitPrice: salesInvoiceItems.unitPrice,
+      subtotal: salesInvoiceItems.subtotal,
+      createdAt: salesInvoiceItems.createdAt,
+    })
+    .from(salesInvoiceItems)
+    .leftJoin(parts, eq(salesInvoiceItems.partId, parts.id))
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(eq(salesInvoiceItems.salesInvoiceId, id));
+  
   return { ...invoice, items };
 }
 

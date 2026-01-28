@@ -134,6 +134,8 @@ export const purchaseOrders = mysqlTable("purchase_orders", {
   orderNumber: varchar("orderNumber", { length: 100 }).notNull().unique(),
   supplierId: int("supplierId").notNull().references(() => suppliers.id),
   orderDate: timestamp("orderDate").defaultNow().notNull(),
+  orderTime: varchar("orderTime", { length: 10 }), // Time in HH:MM:SS format
+  type: mysqlEnum("type", ["purchase", "return"]).default("purchase").notNull(), // Purchase or Return
   totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(),
   status: mysqlEnum("status", ["pending", "received", "cancelled"]).default("pending").notNull(),
   notes: text("notes"),
@@ -166,13 +168,16 @@ export type InsertPurchaseOrderItem = typeof purchaseOrderItems.$inferInsert;
  */
 export const salesInvoices = mysqlTable("sales_invoices", {
   id: int("id").autoincrement().primaryKey(),
-  invoiceNumber: varchar("invoiceNumber", { length: 100 }).notNull().unique(),
-  customerId: int("customerId").notNull().references(() => customers.id),
-  invoiceDate: timestamp("invoiceDate").defaultNow().notNull(),
-  totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(),
+  invoiceNumber: varchar("invoiceNumber", { length: 100 }).notNull().unique(), // Doc #
+  customerId: int("customerId").notNull().references(() => customers.id), // Cust #
+  customerNumber: varchar("customerNumber", { length: 50 }), // Customer's own reference number
+  invoiceDate: timestamp("invoiceDate").defaultNow().notNull(), // Date
+  invoiceTime: varchar("invoiceTime", { length: 10 }), // Time in HH:MM:SS format
+  type: mysqlEnum("type", ["invoice", "return", "credit"]).default("invoice").notNull(), // Type: Invoice/Return/Credit
+  totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(), // Total
   status: mysqlEnum("status", ["pending", "completed", "cancelled"]).default("pending").notNull(),
   notes: text("notes"),
-  createdBy: int("createdBy").notNull().references(() => users.id),
+  createdBy: int("createdBy").notNull().references(() => users.id), // Counterman
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

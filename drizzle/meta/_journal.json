@@ -43,6 +43,13 @@
       "when": 1769455642063,
       "tag": "0005_fine_captain_universe",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1769618689686,
+      "tag": "0006_real_dark_beast",
+      "breakpoints": true
     }
   ]
 }

@@ -30,6 +30,7 @@ import { Plus, FileText, Trash2, X, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
+import { SalesInvoiceDetail } from "@/components/SalesInvoiceDetail";
 
 type InvoiceFormData = {
   invoiceNumber: string;
@@ -48,6 +49,7 @@ type InvoiceFormData = {
 export default function SalesInvoices() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
+  const [detailInvoiceId, setDetailInvoiceId] = useState<number | null>(null);
 
   const { data: invoices, isLoading, refetch } = trpc.salesInvoices.list.useQuery();
   const { data: customers } = trpc.customers.list.useQuery();
@@ -186,7 +188,14 @@ export default function SalesInvoices() {
                   const customer = customers?.find(c => c.id === invoice.customerId);
                   return (
                     <TableRow key={invoice.id}>
-                      <TableCell className="font-mono">{invoice.invoiceNumber}</TableCell>
+                      <TableCell className="font-mono">
+                        <button
+                          onClick={() => setDetailInvoiceId(invoice.id)}
+                          className="text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {invoice.invoiceNumber}
+                        </button>
+                      </TableCell>
                       <TableCell>{customer?.name || "-"}</TableCell>
                        <TableCell className="font-semibold">${parseFloat(invoice.totalAmount).toFixed(2)}</TableCell>
                       <TableCell>
@@ -569,6 +578,13 @@ export default function SalesInvoices() {
           }
         }
       `}</style>
+
+      {/* Invoice Detail Dialog */}
+      <SalesInvoiceDetail
+        invoiceId={detailInvoiceId}
+        open={detailInvoiceId !== null}
+        onClose={() => setDetailInvoiceId(null)}
+      />
     </div>
   );
 }

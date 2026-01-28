@@ -31,6 +31,7 @@ import { Plus, ShoppingCart, Trash2, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
+import { PurchaseOrderDetail } from "@/components/PurchaseOrderDetail";
 
 type OrderFormData = {
   orderNumber: string;
@@ -45,6 +46,7 @@ type OrderFormData = {
 
 export default function PurchaseOrders() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
 
   const { data: orders, isLoading, refetch } = trpc.purchaseOrders.list.useQuery();
   const { data: suppliers } = trpc.suppliers.list.useQuery();
@@ -318,7 +320,14 @@ export default function PurchaseOrders() {
                     const supplier = suppliers?.find(s => s.id === order.supplierId);
                     return (
                       <TableRow key={order.id} className="hover:bg-card/30">
-                        <TableCell className="font-mono text-sm">{order.orderNumber}</TableCell>
+                        <TableCell className="font-mono text-sm">
+                          <button
+                            onClick={() => setDetailOrderId(order.id)}
+                            className="text-blue-400 hover:underline cursor-pointer"
+                          >
+                            {order.orderNumber}
+                          </button>
+                        </TableCell>
                         <TableCell>{supplier?.name || "-"}</TableCell>
                         <TableCell>{new Date(order.orderDate).toLocaleDateString()}</TableCell>
                         <TableCell className="font-mono">¥{parseFloat(order.totalAmount).toFixed(2)}</TableCell>
@@ -358,6 +367,13 @@ export default function PurchaseOrders() {
           )}
         </CardContent>
       </Card>
+
+      {/* Order Detail Dialog */}
+      <PurchaseOrderDetail
+        orderId={detailOrderId}
+        open={detailOrderId !== null}
+        onClose={() => setDetailOrderId(null)}
+      />
     </div>
   );
 }

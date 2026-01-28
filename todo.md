@@ -168,3 +168,16 @@
 - [x] 检查updateMutation传递的数据字段
 - [x] 修复onSubmit中编辑模式的数据传递，传递cleanData而不是部分字段
 - [x] 更新parts.update接口的输入验证规则，添加所有新字段
+
+## 订单详情查看和退货系统
+- [x] 分析Excel数据结构，确定需要添加的字段（Date、Time、Type、Cust#等）
+- [x] 更新salesInvoices表添加新字段（invoiceTime、type、customerNumber等）
+- [x] 更新purchaseOrders表添加type字段支持退货
+- [x] 创建销售发票详情查看组件，显示订单中的所有配件明细
+- [x] 在销售发票列表中添加点击查看详情功能
+- [x] 更新getSalesInvoiceById后端接口，JOIN配件、客户和用户表
+- [x] 在采购订单列表中添加点击查看详情功能
+- [x] 创建采购订单详情查看组件
+- [x] 更新getPurchaseOrderById后端接口，JOIN配件、供应商和用户表
+- [x] 为订单类型添加"Return"（退货）选项（schema已支持）
+- [ ] 更新订单创建表单支持选择订单类型（待用户测试后完善）
