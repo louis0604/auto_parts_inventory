@@ -207,7 +207,7 @@ export type InsertSalesInvoiceItem = typeof salesInvoiceItems.$inferInsert;
 export const inventoryLedger = mysqlTable("inventory_ledger", {
   id: int("id").autoincrement().primaryKey(),
   partId: int("partId").notNull().references(() => parts.id),
-  transactionType: mysqlEnum("transactionType", ["in", "out", "adjustment"]).notNull(),
+  transactionType: mysqlEnum("transactionType", ["purchase", "sale", "credit", "warranty", "adjustment"]).notNull(),
   quantity: int("quantity").notNull(),
   balanceAfter: int("balanceAfter").notNull(),
   referenceType: varchar("referenceType", { length: 50 }),
@@ -235,3 +235,83 @@ export const lowStockAlerts = mysqlTable("low_stock_alerts", {
 
 export type LowStockAlert = typeof lowStockAlerts.$inferSelect;
 export type InsertLowStockAlert = typeof lowStockAlerts.$inferInsert;
+
+/**
+ * Credits table - customer returns
+ */
+export const credits = mysqlTable("credits", {
+  id: int("id").autoincrement().primaryKey(),
+  creditNumber: varchar("creditNumber", { length: 100 }).notNull().unique(),
+  customerId: int("customerId").notNull().references(() => customers.id),
+  customerNumber: varchar("customerNumber", { length: 50 }),
+  creditDate: timestamp("creditDate").defaultNow().notNull(),
+  creditTime: varchar("creditTime", { length: 10 }),
+  originalInvoiceId: int("originalInvoiceId").references(() => salesInvoices.id),
+  originalInvoiceNumber: varchar("originalInvoiceNumber", { length: 100 }),
+  totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["pending", "completed", "cancelled"]).default("pending").notNull(),
+  reason: text("reason"),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull().references(() => users.id),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Credit = typeof credits.$inferSelect;
+export type InsertCredit = typeof credits.$inferInsert;
+
+/**
+ * Credit items table
+ */
+export const creditItems = mysqlTable("credit_items", {
+  id: int("id").autoincrement().primaryKey(),
+  creditId: int("creditId").notNull().references(() => credits.id, { onDelete: "cascade" }),
+  partId: int("partId").notNull().references(() => parts.id),
+  quantity: int("quantity").notNull(),
+  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(),
+  subtotal: decimal("subtotal", { precision: 15, scale: 2 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type CreditItem = typeof creditItems.$inferSelect;
+export type InsertCreditItem = typeof creditItems.$inferInsert;
+
+/**
+ * Warranties table - warranty claims and replacements
+ */
+export const warranties = mysqlTable("warranties", {
+  id: int("id").autoincrement().primaryKey(),
+  warrantyNumber: varchar("warrantyNumber", { length: 100 }).notNull().unique(),
+  customerId: int("customerId").notNull().references(() => customers.id),
+  customerNumber: varchar("customerNumber", { length: 50 }),
+  warrantyDate: timestamp("warrantyDate").defaultNow().notNull(),
+  warrantyTime: varchar("warrantyTime", { length: 10 }),
+  originalInvoiceId: int("originalInvoiceId").references(() => salesInvoices.id),
+  originalInvoiceNumber: varchar("originalInvoiceNumber", { length: 100 }),
+  totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(),
+  status: mysqlEnum("status", ["pending", "approved", "rejected", "completed"]).default("pending").notNull(),
+  claimReason: text("claimReason"),
+  notes: text("notes"),
+  createdBy: int("createdBy").notNull().references(() => users.id),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Warranty = typeof warranties.$inferSelect;
+export type InsertWarranty = typeof warranties.$inferInsert;
+
+/**
+ * Warranty items table
+ */
+export const warrantyItems = mysqlTable("warranty_items", {
+  id: int("id").autoincrement().primaryKey(),
+  warrantyId: int("warrantyId").notNull().references(() => warranties.id, { onDelete: "cascade" }),
+  partId: int("partId").notNull().references(() => parts.id),
+  quantity: int("quantity").notNull(),
+  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(),
+  subtotal: decimal("subtotal", { precision: 15, scale: 2 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WarrantyItem = typeof warrantyItems.$inferSelect;
+export type InsertWarrantyItem = typeof warrantyItems.$inferInsert;

@@ -14,6 +14,10 @@ import {
   salesInvoiceItems,
   inventoryLedger,
   lowStockAlerts,
+  credits,
+  creditItems,
+  warranties,
+  warrantyItems,
   type Part,
   type Supplier,
   type Customer,
@@ -24,6 +28,8 @@ import {
   type SalesInvoice,
   type InventoryLedgerEntry,
   type LowStockAlert,
+  type Credit,
+  type Warranty,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -462,7 +468,7 @@ export async function getLowStockParts(): Promise<Part[]> {
 // ===== Inventory Ledger =====
 export async function createInventoryLedgerEntry(data: {
   partId: number;
-  transactionType: "in" | "out" | "adjustment";
+  transactionType: "purchase" | "sale" | "credit" | "warranty" | "adjustment";
   quantity: number;
   balanceAfter: number;
   referenceType?: string;
@@ -706,4 +712,226 @@ export async function getDashboardStats() {
     totalCustomers: totalCustomersResult?.count || 0,
     lowStockCount: lowStockCountResult?.count || 0,
   };
+}
+
+// ===== Credits (Customer Returns) =====
+export async function getAllCredits() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const results = await db
+    .select({
+      id: credits.id,
+      creditNumber: credits.creditNumber,
+      customerId: credits.customerId,
+      customerName: customers.name,
+      customerNumber: credits.customerNumber,
+      creditDate: credits.creditDate,
+      creditTime: credits.creditTime,
+      originalInvoiceNumber: credits.originalInvoiceNumber,
+      totalAmount: credits.totalAmount,
+      status: credits.status,
+      reason: credits.reason,
+      notes: credits.notes,
+      createdBy: credits.createdBy,
+      createdByName: users.name,
+      createdAt: credits.createdAt,
+    })
+    .from(credits)
+    .leftJoin(customers, eq(credits.customerId, customers.id))
+    .leftJoin(users, eq(credits.createdBy, users.id))
+    .orderBy(desc(credits.createdAt));
+  
+  return results;
+}
+
+export async function getCreditById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [credit] = await db
+    .select({
+      id: credits.id,
+      creditNumber: credits.creditNumber,
+      customerId: credits.customerId,
+      customerName: customers.name,
+      customerNumber: credits.customerNumber,
+      creditDate: credits.creditDate,
+      creditTime: credits.creditTime,
+      originalInvoiceNumber: credits.originalInvoiceNumber,
+      totalAmount: credits.totalAmount,
+      status: credits.status,
+      reason: credits.reason,
+      notes: credits.notes,
+      createdBy: credits.createdBy,
+      createdByName: users.name,
+      createdAt: credits.createdAt,
+    })
+    .from(credits)
+    .leftJoin(customers, eq(credits.customerId, customers.id))
+    .leftJoin(users, eq(credits.createdBy, users.id))
+    .where(eq(credits.id, id));
+  
+  if (!credit) return null;
+  
+  const items = await db
+    .select({
+      id: creditItems.id,
+      partId: creditItems.partId,
+      partName: parts.name,
+      partSku: parts.sku,
+      quantity: creditItems.quantity,
+      unitPrice: creditItems.unitPrice,
+      subtotal: creditItems.subtotal,
+    })
+    .from(creditItems)
+    .leftJoin(parts, eq(creditItems.partId, parts.id))
+    .where(eq(creditItems.creditId, id));
+  
+  return { ...credit, items };
+}
+
+export async function createCredit(data: {
+  creditNumber: string;
+  customerId: number;
+  customerNumber?: string;
+  originalInvoiceNumber?: string;
+  totalAmount: string;
+  reason?: string;
+  notes?: string;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(credits).values(data);
+  return (await db.select().from(credits).where(eq(credits.id, Number(result.insertId))))[0]!;
+}
+
+export async function createCreditItem(data: {
+  creditId: number;
+  partId: number;
+  quantity: number;
+  unitPrice: string;
+  subtotal: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(creditItems).values(data);
+}
+
+export async function updateCreditStatus(id: number, status: "pending" | "completed" | "cancelled"): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(credits).set({ status }).where(eq(credits.id, id));
+}
+
+// ===== Warranties =====
+export async function getAllWarranties() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const results = await db
+    .select({
+      id: warranties.id,
+      warrantyNumber: warranties.warrantyNumber,
+      customerId: warranties.customerId,
+      customerName: customers.name,
+      customerNumber: warranties.customerNumber,
+      warrantyDate: warranties.warrantyDate,
+      warrantyTime: warranties.warrantyTime,
+      originalInvoiceNumber: warranties.originalInvoiceNumber,
+      totalAmount: warranties.totalAmount,
+      status: warranties.status,
+      claimReason: warranties.claimReason,
+      notes: warranties.notes,
+      createdBy: warranties.createdBy,
+      createdByName: users.name,
+      createdAt: warranties.createdAt,
+    })
+    .from(warranties)
+    .leftJoin(customers, eq(warranties.customerId, customers.id))
+    .leftJoin(users, eq(warranties.createdBy, users.id))
+    .orderBy(desc(warranties.createdAt));
+  
+  return results;
+}
+
+export async function getWarrantyById(id: number) {
+  const db = await getDb();
+  if (!db) return null;
+  
+  const [warranty] = await db
+    .select({
+      id: warranties.id,
+      warrantyNumber: warranties.warrantyNumber,
+      customerId: warranties.customerId,
+      customerName: customers.name,
+      customerNumber: warranties.customerNumber,
+      warrantyDate: warranties.warrantyDate,
+      warrantyTime: warranties.warrantyTime,
+      originalInvoiceNumber: warranties.originalInvoiceNumber,
+      totalAmount: warranties.totalAmount,
+      status: warranties.status,
+      claimReason: warranties.claimReason,
+      notes: warranties.notes,
+      createdBy: warranties.createdBy,
+      createdByName: users.name,
+      createdAt: warranties.createdAt,
+    })
+    .from(warranties)
+    .leftJoin(customers, eq(warranties.customerId, customers.id))
+    .leftJoin(users, eq(warranties.createdBy, users.id))
+    .where(eq(warranties.id, id));
+  
+  if (!warranty) return null;
+  
+  const items = await db
+    .select({
+      id: warrantyItems.id,
+      partId: warrantyItems.partId,
+      partName: parts.name,
+      partSku: parts.sku,
+      quantity: warrantyItems.quantity,
+      unitPrice: warrantyItems.unitPrice,
+      subtotal: warrantyItems.subtotal,
+    })
+    .from(warrantyItems)
+    .leftJoin(parts, eq(warrantyItems.partId, parts.id))
+    .where(eq(warrantyItems.warrantyId, id));
+  
+  return { ...warranty, items };
+}
+
+export async function createWarranty(data: {
+  warrantyNumber: string;
+  customerId: number;
+  customerNumber?: string;
+  originalInvoiceNumber?: string;
+  totalAmount: string;
+  claimReason?: string;
+  notes?: string;
+  createdBy: number;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(warranties).values(data);
+  return (await db.select().from(warranties).where(eq(warranties.id, Number(result.insertId))))[0]!;
+}
+
+export async function createWarrantyItem(data: {
+  warrantyId: number;
+  partId: number;
+  quantity: number;
+  unitPrice: string;
+  subtotal: string;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.insert(warrantyItems).values(data);
+}
+
+export async function updateWarrantyStatus(id: number, status: "pending" | "approved" | "rejected" | "completed"): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(warranties).set({ status }).where(eq(warranties.id, id));
 }

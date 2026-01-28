@@ -1,0 +1,1 @@
+ALTER TABLE `inventory_ledger` MODIFY COLUMN `transactionType` enum('purchase','sale','credit','warranty','adjustment') NOT NULL;

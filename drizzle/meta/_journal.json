@@ -50,6 +50,27 @@
       "when": 1769618689686,
       "tag": "0006_real_dark_beast",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1769622068303,
+      "tag": "0007_unknown_puppet_master",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "5",
+      "when": 1769622109312,
+      "tag": "0008_cuddly_susan_delgado",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1769622325521,
+      "tag": "0009_sticky_shard",
+      "breakpoints": true
     }
   ]
 }

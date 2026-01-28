@@ -247,7 +247,7 @@ export const appRouter = router({
         if (input.stockQuantity > 0) {
           await db.createInventoryLedgerEntry({
             partId: part.id,
-            transactionType: "in",
+            transactionType: "purchase",
             quantity: input.stockQuantity,
             balanceAfter: input.stockQuantity,
             referenceType: "initial",
@@ -442,7 +442,7 @@ export const appRouter = router({
           
           await db.createInventoryLedgerEntry({
             partId: item.partId,
-            transactionType: "in",
+            transactionType: "purchase",
             quantity: item.quantity,
             balanceAfter: newStock,
             referenceType: "purchase_order",
@@ -524,7 +524,7 @@ export const appRouter = router({
             
             await db.createInventoryLedgerEntry({
               partId: item.partId,
-              transactionType: "out",
+              transactionType: "sale",
               quantity: -item.quantity,
               balanceAfter: newStock,
               referenceType: "sales_invoice",
@@ -657,6 +657,187 @@ ${JSON.stringify(partsData, null, 2)}
         };
       }
     }),
+  }),
+
+  // Credits (Customer Returns)
+  credits: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllCredits();
+    }),
+    getById: protectedProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        return await db.getCreditById(input);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        creditNumber: z.string().min(1),
+        customerId: z.number(),
+        customerNumber: z.string().optional(),
+        originalInvoiceNumber: z.string().optional(),
+        items: z.array(z.object({
+          partId: z.number(),
+          quantity: z.number().min(1),
+          unitPrice: z.string(),
+        })),
+        reason: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const totalAmount = input.items.reduce((sum, item) => {
+          return sum + parseFloat(item.unitPrice) * item.quantity;
+        }, 0).toFixed(2);
+        
+        const credit = await db.createCredit({
+          creditNumber: input.creditNumber,
+          customerId: input.customerId,
+          customerNumber: input.customerNumber,
+          originalInvoiceNumber: input.originalInvoiceNumber,
+          totalAmount,
+          reason: input.reason,
+          notes: input.notes,
+          createdBy: ctx.user.id,
+        });
+        
+        for (const item of input.items) {
+          const subtotal = (parseFloat(item.unitPrice) * item.quantity).toFixed(2);
+          await db.createCreditItem({
+            creditId: credit.id,
+            partId: item.partId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            subtotal,
+          });
+          
+          // Update stock (return to inventory)
+          const part = await db.getPartById(item.partId);
+          if (part) {
+            const newStock = part.stockQuantity + item.quantity;
+            await db.updatePart(item.partId, { stockQuantity: newStock });
+            
+            await db.createInventoryLedgerEntry({
+              partId: item.partId,
+              transactionType: "credit",
+              quantity: item.quantity,
+              balanceAfter: newStock,
+              referenceType: "credit",
+              referenceId: credit.id,
+              notes: `退货单 ${credit.creditNumber} 入库`,
+              operatedBy: ctx.user.id,
+            });
+          }
+        }
+        
+        await db.updateCreditStatus(credit.id, "completed");
+        return credit;
+      }),
+    cancel: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.updateCreditStatus(input, "cancelled");
+        return { success: true };
+      }),
+  }),
+
+  // Warranties
+  warranties: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllWarranties();
+    }),
+    getById: protectedProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        return await db.getWarrantyById(input);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        warrantyNumber: z.string().min(1),
+        customerId: z.number(),
+        customerNumber: z.string().optional(),
+        originalInvoiceNumber: z.string().optional(),
+        items: z.array(z.object({
+          partId: z.number(),
+          quantity: z.number().min(1),
+          unitPrice: z.string(),
+        })),
+        claimReason: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Validate stock availability for warranty replacements
+        for (const item of input.items) {
+          const part = await db.getPartById(item.partId);
+          if (!part) throw new Error(`配件 ID ${item.partId} 不存在`);
+          if (part.stockQuantity < item.quantity) {
+            throw new Error(`配件 ${part.name} 库存不足，无法提供保修替换`);
+          }
+        }
+        
+        const totalAmount = input.items.reduce((sum, item) => {
+          return sum + parseFloat(item.unitPrice) * item.quantity;
+        }, 0).toFixed(2);
+        
+        const warranty = await db.createWarranty({
+          warrantyNumber: input.warrantyNumber,
+          customerId: input.customerId,
+          customerNumber: input.customerNumber,
+          originalInvoiceNumber: input.originalInvoiceNumber,
+          totalAmount,
+          claimReason: input.claimReason,
+          notes: input.notes,
+          createdBy: ctx.user.id,
+        });
+        
+        for (const item of input.items) {
+          const subtotal = (parseFloat(item.unitPrice) * item.quantity).toFixed(2);
+          await db.createWarrantyItem({
+            warrantyId: warranty.id,
+            partId: item.partId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            subtotal,
+          });
+          
+          // Update stock (warranty replacement reduces inventory)
+          const part = await db.getPartById(item.partId);
+          if (part) {
+            const newStock = part.stockQuantity - item.quantity;
+            await db.updatePart(item.partId, { stockQuantity: newStock });
+            
+            await db.createInventoryLedgerEntry({
+              partId: item.partId,
+              transactionType: "warranty",
+              quantity: -item.quantity,
+              balanceAfter: newStock,
+              referenceType: "warranty",
+              referenceId: warranty.id,
+              notes: `保修单 ${warranty.warrantyNumber} 出库`,
+              operatedBy: ctx.user.id,
+            });
+            
+            // Check for low stock
+            if (newStock < part.minStockThreshold) {
+              await db.createLowStockAlert({
+                partId: item.partId,
+                currentStock: newStock,
+                minThreshold: part.minStockThreshold,
+              });
+            }
+          }
+        }
+        
+        await db.updateWarrantyStatus(warranty.id, "completed");
+        return warranty;
+      }),
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["pending", "approved", "rejected", "completed"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateWarrantyStatus(input.id, input.status);
+        return { success: true };
+      }),
   }),
 
   // Storage (Image Upload)

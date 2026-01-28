@@ -181,3 +181,16 @@
 - [x] 更新getPurchaseOrderById后端接口，JOIN配件、供应商和用户表
 - [x] 为订单类型添加"Return"（退货）选项（schema已支持）
 - [ ] 更新订单创建表单支持选择订单类型（待用户测试后完善）
+
+## 库存交易类型和Credit/Warranty功能
+- [x] 更新inventoryLedger表的transactionType字段，支持purchase、sale、credit、warranty、adjustment等类型
+- [x] 迁移现有数据，将"in"改为"purchase"，"out"改为"sale"
+- [x] 更新后端代码使用新的类型值
+- [x] 优化库存记录显示，添加交易类型图标（↑↓）和类型标签
+- [x] 创建Credits表存储退货记录（credits和creditItems）
+- [x] 创建Warranties表存储保修记录（warranties和warrantyItems）
+- [x] 后端API：credits和warranties的CRUD接口（list/getById/create/cancel/updateStatus）
+- [x] 后端逻辑：Credit创建后库存增加，Warranty创建后库存减少
+- [ ] 创建Credit管理页面（退货单列表、创建、详情）
+- [ ] 创建Warranty管理页面（保修单列表、创建、详情）
+- [ ] 在侧边栏导航中添加Credit和Warranty入口

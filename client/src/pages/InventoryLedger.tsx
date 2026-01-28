@@ -31,12 +31,14 @@ export default function InventoryLedger() {
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case "in":
-        return <ArrowUp className="h-4 w-4 text-accent" />;
-      case "out":
-        return <ArrowDown className="h-4 w-4 text-destructive" />;
+      case "purchase":
+      case "credit":
+        return <ArrowUp className="h-4 w-4 text-green-600" />;
+      case "sale":
+      case "warranty":
+        return <ArrowDown className="h-4 w-4 text-red-600" />;
       case "adjustment":
-        return <RefreshCw className="h-4 w-4 text-primary" />;
+        return <RefreshCw className="h-4 w-4 text-blue-600" />;
       default:
         return null;
     }
@@ -44,12 +46,16 @@ export default function InventoryLedger() {
 
   const getTransactionBadge = (type: string) => {
     switch (type) {
-      case "in":
-        return <Badge variant="default" className="bg-accent">入库</Badge>;
-      case "out":
-        return <Badge variant="destructive">出库</Badge>;
+      case "purchase":
+        return <Badge variant="default" className="bg-green-600">入库</Badge>;
+      case "sale":
+        return <Badge variant="destructive">销售</Badge>;
+      case "credit":
+        return <Badge variant="default" className="bg-blue-600">退货</Badge>;
+      case "warranty":
+        return <Badge variant="outline" className="border-orange-600 text-orange-600">保修</Badge>;
       case "adjustment":
-        return <Badge variant="outline" className="neon-border-pink">调整</Badge>;
+        return <Badge variant="outline">调整</Badge>;
       default:
         return <Badge>{type}</Badge>;
     }
