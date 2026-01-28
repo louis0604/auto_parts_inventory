@@ -737,6 +737,26 @@ ${JSON.stringify(partsData, null, 2)}
         await db.updateCreditStatus(input, "cancelled");
         return { success: true };
       }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deleteCredit(input);
+        return { success: true };
+      }),
+    updateStatus: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        status: z.enum(["pending", "completed", "cancelled"]),
+      }))
+      .mutation(async ({ input }) => {
+        await db.updateCreditStatus(input.id, input.status);
+        return { success: true };
+      }),
+    getSalesHistory: protectedProcedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        return await db.getSalesHistoryByPartSku(input);
+      }),
   }),
 
   // Warranties
@@ -837,6 +857,17 @@ ${JSON.stringify(partsData, null, 2)}
       .mutation(async ({ input }) => {
         await db.updateWarrantyStatus(input.id, input.status);
         return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deleteWarranty(input);
+        return { success: true };
+      }),
+    getSalesHistory: protectedProcedure
+      .input(z.string())
+      .query(async ({ input }) => {
+        return await db.getSalesHistoryByPartSku(input);
       }),
   }),
 

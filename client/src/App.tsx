@@ -15,6 +15,7 @@ import InventoryLedger from "./pages/InventoryLedger";
 import AIRestocking from "./pages/AIRestocking";
 import Credits from "./pages/Credits";
 import Warranties from "./pages/Warranties";
+import SalesHistoryDemo from "./pages/SalesHistoryDemo";
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
         <Route path={"/inventory-ledger"} component={InventoryLedger} />
         <Route path={"/credits"} component={Credits} />
         <Route path={"/warranties"} component={Warranties} />
+        <Route path={"/sales-history-demo"} component={SalesHistoryDemo} />
         <Route path={"/ai-restocking"} component={AIRestocking} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />

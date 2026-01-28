@@ -18,6 +18,7 @@ import {
   creditItems,
   warranties,
   warrantyItems,
+  auditLogs,
   type Part,
   type Supplier,
   type Customer,
@@ -30,6 +31,8 @@ import {
   type LowStockAlert,
   type Credit,
   type Warranty,
+  type AuditLog,
+  type InsertAuditLog,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -969,4 +972,150 @@ export async function updateWarrantyStatus(id: number, status: "pending" | "appr
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(warranties).set({ status }).where(eq(warranties.id, id));
+}
+
+
+// ===== Audit Logs =====
+export async function createAuditLog(data: {
+  userId: number;
+  userName?: string;
+  action: "create" | "update" | "delete";
+  entityType: string;
+  entityId: number;
+  entityName?: string;
+  changes?: Record<string, any>;
+  ipAddress?: string;
+  userAgent?: string;
+}): Promise<AuditLog> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const [log] = await db.insert(auditLogs).values({
+    userId: data.userId,
+    userName: data.userName,
+    action: data.action,
+    entityType: data.entityType,
+    entityId: data.entityId,
+    entityName: data.entityName,
+    changes: data.changes ? JSON.stringify(data.changes) : null,
+    ipAddress: data.ipAddress,
+    userAgent: data.userAgent,
+  }).$returningId();
+
+  const created = await db.select().from(auditLogs).where(eq(auditLogs.id, log.id)).limit(1);
+  return created[0];
+}
+
+export async function getAllAuditLogs(filters?: {
+  userId?: number;
+  action?: "create" | "update" | "delete";
+  entityType?: string;
+  startDate?: Date;
+  endDate?: Date;
+  limit?: number;
+}): Promise<AuditLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  let query = db.select().from(auditLogs);
+
+  const conditions = [];
+  if (filters?.userId) {
+    conditions.push(eq(auditLogs.userId, filters.userId));
+  }
+  if (filters?.action) {
+    conditions.push(eq(auditLogs.action, filters.action));
+  }
+  if (filters?.entityType) {
+    conditions.push(eq(auditLogs.entityType, filters.entityType));
+  }
+  if (filters?.startDate) {
+    conditions.push(sql`${auditLogs.createdAt} >= ${filters.startDate}`);
+  }
+  if (filters?.endDate) {
+    conditions.push(sql`${auditLogs.createdAt} <= ${filters.endDate}`);
+  }
+
+  if (conditions.length > 0) {
+    query = query.where(and(...conditions)) as any;
+  }
+
+  query = query.orderBy(desc(auditLogs.createdAt)) as any;
+
+  if (filters?.limit) {
+    query = query.limit(filters.limit) as any;
+  }
+
+  return await query;
+}
+
+export async function getAuditLogsByEntity(entityType: string, entityId: number): Promise<AuditLog[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db.select().from(auditLogs)
+    .where(and(
+      eq(auditLogs.entityType, entityType),
+      eq(auditLogs.entityId, entityId)
+    ))
+    .orderBy(desc(auditLogs.createdAt));
+}
+
+
+export async function deleteCredit(creditId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Delete credit items first
+  await db.delete(creditItems).where(eq(creditItems.creditId, creditId));
+  
+  // Delete the credit
+  await db.delete(credits).where(eq(credits.id, creditId));
+}
+
+export async function deleteWarranty(warrantyId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Delete warranty items first
+  await db.delete(warrantyItems).where(eq(warrantyItems.warrantyId, warrantyId));
+  
+  // Delete the warranty
+  await db.delete(warranties).where(eq(warranties.id, warrantyId));
+}
+
+export async function getSalesHistoryByPartSku(sku: string): Promise<Array<{
+  invoiceId: number;
+  invoiceNumber: string;
+  invoiceDate: Date;
+  quantity: number;
+  unitPrice: string;
+  customerName: string;
+}>> {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Find the part by SKU
+  const part = await db.select().from(parts).where(eq(parts.sku, sku)).limit(1);
+  if (!part || part.length === 0) return [];
+
+  const partId = part[0].id;
+
+  // Get sales history for this part
+  const history = await db
+    .select({
+      invoiceId: salesInvoices.id,
+      invoiceNumber: salesInvoices.invoiceNumber,
+      invoiceDate: salesInvoices.invoiceDate,
+      quantity: salesInvoiceItems.quantity,
+      unitPrice: salesInvoiceItems.unitPrice,
+      customerName: customers.name,
+    })
+    .from(salesInvoiceItems)
+    .innerJoin(salesInvoices, eq(salesInvoiceItems.salesInvoiceId, salesInvoices.id))
+    .innerJoin(customers, eq(salesInvoices.customerId, customers.id))
+    .where(eq(salesInvoiceItems.partId, partId))
+    .orderBy(desc(salesInvoices.invoiceDate));
+
+  return history;
 }

@@ -71,6 +71,13 @@
       "when": 1769622325521,
       "tag": "0009_sticky_shard",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1769630264899,
+      "tag": "0010_majestic_baron_strucker",
+      "breakpoints": true
     }
   ]
 }

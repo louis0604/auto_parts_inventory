@@ -315,3 +315,23 @@ export const warrantyItems = mysqlTable("warranty_items", {
 
 export type WarrantyItem = typeof warrantyItems.$inferSelect;
 export type InsertWarrantyItem = typeof warrantyItems.$inferInsert;
+
+/**
+ * Audit logs table - tracks all system operations
+ */
+export const auditLogs = mysqlTable("audit_logs", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull().references(() => users.id),
+  userName: varchar("userName", { length: 200 }),
+  action: mysqlEnum("action", ["create", "update", "delete"]).notNull(),
+  entityType: varchar("entityType", { length: 50 }).notNull(), // parts, customers, suppliers, etc.
+  entityId: int("entityId").notNull(),
+  entityName: varchar("entityName", { length: 200 }), // Name or identifier of the entity
+  changes: text("changes"), // JSON string of changes (for update operations)
+  ipAddress: varchar("ipAddress", { length: 50 }),
+  userAgent: text("userAgent"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = typeof auditLogs.$inferInsert;
