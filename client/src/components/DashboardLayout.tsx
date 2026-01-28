@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles, RotateCcw, Shield } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -34,6 +34,8 @@ const menuItems = [
   { icon: Users, label: "客户", path: "/customers" },
   { icon: ShoppingCart, label: "采购订单", path: "/purchase-orders" },
   { icon: FileText, label: "销售发票", path: "/sales-invoices" },
+  { icon: RotateCcw, label: "退货管理", path: "/credits" },
+  { icon: Shield, label: "保修管理", path: "/warranties" },
   { icon: BarChart3, label: "库存记录", path: "/inventory-ledger" },
   { icon: Sparkles, label: "AI补货建议", path: "/ai-restocking" },
 ];

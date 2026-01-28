@@ -13,6 +13,8 @@ import PurchaseOrders from "./pages/PurchaseOrders";
 import SalesInvoices from "./pages/SalesInvoices";
 import InventoryLedger from "./pages/InventoryLedger";
 import AIRestocking from "./pages/AIRestocking";
+import Credits from "./pages/Credits";
+import Warranties from "./pages/Warranties";
 
 function Router() {
   return (
@@ -25,6 +27,8 @@ function Router() {
         <Route path={"/purchase-orders"} component={PurchaseOrders} />
         <Route path={"/sales-invoices"} component={SalesInvoices} />
         <Route path={"/inventory-ledger"} component={InventoryLedger} />
+        <Route path={"/credits"} component={Credits} />
+        <Route path={"/warranties"} component={Warranties} />
         <Route path={"/ai-restocking"} component={AIRestocking} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />

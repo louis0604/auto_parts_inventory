@@ -1,14 +1,19 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { format } from "date-fns";
+import { Button } from "@/components/ui/button";
+import { RotateCcw } from "lucide-react";
+import { useLocation } from "wouter";
 
 interface SalesInvoiceDetailProps {
   invoiceId: number | null;
   open: boolean;
   onClose: () => void;
+  onCreateCredit?: (invoice: any) => void;
 }
 
-export function SalesInvoiceDetail({ invoiceId, open, onClose }: SalesInvoiceDetailProps) {
+export function SalesInvoiceDetail({ invoiceId, open, onClose, onCreateCredit }: SalesInvoiceDetailProps) {
+  const [, setLocation] = useLocation();
   const { data: invoice, isLoading } = trpc.salesInvoices.getById.useQuery(
     invoiceId!,
     { enabled: !!invoiceId }
@@ -20,7 +25,27 @@ export function SalesInvoiceDetail({ invoiceId, open, onClose }: SalesInvoiceDet
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>销售发票详情 - {invoice.invoiceNumber}</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>销售发票详情 - {invoice.invoiceNumber}</DialogTitle>
+            {invoice.status === "completed" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  if (onCreateCredit) {
+                    onCreateCredit(invoice);
+                  } else {
+                    // 如果没有回调，导航到Credits页面并传递发票信息
+                    setLocation(`/credits?from_invoice=${invoice.id}`);
+                  }
+                  onClose();
+                }}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                创建退货单
+              </Button>
+            )}
+          </div>
         </DialogHeader>
 
         {isLoading ? (

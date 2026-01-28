@@ -191,6 +191,8 @@
 - [x] 创建Warranties表存储保修记录（warranties和warrantyItems）
 - [x] 后端API：credits和warranties的CRUD接口（list/getById/create/cancel/updateStatus）
 - [x] 后端逻辑：Credit创建后库存增加，Warranty创建后库存减少
-- [ ] 创建Credit管理页面（退货单列表、创建、详情）
-- [ ] 创建Warranty管理页面（保修单列表、创建、详情）
-- [ ] 在侧边栏导航中添加Credit和Warranty入口
+- [x] 创建Credit管理页面（退货单列表、创建表单、详情查看、取消功能）
+- [x] 创建Warranty管理页面（保修单列表、创建表单、详情查看、状态管理）
+- [x] 在侧边栏导航中添加Credit和Warranty入口
+- [x] 在销售发票详情页添加“创建退货单”快捷按钮
+- [x] 编写并通过Credits和Warranties功能的单元测试
