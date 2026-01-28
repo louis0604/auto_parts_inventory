@@ -102,7 +102,8 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.number())
       .mutation(async ({ input }) => {
-        await db.deleteSupplier(input);
+        // Use forceDelete to handle all related records
+        await db.forceDeleteSupplier(input);
         return { success: true };
       }),
     forceDelete: protectedProcedure
@@ -156,7 +157,8 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.number())
       .mutation(async ({ input }) => {
-        await db.deleteCustomer(input);
+        // Use forceDelete to handle all related records
+        await db.forceDeleteCustomer(input);
         return { success: true };
       }),
     forceDelete: protectedProcedure
@@ -305,7 +307,8 @@ export const appRouter = router({
     delete: protectedProcedure
       .input(z.number())
       .mutation(async ({ input }) => {
-        await db.deletePart(input);
+        // Use forceDelete to handle all related records
+        await db.forceDeletePart(input);
         return { success: true };
       }),
     forceDelete: protectedProcedure
@@ -461,6 +464,12 @@ export const appRouter = router({
         await db.updatePurchaseOrderStatus(input, "cancelled");
         return { success: true };
       }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deletePurchaseOrder(input);
+        return { success: true };
+      }),
   }),
 
   // Sales Invoices
@@ -551,6 +560,12 @@ export const appRouter = router({
       .input(z.number())
       .mutation(async ({ input }) => {
         await db.updateSalesInvoiceStatus(input, "cancelled");
+        return { success: true };
+      }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deleteSalesInvoice(input);
         return { success: true };
       }),
   }),

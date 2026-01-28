@@ -1119,3 +1119,43 @@ export async function getSalesHistoryByPartSku(sku: string): Promise<Array<{
 
   return history;
 }
+
+// Delete purchase order and all related records
+export async function deletePurchaseOrder(orderId: number) {
+  const dbConn = await getDb();
+  if (!dbConn) throw new Error("Database connection failed");
+  
+  // Delete purchase order items first
+  await dbConn.delete(purchaseOrderItems).where(eq(purchaseOrderItems.purchaseOrderId, orderId));
+  
+  // Delete inventory ledger entries (using referenceType and referenceId)
+  await dbConn.delete(inventoryLedger).where(
+    and(
+      eq(inventoryLedger.referenceType, "purchase_order"),
+      eq(inventoryLedger.referenceId, orderId)
+    )
+  );
+  
+  // Delete the purchase order
+  await dbConn.delete(purchaseOrders).where(eq(purchaseOrders.id, orderId));
+}
+
+// Delete sales invoice and all related records
+export async function deleteSalesInvoice(invoiceId: number) {
+  const dbConn = await getDb();
+  if (!dbConn) throw new Error("Database connection failed");
+  
+  // Delete sales invoice items first
+  await dbConn.delete(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, invoiceId));
+  
+  // Delete inventory ledger entries (using referenceType and referenceId)
+  await dbConn.delete(inventoryLedger).where(
+    and(
+      eq(inventoryLedger.referenceType, "sales_invoice"),
+      eq(inventoryLedger.referenceId, invoiceId)
+    )
+  );
+  
+  // Delete the sales invoice
+  await dbConn.delete(salesInvoices).where(eq(salesInvoices.id, invoiceId));
+}

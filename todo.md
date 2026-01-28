@@ -235,3 +235,18 @@
 - [x] 修夏Warranties.tsx中加载状态Dialog缺少DialogTitle的错误
 - [x] 修夏SalesInvoices.tsx中打印预览Dialog缺少DialogTitle的错误
 - [x] 检查所有其他页面的Dialog组件，确保符合可访问性标准
+
+## 完整删除功能实现
+- [x] 添加采购订单删除API（deletePurchaseOrder）
+- [x] 添加销售发票删除API（deleteSalesInvoice）
+- [x] 修复parts/customers/suppliers的delete方法，使用forceDelete处理关联
+- [ ] 在配件管理页面添加删除按钮
+- [ ] 在客户管理页面添加删除按钮
+- [ ] 在供应商管理页面添加删除按钮
+- [ ] 在采购订单页面添加删除按钮
+- [ ] 在销售发票页面添加删除按钮
+- [ ] 在退货单页面添加删除按钮
+- [ ] 在保修单页面添加删除按钮
+- [ ] 创建通用删除确认对话框组件
+- [ ] 在删除确认对话框中显示关联数据数量
+- [ ] 编写并通过所有删除功能的测试
