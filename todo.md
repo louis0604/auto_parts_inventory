@@ -196,3 +196,10 @@
 - [x] 在侧边栏导航中添加Credit和Warranty入口
 - [x] 在销售发票详情页添加“创建退货单”快捷按钮
 - [x] 编写并通过Credits和Warranties功能的单元测试
+
+## 删除功能修复
+- [x] 检查数据库schema中所有外键关系（parts/customers/suppliers）
+- [x] 更新forceDeletePart函数，添加creditItems、warrantyItems、lowStockAlerts关联删除
+- [x] 更新forceDeleteCustomer函数，添加credits、warranties及其明细的关联删除
+- [x] 更新forceDeleteSupplier函数，添加purchaseOrderItems关联删除，将配件supplierId设为null
+- [x] 编写并通过所有强制删除功能的单元测试，确保测试数据可以被清理

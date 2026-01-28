@@ -419,8 +419,15 @@ export async function forceDeleteSupplier(supplierId: number): Promise<void> {
   if (!db) throw new Error("数据库连接失败");
 
   // 删除所有相关记录
+  // 1. 删除采购订单和其明细
+  const supplierOrders = await db.select({ id: purchaseOrders.id }).from(purchaseOrders).where(eq(purchaseOrders.supplierId, supplierId));
+  for (const order of supplierOrders) {
+    await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.purchaseOrderId, order.id));
+  }
   await db.delete(purchaseOrders).where(eq(purchaseOrders.supplierId, supplierId));
-  await db.delete(parts).where(eq(parts.supplierId, supplierId));
+  
+  // 2. 将供应商的配件supplierId设为null（不删除配件）
+  await db.update(parts).set({ supplierId: null }).where(eq(parts.supplierId, supplierId));
   
   // 删除供应商
   await db.delete(suppliers).where(eq(suppliers.id, supplierId));
@@ -431,7 +438,26 @@ export async function forceDeleteCustomer(customerId: number): Promise<void> {
   if (!db) throw new Error("数据库连接失败");
 
   // 删除所有相关记录
+  // 1. 删除销售发票和其明细
+  const customerInvoices = await db.select({ id: salesInvoices.id }).from(salesInvoices).where(eq(salesInvoices.customerId, customerId));
+  for (const invoice of customerInvoices) {
+    await db.delete(salesInvoiceItems).where(eq(salesInvoiceItems.salesInvoiceId, invoice.id));
+  }
   await db.delete(salesInvoices).where(eq(salesInvoices.customerId, customerId));
+  
+  // 2. 删除退货单和其明细
+  const customerCredits = await db.select({ id: credits.id }).from(credits).where(eq(credits.customerId, customerId));
+  for (const credit of customerCredits) {
+    await db.delete(creditItems).where(eq(creditItems.creditId, credit.id));
+  }
+  await db.delete(credits).where(eq(credits.customerId, customerId));
+  
+  // 3. 删除保修单和其明细
+  const customerWarranties = await db.select({ id: warranties.id }).from(warranties).where(eq(warranties.customerId, customerId));
+  for (const warranty of customerWarranties) {
+    await db.delete(warrantyItems).where(eq(warrantyItems.warrantyId, warranty.id));
+  }
+  await db.delete(warranties).where(eq(warranties.customerId, customerId));
   
   // 删除客户
   await db.delete(customers).where(eq(customers.id, customerId));
@@ -444,8 +470,17 @@ export async function forceDeletePart(partId: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // Delete low stock alerts
+  await db.delete(lowStockAlerts).where(eq(lowStockAlerts.partId, partId));
+  
   // Delete inventory ledger entries
   await db.delete(inventoryLedger).where(eq(inventoryLedger.partId, partId));
+  
+  // Delete credit items (customer returns)
+  await db.delete(creditItems).where(eq(creditItems.partId, partId));
+  
+  // Delete warranty items
+  await db.delete(warrantyItems).where(eq(warrantyItems.partId, partId));
   
   // Delete purchase order items
   await db.delete(purchaseOrderItems).where(eq(purchaseOrderItems.partId, partId));
