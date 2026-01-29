@@ -245,51 +245,57 @@ export default function PartDetail() {
           <div className="space-y-4">
             <div>
               <Label>配件图片</Label>
-              <div 
-                className="relative w-full h-64 bg-gray-50 rounded mt-2 border-2 border-gray-300 hover:border-blue-400 transition-colors cursor-pointer flex items-center justify-center group"
-                onClick={() => document.getElementById('image-upload')?.click()}
-                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-                onDrop={async (e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const file = e.dataTransfer.files[0];
-                  if (file && file.type.startsWith('image/')) {
-                    await handleImageUpload(file);
-                  }
-                }}
-              >
+              <div className="mt-2 space-y-2">
                 {formData.imageUrl ? (
-                  <img
-                    src={formData.imageUrl}
-                    alt={formData.name}
-                    className="max-w-full max-h-full object-contain"
-                    onError={(e) => {
-                      console.error('图片加载失败:', formData.imageUrl);
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+                  <div className="relative group">
+                    <img
+                      src={formData.imageUrl}
+                      alt={formData.name}
+                      className="w-full h-64 object-contain bg-gray-50 rounded border-2 border-gray-300 cursor-pointer hover:border-blue-400 transition-colors"
+                      onClick={() => window.open(formData.imageUrl, '_blank')}
+                      onError={(e) => {
+                        console.error('图片加载失败:', formData.imageUrl);
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => document.getElementById('image-upload')?.click()}
+                      >
+                        更换图片
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-gray-400">
+                  <div 
+                    className="w-full h-64 bg-gray-50 rounded border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors cursor-pointer flex flex-col items-center justify-center text-gray-400"
+                    onClick={() => document.getElementById('image-upload')?.click()}
+                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                    onDrop={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const file = e.dataTransfer.files[0];
+                      if (file && file.type.startsWith('image/')) {
+                        await handleImageUpload(file);
+                      }
+                    }}
+                  >
                     <Package className="w-12 h-12 mb-2" />
                     <span className="text-sm">点击或拖拽上传图片</span>
                   </div>
                 )}
-                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center pointer-events-none">
-                  <span className="text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium bg-white px-3 py-1 rounded shadow">
-                    点击更换图片
-                  </span>
-                </div>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
+                  }}
+                />
               </div>
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file);
-                }}
-              />
             </div>
 
             <div>
