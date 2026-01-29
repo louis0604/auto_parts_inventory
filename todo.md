@@ -284,3 +284,7 @@
 - [x] 更新PartHistory.tsx，将单号列转换为可点击链接
 - [x] 根据操作类型跳转到对应详情页（销售发票/采购订单/退货单/保修单）
 - [x] 测试所有类型的单号链接跳转功能
+
+## 配件页面Select组件错误修复
+- [x] 定位PartsNew.tsx中空值的Select.Item
+- [x] 修复Select.Item的value属性，确保不为空字符串

@@ -338,14 +338,14 @@ export default function PartsNew() {
                 <div>
                   <Label>产品线 (Line)</Label>
                   <Select
-                    value={watch("lineCodeId")?.toString() || ""}
-                    onValueChange={(value) => setValue("lineCodeId", value ? parseInt(value) : undefined)}
+                    value={watch("lineCodeId")?.toString() || "none"}
+                    onValueChange={(value) => setValue("lineCodeId", value === "none" ? undefined : parseInt(value))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="选择产品线" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">无</SelectItem>
+                      <SelectItem value="none">无</SelectItem>
                       {lineCodes.map((lc) => (
                         <SelectItem key={lc.id} value={lc.id.toString()}>
                           {lc.code} - {lc.description}
