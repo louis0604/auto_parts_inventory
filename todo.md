@@ -256,3 +256,13 @@
 - [x] 在销售发票列表页添加状态切换下拉菜单（pending/completed/cancelled）
 - [x] 更新状态Badge显示，使用不同颜色区分三种状态
 - [x] 编写并通过4个单元测试验证状态切换功能
+
+## 配件管理页面重新设计
+- [x] 更新parts表schema，添加新字段（replCost/avgCost/price1/price2/price3/orderPoint）
+- [x] 创建配件操作历史查询API（parts.getHistory），返回该配件的所有操作记录
+- [x] 创建PartsNew.tsx新的配件管理页面，显示所有新字段
+- [x] 移除定价、编码、历史等不需要的页面链接
+- [x] Part Number添加点击链接功能，跳转到操作历史页面
+- [x] 创建PartHistory.tsx配件操作历史详情页面
+- [x] 保留批量导入功能
+- [x] 更新路由配置，替换为PartsNew页面

@@ -321,6 +321,11 @@ export const appRouter = router({
         await db.forceDeletePart(input);
         return { success: true };
       }),
+    getHistory: protectedProcedure
+      .input(z.number())
+      .query(async ({ input: partId }) => {
+        return await db.getPartHistory(partId);
+      }),
     adjustStock: protectedProcedure
       .input(z.object({
         partId: z.number(),

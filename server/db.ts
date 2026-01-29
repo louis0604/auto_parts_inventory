@@ -1159,3 +1159,134 @@ export async function deleteSalesInvoice(invoiceId: number) {
   // Delete the sales invoice
   await dbConn.delete(salesInvoices).where(eq(salesInvoices.id, invoiceId));
 }
+
+/**
+ * Get complete history of all operations for a specific part
+ * Returns sales, purchases, credits, warranties, and inventory adjustments
+ */
+export async function getPartHistory(partId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+  
+  // Get sales history
+  const salesHistory = await db
+    .select({
+      id: salesInvoiceItems.id,
+      type: sql<string>`'sale'`.as('type'),
+      date: salesInvoices.invoiceDate,
+      time: salesInvoices.invoiceTime,
+      referenceNumber: salesInvoices.invoiceNumber,
+      quantity: salesInvoiceItems.quantity,
+      unitPrice: salesInvoiceItems.unitPrice,
+      totalAmount: sql<string>`${salesInvoiceItems.quantity} * ${salesInvoiceItems.unitPrice}`,
+      customerName: customers.name,
+      notes: salesInvoices.notes,
+      createdAt: salesInvoices.createdAt,
+    })
+    .from(salesInvoiceItems)
+    .innerJoin(salesInvoices, eq(salesInvoiceItems.salesInvoiceId, salesInvoices.id))
+    .leftJoin(customers, eq(salesInvoices.customerId, customers.id))
+    .where(eq(salesInvoiceItems.partId, partId))
+    .orderBy(desc(salesInvoices.invoiceDate));
+  
+  // Get purchase history
+  const purchaseHistory = await db
+    .select({
+      id: purchaseOrderItems.id,
+      type: sql<string>`'purchase'`.as('type'),
+      date: purchaseOrders.orderDate,
+      time: sql<string>`NULL`.as('time'),
+      referenceNumber: purchaseOrders.orderNumber,
+      quantity: purchaseOrderItems.quantity,
+      unitPrice: purchaseOrderItems.unitPrice,
+      totalAmount: sql<string>`${purchaseOrderItems.quantity} * ${purchaseOrderItems.unitPrice}`,
+      supplierName: suppliers.name,
+      notes: purchaseOrders.notes,
+      createdAt: purchaseOrders.createdAt,
+    })
+    .from(purchaseOrderItems)
+    .innerJoin(purchaseOrders, eq(purchaseOrderItems.purchaseOrderId, purchaseOrders.id))
+    .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+    .where(eq(purchaseOrderItems.partId, partId))
+    .orderBy(desc(purchaseOrders.orderDate));
+  
+  // Get credit (return) history
+  const creditHistory = await db
+    .select({
+      id: creditItems.id,
+      type: sql<string>`'credit'`.as('type'),
+      date: credits.creditDate,
+      time: credits.creditTime,
+      referenceNumber: credits.creditNumber,
+      quantity: creditItems.quantity,
+      unitPrice: creditItems.unitPrice,
+      totalAmount: sql<string>`${creditItems.quantity} * ${creditItems.unitPrice}`,
+      customerName: customers.name,
+      notes: credits.notes,
+      createdAt: credits.createdAt,
+    })
+    .from(creditItems)
+    .innerJoin(credits, eq(creditItems.creditId, credits.id))
+    .leftJoin(customers, eq(credits.customerId, customers.id))
+    .where(eq(creditItems.partId, partId))
+    .orderBy(desc(credits.creditDate));
+  
+  // Get warranty history
+  const warrantyHistory = await db
+    .select({
+      id: warrantyItems.id,
+      type: sql<string>`'warranty'`.as('type'),
+      date: warranties.warrantyDate,
+      time: warranties.warrantyTime,
+      referenceNumber: warranties.warrantyNumber,
+      quantity: warrantyItems.quantity,
+      unitPrice: warrantyItems.unitPrice,
+      totalAmount: sql<string>`${warrantyItems.quantity} * ${warrantyItems.unitPrice}`,
+      customerName: customers.name,
+      notes: warranties.notes,
+      createdAt: warranties.createdAt,
+    })
+    .from(warrantyItems)
+    .innerJoin(warranties, eq(warrantyItems.warrantyId, warranties.id))
+    .leftJoin(customers, eq(warranties.customerId, customers.id))
+    .where(eq(warrantyItems.partId, partId))
+    .orderBy(desc(warranties.warrantyDate));
+  
+  // Get inventory adjustment history
+  const adjustmentHistory = await db
+    .select({
+      id: inventoryLedger.id,
+      type: inventoryLedger.transactionType,
+      date: sql<Date>`DATE(${inventoryLedger.createdAt})`.as('date'),
+      time: sql<string>`TIME(${inventoryLedger.createdAt})`.as('time'),
+      referenceNumber: inventoryLedger.referenceType,
+      quantity: inventoryLedger.quantity,
+      unitPrice: sql<string>`NULL`.as('unitPrice'),
+      totalAmount: sql<string>`NULL`.as('totalAmount'),
+      notes: inventoryLedger.notes,
+      createdAt: inventoryLedger.createdAt,
+    })
+    .from(inventoryLedger)
+    .where(
+      and(
+        eq(inventoryLedger.partId, partId),
+        eq(inventoryLedger.transactionType, "adjustment")
+      )
+    )
+    .orderBy(desc(inventoryLedger.createdAt));
+  
+  // Combine all histories and sort by date
+  const allHistory = [
+    ...salesHistory.map(h => ({ ...h, category: 'sales' as const })),
+    ...purchaseHistory.map(h => ({ ...h, category: 'purchase' as const, customerName: h.supplierName })),
+    ...creditHistory.map(h => ({ ...h, category: 'credit' as const })),
+    ...warrantyHistory.map(h => ({ ...h, category: 'warranty' as const })),
+    ...adjustmentHistory.map(h => ({ ...h, category: 'adjustment' as const, customerName: null })),
+  ].sort((a, b) => {
+    const dateA = new Date(a.date);
+    const dateB = new Date(b.date);
+    return dateB.getTime() - dateA.getTime();
+  });
+  
+  return allHistory;
+}

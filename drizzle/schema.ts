@@ -98,6 +98,11 @@ export const parts = mysqlTable("parts", {
   listPrice: decimal("listPrice", { precision: 15, scale: 2 }), // List
   cost: decimal("cost", { precision: 15, scale: 2 }), // Cost
   retail: decimal("retail", { precision: 15, scale: 2 }), // Retail
+  replCost: decimal("replCost", { precision: 15, scale: 2 }), // Replacement Cost
+  avgCost: decimal("avgCost", { precision: 15, scale: 2 }), // Average Cost
+  price1: decimal("price1", { precision: 15, scale: 2 }), // Price 1
+  price2: decimal("price2", { precision: 15, scale: 2 }), // Price 2
+  price3: decimal("price3", { precision: 15, scale: 2 }), // Price 3
   coreCost: decimal("coreCost", { precision: 15, scale: 2 }), // Core Cost
   coreRetail: decimal("coreRetail", { precision: 15, scale: 2 }), // Core Retail
   unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(), // 保留兼容性
@@ -105,6 +110,7 @@ export const parts = mysqlTable("parts", {
   // Inventory fields
   stockQuantity: int("stockQuantity").default(0).notNull(),
   minStockThreshold: int("minStockThreshold").default(10).notNull(),
+  orderPoint: int("orderPoint").default(0), // Order Point (reorder threshold)
   orderQty: int("orderQty").default(0), // Order Qty
   orderMultiple: int("orderMultiple").default(1), // Order Multiple
   

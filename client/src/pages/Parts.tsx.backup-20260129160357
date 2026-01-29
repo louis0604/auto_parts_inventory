@@ -38,11 +38,6 @@ type PartFormData = {
   listPrice?: string; // List
   cost?: string; // Cost
   retail?: string; // Retail
-  replCost?: string; // Replacement Cost
-  avgCost?: string; // Average Cost
-  price1?: string; // Price 1
-  price2?: string; // Price 2
-  price3?: string; // Price 3
   coreCost?: string; // Core Cost
   coreRetail?: string; // Core Retail
   unitPrice: string; // 保留兼容性
@@ -50,7 +45,6 @@ type PartFormData = {
   // Inventory
   stockQuantity: number;
   minStockThreshold: number;
-  orderPoint?: number; // Order Point
   orderQty?: number; // Order Qty
   orderMultiple?: number; // Order Multiple
   

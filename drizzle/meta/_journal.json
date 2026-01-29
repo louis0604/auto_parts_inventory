@@ -78,6 +78,13 @@
       "when": 1769630264899,
       "tag": "0010_majestic_baron_strucker",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1769720533720,
+      "tag": "0011_lumpy_killraven",
+      "breakpoints": true
     }
   ]
 }

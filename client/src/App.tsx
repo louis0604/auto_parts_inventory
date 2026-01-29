@@ -6,7 +6,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
-import Parts from "./pages/Parts";
+import PartsNew from "./pages/PartsNew";
+import PartHistory from "./pages/PartHistory";
 import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
 import PurchaseOrders from "./pages/PurchaseOrders";
@@ -22,7 +23,8 @@ function Router() {
     <DashboardLayout>
       <Switch>
         <Route path={"/"} component={Dashboard} />
-        <Route path={"/parts"} component={Parts} />
+        <Route path={"/parts"} component={PartsNew} />
+        <Route path={"/parts/:id/history"} component={PartHistory} />
         <Route path={"/suppliers"} component={Suppliers} />
         <Route path={"/customers"} component={Customers} />
         <Route path={"/purchase-orders"} component={PurchaseOrders} />
