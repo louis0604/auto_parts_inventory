@@ -340,3 +340,10 @@
 - [x] 定位PartsNew.tsx中的Dialog组件
 - [x] 为Dialog添加不透明背景遮罩
 - [x] 测试Dialog显示效果
+
+## 将添加配件功能改为独立页面
+- [x] 创建AddPart.tsx独立页面
+- [x] 复用PartsNew.tsx中的表单逻辑
+- [x] 在App.tsx中添加路由
+- [x] 更新配件列表的“添加配件”按钮为路由导航
+- [x] 测试添加配件功能

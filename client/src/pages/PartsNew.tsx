@@ -192,22 +192,11 @@ export default function PartsNew() {
             <Upload className="w-4 h-4 mr-2" />
             批量导入
           </Button>
-          <Button onClick={() => {
-            setEditingPart(null);
-            reset({
-              sku: "",
-              name: "",
-              stockQuantity: 0,
-              minStockThreshold: 10,
-              orderPoint: 0,
-              unit: "件",
-              unitPrice: "0",
-            });
-            setUploadedImageUrl("");
-            setIsAddDialogOpen(true);
-          }}>
-            添加配件
-          </Button>
+          <Link href="/parts/add">
+            <Button>
+              添加配件
+            </Button>
+          </Link>
         </div>
       </div>
 
