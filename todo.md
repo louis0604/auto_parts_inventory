@@ -277,3 +277,10 @@
 ## 配件操作历史页面错误修复
 - [x] 修复统计金额计算错误（totalAmount.toFixed is not a function）
 - [x] 修复嵌套<a>标签问题（nested anchor tags）
+
+## 操作历史单号链接功能
+- [x] 分析不同操作类型对应的详情页面路由
+- [x] 在getPartHistory返回数据中添加记录ID字段
+- [x] 更新PartHistory.tsx，将单号列转换为可点击链接
+- [x] 根据操作类型跳转到对应详情页（销售发票/采购订单/退货单/保修单）
+- [x] 测试所有类型的单号链接跳转功能

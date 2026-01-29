@@ -141,6 +141,22 @@ export default function PartHistory() {
     );
   };
 
+  // 根据操作类型生成详情页链接
+  const getRecordDetailUrl = (type: string, recordId: number): string => {
+    switch (type) {
+      case "sale":
+        return `/sales-invoices?id=${recordId}`;
+      case "purchase":
+        return `/purchase-orders?id=${recordId}`;
+      case "credit":
+        return `/credits?id=${recordId}`;
+      case "warranty":
+        return `/warranties?id=${recordId}`;
+      default:
+        return "#";
+    }
+  };
+
   return (
     <div className="p-6">
       {/* Header */}
@@ -307,7 +323,16 @@ export default function PartHistory() {
                     </div>
                   </TableCell>
                   <TableCell className="font-mono text-sm">
-                    {record.referenceNumber || "-"}
+                    {record.recordId ? (
+                      <Link 
+                        href={getRecordDetailUrl(record.type, record.recordId)}
+                        className="text-blue-600 hover:underline"
+                      >
+                        {record.referenceNumber}
+                      </Link>
+                    ) : (
+                      <span>{record.referenceNumber || "-"}</span>
+                    )}
                   </TableCell>
                   <TableCell className="text-right font-semibold">
                     {record.quantity > 0 ? "+" : ""}{record.quantity}

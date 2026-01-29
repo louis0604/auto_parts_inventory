@@ -1172,6 +1172,7 @@ export async function getPartHistory(partId: number) {
   const salesHistory = await db
     .select({
       id: salesInvoiceItems.id,
+      recordId: salesInvoices.id, // 用于链接跳转的主记录ID
       type: sql<string>`'sale'`.as('type'),
       date: salesInvoices.invoiceDate,
       time: salesInvoices.invoiceTime,
@@ -1193,6 +1194,7 @@ export async function getPartHistory(partId: number) {
   const purchaseHistory = await db
     .select({
       id: purchaseOrderItems.id,
+      recordId: purchaseOrders.id, // 用于链接跳转的主记录ID
       type: sql<string>`'purchase'`.as('type'),
       date: purchaseOrders.orderDate,
       time: sql<string>`NULL`.as('time'),
@@ -1214,6 +1216,7 @@ export async function getPartHistory(partId: number) {
   const creditHistory = await db
     .select({
       id: creditItems.id,
+      recordId: credits.id, // 用于链接跳转的主记录ID
       type: sql<string>`'credit'`.as('type'),
       date: credits.creditDate,
       time: credits.creditTime,
@@ -1235,6 +1238,7 @@ export async function getPartHistory(partId: number) {
   const warrantyHistory = await db
     .select({
       id: warrantyItems.id,
+      recordId: warranties.id, // 用于链接跳转的主记录ID
       type: sql<string>`'warranty'`.as('type'),
       date: warranties.warrantyDate,
       time: warranties.warrantyTime,
@@ -1256,6 +1260,7 @@ export async function getPartHistory(partId: number) {
   const adjustmentHistory = await db
     .select({
       id: inventoryLedger.id,
+      recordId: sql<number>`NULL`.as('recordId'), // 调整记录没有详情页
       type: inventoryLedger.transactionType,
       date: sql<Date>`DATE(${inventoryLedger.createdAt})`.as('date'),
       time: sql<string>`TIME(${inventoryLedger.createdAt})`.as('time'),
