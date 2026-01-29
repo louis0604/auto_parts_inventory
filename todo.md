@@ -356,3 +356,13 @@
 - [ ] 实现Excel中图片提取和上传功能
 - [ ] 生成符合模板格式的下载模板
 - [ ] 测试批量导入功能（包含图片）
+
+## Line Code管理界面创建
+- [x] 创建LineCodes.tsx管理页面
+- [x] 实现Line Code列表显示
+- [x] 添加创建Line Code表单
+- [x] 添加编辑Line Code功能
+- [x] 添加删除Line Code功能（带确认对话框）
+- [x] 在DashboardLayout侧边栏添加导航入口
+- [x] 在App.tsx中添加路由配置
+- [x] 测试所有功能

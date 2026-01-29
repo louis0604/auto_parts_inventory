@@ -11,6 +11,7 @@ import PartDetail from "./pages/PartDetail";
 import PartHistory from "./pages/PartHistory";
 import AddPart from "./pages/AddPart";
 import { BulkImportPartsPage } from "./pages/BulkImportParts";
+import LineCodes from "./pages/LineCodes";
 import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
 import PurchaseOrders from "./pages/PurchaseOrders";
@@ -26,6 +27,7 @@ function Router() {
     <DashboardLayout>
       <Switch>
         <Route path={"/"} component={Dashboard} />
+        <Route path={"/line-codes"} component={LineCodes} />
         <Route path={"/parts/import"} component={BulkImportPartsPage} />
         <Route path={"/parts/add"} component={AddPart} />
         <Route path={"/parts/:id/history"} component={PartHistory} />

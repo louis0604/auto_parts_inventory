@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles, RotateCcw, Shield, Search } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles, RotateCcw, Shield, Search, Tag } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -30,6 +30,7 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: LayoutDashboard, label: "仪表盘", path: "/" },
   { icon: Package, label: "配件管理", path: "/parts" },
+  { icon: Tag, label: "Line Code管理", path: "/line-codes" },
   { icon: TruckIcon, label: "供应商", path: "/suppliers" },
   { icon: Users, label: "客户", path: "/customers" },
   { icon: ShoppingCart, label: "采购订单", path: "/purchase-orders" },
