@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Trash2, History } from "lucide-react";
+import { ArrowLeft, Save, Trash2, History, Package } from "lucide-react";
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -128,6 +128,32 @@ export default function PartDetail() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const uploadImageMutation = trpc.storage.uploadImage.useMutation();
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      // Read file as base64
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Data = e.target?.result as string;
+        
+        // Upload to S3 via tRPC
+        const result = await uploadImageMutation.mutateAsync({
+          fileName: file.name,
+          fileData: base64Data,
+          contentType: file.type,
+        });
+        
+        // Update form data with new image URL
+        handleInputChange("imageUrl", result.url);
+      };
+      reader.readAsDataURL(file);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+      alert("图片上传失败，请重试");
+    }
+  };
+
   if (partLoading) {
     return (
       <div className="p-6">
@@ -219,22 +245,48 @@ export default function PartDetail() {
           <div className="space-y-4">
             <div>
               <Label>配件图片</Label>
-              {formData.imageUrl ? (
-                <img
-                  src={formData.imageUrl}
-                  alt={formData.name}
-                  className="w-full h-48 object-cover rounded mt-2"
-                />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 rounded flex items-center justify-center text-gray-400 mt-2">
-                  无图片
-                </div>
-              )}
-              <Input
-                value={formData.imageUrl || ""}
-                onChange={(e) => handleInputChange("imageUrl", e.target.value)}
-                placeholder="图片URL"
-                className="mt-2"
+              <div 
+                className="relative w-full h-64 bg-gray-100 rounded mt-2 border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer overflow-hidden group"
+                onClick={() => document.getElementById('image-upload')?.click()}
+                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
+                onDrop={async (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const file = e.dataTransfer.files[0];
+                  if (file && file.type.startsWith('image/')) {
+                    await handleImageUpload(file);
+                  }
+                }}
+              >
+                {formData.imageUrl ? (
+                  <>
+                    <img
+                      src={formData.imageUrl}
+                      alt={formData.name}
+                      className="w-full h-full object-contain"
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
+                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm">
+                        点击或拖拽更换图片
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                    <Package className="w-12 h-12 mb-2" />
+                    <span className="text-sm">点击或拖拽上传图片</span>
+                  </div>
+                )}
+              </div>
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
+                }}
               />
             </div>
 

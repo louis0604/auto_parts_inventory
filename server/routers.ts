@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
+import { storagePut } from "./storage";
 
 export const appRouter = router({
   system: systemRouter,

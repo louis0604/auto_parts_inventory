@@ -250,7 +250,6 @@ export default function PartsNew() {
               <TableHead className="w-24 text-right">Retail</TableHead>
               <TableHead className="w-24 text-right">List</TableHead>
               <TableHead className="w-24 text-right">Order Point</TableHead>
-              <TableHead className="w-32 text-center">操作</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -282,24 +281,6 @@ export default function PartsNew() {
                   <TableCell className="text-right">${part.retail || "-"}</TableCell>
                   <TableCell className="text-right">${part.listPrice || "-"}</TableCell>
                   <TableCell className="text-right">{part.orderPoint || 0}</TableCell>
-                  <TableCell>
-                    <div className="flex gap-2 justify-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(part)}
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(part.id)}
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
                 </TableRow>
               );
             })}
