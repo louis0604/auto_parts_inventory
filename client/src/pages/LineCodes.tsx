@@ -1,15 +1,7 @@
 import { useState } from "react";
+import { Link, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -32,46 +24,12 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-type LineCodeFormData = {
-  code: string;
-  description?: string;
-};
-
 export default function LineCodes() {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editingLineCode, setEditingLineCode] = useState<{ id: number; code: string; description?: string } | null>(null);
+  const [, setLocation] = useLocation();
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<LineCodeFormData>({
-    code: "",
-    description: "",
-  });
 
-  const { data: lineCodes = [], refetch } = trpc.lineCodes.list.useQuery();
+  const { data: lineCodes = [] } = trpc.lineCodes.list.useQuery();
   const utils = trpc.useUtils();
-
-  const createMutation = trpc.lineCodes.create.useMutation({
-    onSuccess: () => {
-      toast.success("Line Code 添加成功");
-      setIsAddDialogOpen(false);
-      utils.lineCodes.list.invalidate();
-      resetForm();
-    },
-    onError: (error) => {
-      toast.error(`添加失败: ${error.message}`);
-    },
-  });
-
-  const updateMutation = trpc.lineCodes.update.useMutation({
-    onSuccess: () => {
-      toast.success("Line Code 更新成功");
-      setEditingLineCode(null);
-      utils.lineCodes.list.invalidate();
-      resetForm();
-    },
-    onError: (error) => {
-      toast.error(`更新失败: ${error.message}`);
-    },
-  });
 
   const deleteMutation = trpc.lineCodes.delete.useMutation({
     onSuccess: () => {
@@ -84,42 +42,6 @@ export default function LineCodes() {
     },
   });
 
-  const resetForm = () => {
-    setFormData({ code: "", description: "" });
-  };
-
-  const handleAdd = () => {
-    if (!formData.code.trim()) {
-      toast.error("请输入 Line Code");
-      return;
-    }
-    createMutation.mutate({
-      code: formData.code.trim(),
-      description: formData.description?.trim() || undefined,
-    });
-  };
-
-  const handleEdit = (lineCode: { id: number; code: string; description?: string }) => {
-    setEditingLineCode(lineCode);
-    setFormData({
-      code: lineCode.code,
-      description: lineCode.description || "",
-    });
-  };
-
-  const handleUpdate = () => {
-    if (!editingLineCode) return;
-    if (!formData.code.trim()) {
-      toast.error("请输入 Line Code");
-      return;
-    }
-    updateMutation.mutate({
-      id: editingLineCode.id,
-      code: formData.code.trim(),
-      description: formData.description?.trim() || undefined,
-    });
-  };
-
   const handleDelete = (id: number) => {
     deleteMutation.mutate(id);
   };
@@ -131,10 +53,12 @@ export default function LineCodes() {
           <Tag className="w-8 h-8 text-primary" />
           <h1 className="text-3xl font-bold">Line Code 管理</h1>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          添加 Line Code
-        </Button>
+        <Link href="/line-codes/add">
+          <Button size="lg">
+            <Plus className="w-4 h-4 mr-2" />
+            添加 Line Code
+          </Button>
+        </Link>
       </div>
 
       <Card>
@@ -167,7 +91,7 @@ export default function LineCodes() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleEdit(lineCode)}
+                          onClick={() => setLocation(`/line-codes/${lineCode.id}/edit`)}
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -187,92 +111,6 @@ export default function LineCodes() {
           )}
         </CardContent>
       </Card>
-
-      {/* Add Dialog */}
-      <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>添加 Line Code</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="code">Code *</Label>
-              <Input
-                id="code"
-                placeholder="例如: DEL, SUBARU, HONDA"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">描述</Label>
-              <Input
-                id="description"
-                placeholder="例如: Delphi, Subaru Parts, Honda Parts"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setIsAddDialogOpen(false);
-                resetForm();
-              }}
-            >
-              取消
-            </Button>
-            <Button onClick={handleAdd} disabled={createMutation.isPending}>
-              {createMutation.isPending ? "添加中..." : "添加"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Edit Dialog */}
-      <Dialog open={!!editingLineCode} onOpenChange={(open) => !open && setEditingLineCode(null)}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>编辑 Line Code</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-code">Code *</Label>
-              <Input
-                id="edit-code"
-                placeholder="例如: DEL, SUBARU, HONDA"
-                value={formData.code}
-                onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="edit-description">描述</Label>
-              <Input
-                id="edit-description"
-                placeholder="例如: Delphi, Subaru Parts, Honda Parts"
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setEditingLineCode(null);
-                resetForm();
-              }}
-            >
-              取消
-            </Button>
-            <Button onClick={handleUpdate} disabled={updateMutation.isPending}>
-              {updateMutation.isPending ? "更新中..." : "更新"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Delete Confirmation */}
       <AlertDialog open={!!deleteConfirmId} onOpenChange={(open) => !open && setDeleteConfirmId(null)}>
