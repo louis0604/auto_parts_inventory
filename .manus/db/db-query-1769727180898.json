@@ -1,0 +1,16 @@
+{
+  "query": "SELECT id, sku, name, imageUrl FROM parts WHERE id IN (30001, 20001) LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, sku, name, imageUrl FROM parts WHERE id IN (30001, 20001) LIMIT 5;",
+  "rows": [
+    {
+      "id": "30001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "imageUrl": "https://d2xsxph8kpxj0f.cloudfront.net/99284894/b8PSAc4GGbWJXFTqco8XmD/parts/1769458802519-qp8m5y7t.jpg"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\timageUrl\n30001\tDL3614\tOil filter\thttps://d2xsxph8kpxj0f.cloudfront.net/99284894/b8PSAc4GGbWJXFTqco8XmD/parts/1769458802519-qp8m5y7t.jpg\n",
+  "stderr": "",
+  "execution_time_ms": 365
+}

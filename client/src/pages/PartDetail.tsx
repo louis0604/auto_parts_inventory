@@ -246,7 +246,7 @@ export default function PartDetail() {
             <div>
               <Label>配件图片</Label>
               <div 
-                className="relative w-full h-64 bg-white rounded mt-2 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors cursor-pointer overflow-hidden group"
+                className="relative w-full h-64 bg-gray-50 rounded mt-2 border-2 border-gray-300 hover:border-blue-400 transition-colors cursor-pointer flex items-center justify-center group"
                 onClick={() => document.getElementById('image-upload')?.click()}
                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                 onDrop={async (e) => {
@@ -259,28 +259,26 @@ export default function PartDetail() {
                 }}
               >
                 {formData.imageUrl ? (
-                  <>
-                    <img
-                      src={formData.imageUrl}
-                      alt={formData.name}
-                      className="w-full h-full object-contain p-2"
-                      onError={(e) => {
-                        // 图片加载失败时显示占位符
-                        e.currentTarget.style.display = 'none';
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center pointer-events-none">
-                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
-                        点击或拖拽更换图片
-                      </span>
-                    </div>
-                  </>
+                  <img
+                    src={formData.imageUrl}
+                    alt={formData.name}
+                    className="max-w-full max-h-full object-contain"
+                    onError={(e) => {
+                      console.error('图片加载失败:', formData.imageUrl);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
                 ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center text-gray-400">
+                  <div className="flex flex-col items-center justify-center text-gray-400">
                     <Package className="w-12 h-12 mb-2" />
                     <span className="text-sm">点击或拖拽上传图片</span>
                   </div>
                 )}
+                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 transition-opacity flex items-center justify-center pointer-events-none">
+                  <span className="text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium bg-white px-3 py-1 rounded shadow">
+                    点击更换图片
+                  </span>
+                </div>
               </div>
               <input
                 id="image-upload"
