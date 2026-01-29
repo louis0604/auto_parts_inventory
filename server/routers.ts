@@ -284,6 +284,11 @@ export const appRouter = router({
           unitPrice: z.string().optional(),
           coreCost: z.string().nullable().optional(),
           coreRetail: z.string().nullable().optional(),
+          replCost: z.string().nullable().optional(),
+          avgCost: z.string().nullable().optional(),
+          price1: z.string().nullable().optional(),
+          price2: z.string().nullable().optional(),
+          price3: z.string().nullable().optional(),
           
           // Order info
           orderMultiple: z.number().nullable().optional(),

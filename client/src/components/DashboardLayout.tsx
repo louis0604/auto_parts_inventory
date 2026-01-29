@@ -36,7 +36,7 @@ const menuItems = [
   { icon: FileText, label: "销售发票", path: "/sales-invoices" },
   { icon: RotateCcw, label: "退货管理", path: "/credits" },
   { icon: Shield, label: "保修管理", path: "/warranties" },
-  { icon: Search, label: "销售历史查询演示", path: "/sales-history-demo" },
+  { icon: Search, label: "操作历史", path: "/operation-history" },
   { icon: BarChart3, label: "库存记录", path: "/inventory-ledger" },
   { icon: Sparkles, label: "AI补货建议", path: "/ai-restocking" },
 ];

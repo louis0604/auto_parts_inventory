@@ -7,6 +7,7 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import PartsNew from "./pages/PartsNew";
+import PartDetail from "./pages/PartDetail";
 import PartHistory from "./pages/PartHistory";
 import Suppliers from "./pages/Suppliers";
 import Customers from "./pages/Customers";
@@ -16,15 +17,16 @@ import InventoryLedger from "./pages/InventoryLedger";
 import AIRestocking from "./pages/AIRestocking";
 import Credits from "./pages/Credits";
 import Warranties from "./pages/Warranties";
-import SalesHistoryDemo from "./pages/SalesHistoryDemo";
+import OperationHistory from "./pages/OperationHistory";
 
 function Router() {
   return (
     <DashboardLayout>
       <Switch>
         <Route path={"/"} component={Dashboard} />
-        <Route path={"/parts"} component={PartsNew} />
         <Route path={"/parts/:id/history"} component={PartHistory} />
+        <Route path={"/parts/:id"} component={PartDetail} />
+        <Route path={"/parts"} component={PartsNew} />
         <Route path={"/suppliers"} component={Suppliers} />
         <Route path={"/customers"} component={Customers} />
         <Route path={"/purchase-orders/:id"} component={PurchaseOrders} />
@@ -36,7 +38,8 @@ function Router() {
         <Route path={"/credits"} component={Credits} />
         <Route path={"/warranties/:id"} component={Warranties} />
         <Route path={"/warranties"} component={Warranties} />
-        <Route path={"/sales-history-demo"} component={SalesHistoryDemo} />
+        <Route path={"/operation-history/:partId?"} component={OperationHistory} />
+        <Route path={"/operation-history"} component={OperationHistory} />
         <Route path={"/ai-restocking"} component={AIRestocking} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
