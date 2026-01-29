@@ -288,3 +288,8 @@
 ## 配件页面Select组件错误修复
 - [x] 定位PartsNew.tsx中空值的Select.Item
 - [x] 修复Select.Item的value属性，确保不为空字符串
+
+## 配件页面布局优化
+- [x] 从配件列表移除Repl Cost、Avg Cost、Price 1、Price 2、Price 3列
+- [x] 在配件操作历史页面顶部信息区域添加价格字段显示
+- [x] 修改操作历史单号链接，直接跳转到单据详情而非列表页

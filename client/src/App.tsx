@@ -27,10 +27,14 @@ function Router() {
         <Route path={"/parts/:id/history"} component={PartHistory} />
         <Route path={"/suppliers"} component={Suppliers} />
         <Route path={"/customers"} component={Customers} />
+        <Route path={"/purchase-orders/:id"} component={PurchaseOrders} />
         <Route path={"/purchase-orders"} component={PurchaseOrders} />
+        <Route path={"/sales-invoices/:id"} component={SalesInvoices} />
         <Route path={"/sales-invoices"} component={SalesInvoices} />
         <Route path={"/inventory-ledger"} component={InventoryLedger} />
+        <Route path={"/credits/:id"} component={Credits} />
         <Route path={"/credits"} component={Credits} />
+        <Route path={"/warranties/:id"} component={Warranties} />
         <Route path={"/warranties"} component={Warranties} />
         <Route path={"/sales-history-demo"} component={SalesHistoryDemo} />
         <Route path={"/ai-restocking"} component={AIRestocking} />

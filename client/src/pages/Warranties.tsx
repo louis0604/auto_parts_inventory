@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,8 +48,19 @@ type WarrantyFormData = {
 };
 
 export default function Warranties() {
+  const [, params] = useRoute("/warranties/:id");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailWarrantyId, setDetailWarrantyId] = useState<number | null>(null);
+
+  // 如果有路由参数id，自动打开详情页
+  useEffect(() => {
+    if (params?.id) {
+      const warrantyId = parseInt(params.id);
+      if (!isNaN(warrantyId)) {
+        setDetailWarrantyId(warrantyId);
+      }
+    }
+  }, [params?.id]);
 
   const { data: warranties, isLoading, refetch } = trpc.warranties.list.useQuery();
   const { data: customers } = trpc.customers.list.useQuery();

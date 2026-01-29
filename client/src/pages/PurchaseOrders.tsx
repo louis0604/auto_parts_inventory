@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,8 +46,19 @@ type OrderFormData = {
 };
 
 export default function PurchaseOrders() {
+  const [, params] = useRoute("/purchase-orders/:id");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
+
+  // 如果有路由参数id，自动打开详情页
+  useEffect(() => {
+    if (params?.id) {
+      const orderId = parseInt(params.id);
+      if (!isNaN(orderId)) {
+        setDetailOrderId(orderId);
+      }
+    }
+  }, [params?.id]);
 
   const { data: orders, isLoading, refetch } = trpc.purchaseOrders.list.useQuery();
   const { data: suppliers } = trpc.suppliers.list.useQuery();

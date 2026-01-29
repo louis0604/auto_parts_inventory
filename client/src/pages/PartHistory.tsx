@@ -145,13 +145,13 @@ export default function PartHistory() {
   const getRecordDetailUrl = (type: string, recordId: number): string => {
     switch (type) {
       case "sale":
-        return `/sales-invoices?id=${recordId}`;
+        return `/sales-invoices/${recordId}`;
       case "purchase":
-        return `/purchase-orders?id=${recordId}`;
+        return `/purchase-orders/${recordId}`;
       case "credit":
-        return `/credits?id=${recordId}`;
+        return `/credits/${recordId}`;
       case "warranty":
-        return `/warranties?id=${recordId}`;
+        return `/warranties/${recordId}`;
       default:
         return "#";
     }
@@ -195,6 +195,28 @@ export default function PartHistory() {
                 <div>
                   <span className="text-gray-500">订货点：</span>
                   <span className="font-semibold ml-2">{part.orderPoint || 0}</span>
+                </div>
+              </div>
+              <div className="grid grid-cols-5 gap-4 text-sm mt-4 pt-4 border-t">
+                <div>
+                  <span className="text-gray-500">Repl Cost：</span>
+                  <span className="font-semibold ml-2">${part.replCost || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Avg Cost：</span>
+                  <span className="font-semibold ml-2">${part.avgCost || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Price 1：</span>
+                  <span className="font-semibold ml-2">${part.price1 || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Price 2：</span>
+                  <span className="font-semibold ml-2">${part.price2 || "-"}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Price 3：</span>
+                  <span className="font-semibold ml-2">${part.price3 || "-"}</span>
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,9 +48,20 @@ type InvoiceFormData = {
 };
 
 export default function SalesInvoices() {
+  const [, params] = useRoute("/sales-invoices/:id");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
   const [detailInvoiceId, setDetailInvoiceId] = useState<number | null>(null);
+
+  // 如果有路由参数id，自动打开详情页
+  useEffect(() => {
+    if (params?.id) {
+      const invoiceId = parseInt(params.id);
+      if (!isNaN(invoiceId)) {
+        setDetailInvoiceId(invoiceId);
+      }
+    }
+  }, [params?.id]);
 
   const { data: invoices, isLoading, refetch } = trpc.salesInvoices.list.useQuery();
   const { data: customers } = trpc.customers.list.useQuery();

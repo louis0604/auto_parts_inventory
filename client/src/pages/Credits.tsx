@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRoute } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,8 +48,19 @@ type CreditFormData = {
 };
 
 export default function Credits() {
+  const [, params] = useRoute("/credits/:id");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailCreditId, setDetailCreditId] = useState<number | null>(null);
+
+  // 如果有路由参数id，自动打开详情页
+  useEffect(() => {
+    if (params?.id) {
+      const creditId = parseInt(params.id);
+      if (!isNaN(creditId)) {
+        setDetailCreditId(creditId);
+      }
+    }
+  }, [params?.id]);
 
   const { data: credits, isLoading, refetch } = trpc.credits.list.useQuery();
   const { data: customers } = trpc.customers.list.useQuery();

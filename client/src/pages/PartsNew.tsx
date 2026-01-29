@@ -247,11 +247,6 @@ export default function PartsNew() {
               <TableHead className="w-32">Part Number</TableHead>
               <TableHead>Description</TableHead>
               <TableHead className="w-20 text-right">QOH</TableHead>
-              <TableHead className="w-24 text-right">Repl Cost</TableHead>
-              <TableHead className="w-24 text-right">Avg Cost</TableHead>
-              <TableHead className="w-24 text-right">Price 1</TableHead>
-              <TableHead className="w-24 text-right">Price 2</TableHead>
-              <TableHead className="w-24 text-right">Price 3</TableHead>
               <TableHead className="w-24 text-right">Retail</TableHead>
               <TableHead className="w-24 text-right">List</TableHead>
               <TableHead className="w-24 text-right">Order Point</TableHead>
@@ -284,11 +279,6 @@ export default function PartsNew() {
                   </TableCell>
                   <TableCell>{part.name}</TableCell>
                   <TableCell className="text-right">{part.stockQuantity}</TableCell>
-                  <TableCell className="text-right">${part.replCost || "-"}</TableCell>
-                  <TableCell className="text-right">${part.avgCost || "-"}</TableCell>
-                  <TableCell className="text-right">${part.price1 || "-"}</TableCell>
-                  <TableCell className="text-right">${part.price2 || "-"}</TableCell>
-                  <TableCell className="text-right">${part.price3 || "-"}</TableCell>
                   <TableCell className="text-right">${part.retail || "-"}</TableCell>
                   <TableCell className="text-right">${part.listPrice || "-"}</TableCell>
                   <TableCell className="text-right">{part.orderPoint || 0}</TableCell>
