@@ -55,7 +55,11 @@ export default function PartHistory() {
   // 统计信息
   const stats = useMemo(() => {
     const totalAmount = filteredHistory.reduce((sum: number, record: any) => {
-      return sum + (record.totalAmount || 0);
+      // totalAmount 可能是字符串或数字，需要转换为数字
+      const amount = typeof record.totalAmount === 'string' 
+        ? parseFloat(record.totalAmount) 
+        : (record.totalAmount || 0);
+      return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
     return {
       count: filteredHistory.length,

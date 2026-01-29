@@ -278,10 +278,8 @@ export default function PartsNew() {
                   </TableCell>
                   <TableCell className="font-medium">{lineCode?.code || "-"}</TableCell>
                   <TableCell>
-                    <Link href={`/parts/${part.id}/history`}>
-                      <a className="text-blue-600 hover:underline font-medium">
-                        {part.sku}
-                      </a>
+                    <Link href={`/parts/${part.id}/history`} className="text-blue-600 hover:underline font-medium">
+                      {part.sku}
                     </Link>
                   </TableCell>
                   <TableCell>{part.name}</TableCell>

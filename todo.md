@@ -273,3 +273,7 @@
 - [x] 实现前端筛选逻辑
 - [x] 显示筛选结果统计（记录数、总金额）
 - [x] 测试筛选功能
+
+## 配件操作历史页面错误修复
+- [x] 修复统计金额计算错误（totalAmount.toFixed is not a function）
+- [x] 修复嵌套<a>标签问题（nested anchor tags）
