@@ -353,6 +353,8 @@ export async function bulkCreateParts(partsData: Array<{
   unitPrice: string;
   currentStock?: number;
   minStock?: number;
+  imageBase64?: { data: string; extension: string } | null;
+  imageUrl?: string;
 }>): Promise<{ success: number; failed: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -362,6 +364,26 @@ export async function bulkCreateParts(partsData: Array<{
 
   for (const partData of partsData) {
     try {
+      // 如果有图片base64数据，上传到S3
+      let finalImageUrl = partData.imageUrl || "";
+      if (partData.imageBase64 && partData.imageBase64.data) {
+        try {
+          // 将base64转换为Buffer
+          const imageBuffer = Buffer.from(partData.imageBase64.data, 'base64');
+          const extension = partData.imageBase64.extension || 'png';
+          const fileName = `parts/${partData.sku}-${Date.now()}.${extension}`;
+          
+          // 上传到S3
+          const { storagePut } = await import('./storage');
+          const result = await storagePut(fileName, imageBuffer, `image/${extension}`);
+          finalImageUrl = result.url;
+          console.log(`Uploaded image for part ${partData.sku}: ${finalImageUrl}`);
+        } catch (uploadError) {
+          console.error(`Failed to upload image for part ${partData.sku}:`, uploadError);
+          // 继续创建配件，但不使用图片
+        }
+      }
+      
       await db.insert(parts).values({
         sku: partData.sku,
         name: partData.name,
@@ -372,6 +394,7 @@ export async function bulkCreateParts(partsData: Array<{
         stockQuantity: partData.currentStock || 0,
         minStockThreshold: partData.minStock || 0,
         unit: "个",
+        imageUrl: finalImageUrl || undefined,
       });
       success++;
     } catch (error) {

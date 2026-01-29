@@ -202,6 +202,11 @@ export const appRouter = router({
         unitPrice: z.string(),
         currentStock: z.number().optional(),
         minStock: z.number().optional(),
+        imageBase64: z.object({
+          data: z.string(),
+          extension: z.string()
+        }).nullable().optional(),
+        imageUrl: z.string().optional(),
       })))
       .mutation(async ({ input }) => {
         return await db.bulkCreateParts(input);

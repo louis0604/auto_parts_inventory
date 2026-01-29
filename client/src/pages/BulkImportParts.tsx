@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Upload, Download, FileSpreadsheet, ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 import { trpc } from "@/lib/trpc";
 
 export function BulkImportPartsPage() {
@@ -73,16 +74,40 @@ export function BulkImportPartsPage() {
     toast.success("模板已下载");
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setImporting(true);
+    
+    // 使用ExcelJS读取文件以支持图片提取
     const reader = new FileReader();
 
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
-        const data = new Uint8Array(event.target?.result as ArrayBuffer);
+        const arrayBuffer = event.target?.result as ArrayBuffer;
+        
+        // 使用ExcelJS读取文件（支持图片提取）
+        const excelWorkbook = new ExcelJS.Workbook();
+        await excelWorkbook.xlsx.load(arrayBuffer);
+        const excelWorksheet = excelWorkbook.worksheets[0];
+        
+        // 提取图片信息：建立行号到图片buffer的映射
+        const imageMap = new Map<number, { buffer: any; extension: string }>();
+        for (const image of excelWorksheet.getImages()) {
+          const rowIndex = image.range.tl.nativeRow; // 图片所在行（0-based）
+          const media = (excelWorkbook.model as any).media;
+          const img = media?.find((m: any) => m.index === image.imageId);
+          if (img && img.buffer) {
+            imageMap.set(rowIndex, {
+              buffer: img.buffer,
+              extension: img.extension || 'png'
+            });
+          }
+        }
+        
+        // 使用xlsx库解析数据（更快）
+        const data = new Uint8Array(arrayBuffer);
         const workbook = XLSX.read(data, { type: "array" });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
@@ -95,7 +120,8 @@ export function BulkImportPartsPage() {
         }
 
         // 解析数据，适配用户提供的模板格式
-        const parsed = jsonData.map((row: any) => {
+        const parsed = jsonData
+          .map((row: any, index: number) => {
           // 查找Line Code ID
           const lineCodeStr = row["Line"] || row["lineCode"] || "";
           const lineCode = lineCodes?.find(lc => lc.code === lineCodeStr);
@@ -131,8 +157,29 @@ export function BulkImportPartsPage() {
             orderPoint: Number(row["Order Qty"] || row["orderPoint"] || 0),
             // 图片URL（如果有）
             imageUrl: String(row["PICTURE"] || row["imageUrl"] || ""),
+            // 图片base64（如果有嵌入图片）
+            imageBase64: (() => {
+              const imgData = imageMap.get(index + 1); // +1因为Excel行号从1开始，但有表头行
+              if (imgData && imgData.buffer) {
+                // 将buffer转换为base64
+                const uint8Array = new Uint8Array(imgData.buffer);
+                let binary = '';
+                for (let i = 0; i < uint8Array.length; i++) {
+                  binary += String.fromCharCode(uint8Array[i]);
+                }
+                return {
+                  data: btoa(binary),
+                  extension: imgData.extension
+                };
+              }
+              return null;
+            })(),
           };
-        });
+        })
+          .filter((item: any) => {
+            // 过滤掉SKU为空的行（Excel模板末尾可能有空行）
+            return item.sku && item.sku.trim().length > 0;
+          });
 
         setParsedData(parsed);
         toast.success(`已解析 ${parsed.length} 条数据，请确认后导入`);
