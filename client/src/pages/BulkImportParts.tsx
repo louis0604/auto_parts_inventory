@@ -100,23 +100,37 @@ export function BulkImportPartsPage() {
           const lineCodeStr = row["Line"] || row["lineCode"] || "";
           const lineCode = lineCodes?.find(lc => lc.code === lineCodeStr);
 
+          // 价格字段处理：优先使用List Price作为unitPrice
+          const listPrice = row["List Price"] || row["listPrice"] || "";
+          const replCost = row["Repl Cost"] || row["replCost"] || "";
+          const retail = row["Retail"] || row["retail"] || "";
+          
+          // unitPrice使用List Price，如果没有则使用Retail，再没有则使用Repl Cost
+          const unitPrice = listPrice || retail || replCost || "0.00";
+
           return {
             sku: String(row["Partnumber"] || row["sku"] || ""),
             name: String(row["Description"] || row["name"] || ""),
             lineCodeId: lineCode?.id || null,
             description: String(row["Description"] || row["description"] || ""),
-            // Pricing - 使用用户模板的字段名
-            listPrice: String(row["List Price"] || ""),
-            replCost: String(row["Repl Cost"] || ""),
-            retail: String(row["Retail"] || ""),
-            price1: String(row["Price 1"] || ""),
-            price2: String(row["Price 2"] || ""),
-            price3: String(row["Price 3"] || ""),
+            // 必填字段：unitPrice
+            unitPrice: String(unitPrice),
+            // 必填字段：unit（单位），默认为EA
+            unit: String(row["Unit"] || row["unit"] || "EA"),
+            // 必填字段：minStockThreshold（最小库存阈值），默认为0
+            minStockThreshold: Number(row["Min Stock"] || row["minStockThreshold"] || 0),
+            // 额外价格字段 - 使用用户模板的字段名
+            listPrice: String(listPrice),
+            replCost: String(replCost),
+            retail: String(retail),
+            price1: String(row["Price 1"] || row["price1"] || ""),
+            price2: String(row["Price 2"] || row["price2"] || ""),
+            price3: String(row["Price 3"] || row["price3"] || ""),
             // Inventory
-            stockQuantity: Number(row["QOH "] || row["QOH"] || 0),
-            orderPoint: Number(row["Order Qty"] || 0),
+            stockQuantity: Number(row["QOH "] || row["QOH"] || row["stockQuantity"] || 0),
+            orderPoint: Number(row["Order Qty"] || row["orderPoint"] || 0),
             // 图片URL（如果有）
-            imageUrl: String(row["PICTURE"] || ""),
+            imageUrl: String(row["PICTURE"] || row["imageUrl"] || ""),
           };
         });
 
