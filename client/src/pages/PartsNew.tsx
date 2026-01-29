@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/table";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
-import { BulkImportParts } from "@/components/BulkImportParts";
+
 import { ImageUpload } from "@/components/ImageUpload";
 import { Edit, Trash2, Upload, Search } from "lucide-react";
 
@@ -65,7 +65,7 @@ export default function PartsNew() {
   const [selectedLineCodeFilter, setSelectedLineCodeFilter] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState<number | null>(null);
-  const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
 
   const { data: parts = [], refetch } = trpc.parts.list.useQuery();
@@ -188,10 +188,12 @@ export default function PartsNew() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">配件管理</h1>
         <div className="flex gap-2">
-          <Button onClick={() => setIsBulkImportOpen(true)} variant="outline">
-            <Upload className="w-4 h-4 mr-2" />
-            批量导入
-          </Button>
+          <Link href="/parts/import">
+            <Button variant="outline">
+              <Upload className="w-4 h-4 mr-2" />
+              批量导入
+            </Button>
+          </Link>
           <Link href="/parts/add">
             <Button>
               添加配件
@@ -391,22 +393,7 @@ export default function PartsNew() {
         </DialogContent>
       </Dialog>
 
-      {/* Bulk Import Dialog */}
-      <Dialog open={isBulkImportOpen} onOpenChange={setIsBulkImportOpen}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle>批量导入配件</DialogTitle>
-          </DialogHeader>
-          <BulkImportParts
-            open={isBulkImportOpen}
-            onOpenChange={setIsBulkImportOpen}
-            onSuccess={() => {
-              setIsBulkImportOpen(false);
-              refetch();
-            }}
-          />
-        </DialogContent>
-      </Dialog>
+
     </div>
   );
 }
