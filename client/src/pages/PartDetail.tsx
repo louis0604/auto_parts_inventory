@@ -246,7 +246,7 @@ export default function PartDetail() {
             <div>
               <Label>配件图片</Label>
               <div 
-                className="relative w-full h-64 bg-gray-100 rounded mt-2 border-2 border-dashed border-gray-300 hover:border-gray-400 transition-colors cursor-pointer overflow-hidden group"
+                className="relative w-full h-64 bg-white rounded mt-2 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors cursor-pointer overflow-hidden group"
                 onClick={() => document.getElementById('image-upload')?.click()}
                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
                 onDrop={async (e) => {
@@ -263,10 +263,14 @@ export default function PartDetail() {
                     <img
                       src={formData.imageUrl}
                       alt={formData.name}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain p-2"
+                      onError={(e) => {
+                        // 图片加载失败时显示占位符
+                        e.currentTarget.style.display = 'none';
+                      }}
                     />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-40 transition-all flex items-center justify-center">
-                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm">
+                    <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all flex items-center justify-center pointer-events-none">
+                      <span className="text-white opacity-0 group-hover:opacity-100 transition-opacity text-sm font-medium">
                         点击或拖拽更换图片
                       </span>
                     </div>
