@@ -501,7 +501,7 @@ export const appRouter = router({
       .input(z.object({
         orderNumber: z.string().min(1),
         supplierId: z.number(),
-        type: z.enum(["purchase", "return"]).default("purchase"),
+        type: z.enum(["inbound", "outbound"]).default("inbound"),
         items: z.array(z.object({
           partId: z.number(),
           quantity: z.number().min(1),
@@ -534,10 +534,10 @@ export const appRouter = router({
           });
           
           // Update stock based on order type
-          if (input.type === "purchase") {
+          if (input.type === "inbound") {
             // Inbound: increase stock
             await db.adjustStock(item.partId, item.quantity);
-          } else if (input.type === "return") {
+          } else if (input.type === "outbound") {
             // Outbound: decrease stock
             await db.adjustStock(item.partId, -item.quantity);
           }

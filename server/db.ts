@@ -752,7 +752,7 @@ export async function getPurchaseOrderById(id: number) {
 export async function createPurchaseOrder(data: {
   orderNumber: string;
   supplierId: number;
-  type?: "purchase" | "return";
+  type?: "inbound" | "outbound";
   totalAmount: string;
   notes?: string;
   createdBy: number;

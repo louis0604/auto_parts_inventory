@@ -1,0 +1,40 @@
+{
+  "query": "SELECT id, orderNumber, type FROM purchase_orders;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, orderNumber, type FROM purchase_orders;",
+  "rows": [
+    {
+      "id": "30001",
+      "orderNumber": "PO-1769452583649",
+      "type": "purchase"
+    },
+    {
+      "id": "90001",
+      "orderNumber": "PO-1769724015987",
+      "type": "purchase"
+    },
+    {
+      "id": "120001",
+      "orderNumber": "PO-1769754283144",
+      "type": "purchase"
+    },
+    {
+      "id": "150001",
+      "orderNumber": "PO-1769799407330",
+      "type": "purchase"
+    },
+    {
+      "id": "180001",
+      "orderNumber": "PO-1769806412955",
+      "type": "return"
+    },
+    {
+      "id": "180002",
+      "orderNumber": "PO-1769806464054",
+      "type": "return"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\torderNumber\ttype\n30001\tPO-1769452583649\tpurchase\n90001\tPO-1769724015987\tpurchase\n120001\tPO-1769754283144\tpurchase\n150001\tPO-1769799407330\tpurchase\n180001\tPO-1769806412955\treturn\n180002\tPO-1769806464054\treturn\n",
+  "stderr": "",
+  "execution_time_ms": 1241
+}

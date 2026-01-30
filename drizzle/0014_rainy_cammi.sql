@@ -1,0 +1,1 @@
+ALTER TABLE `purchase_orders` MODIFY COLUMN `type` enum('purchase','return') NOT NULL DEFAULT 'purchase';
