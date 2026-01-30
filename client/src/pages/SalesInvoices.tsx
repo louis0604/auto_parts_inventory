@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,7 @@ type InvoiceFormData = {
 
 export default function SalesInvoices() {
   const [, params] = useRoute("/sales-invoices/:id");
+  const [, setLocation] = useLocation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [viewingInvoice, setViewingInvoice] = useState<number | null>(null);
   const [detailInvoiceId, setDetailInvoiceId] = useState<number | null>(null);
@@ -179,7 +180,7 @@ export default function SalesInvoices() {
           <h1 className="text-3xl font-bold">销售发票</h1>
           <p className="text-muted-foreground">管理销售发票和出库记录</p>
         </div>
-        <Button onClick={() => setIsAddDialogOpen(true)}>
+        <Button onClick={() => setLocation("/sales-invoices/create")}>
           <Plus className="h-4 w-4 mr-2" />
           创建发票
         </Button>
@@ -212,7 +213,7 @@ export default function SalesInvoices() {
                     <TableRow key={invoice.id}>
                       <TableCell className="font-mono">
                         <button
-                          onClick={() => setDetailInvoiceId(invoice.id)}
+                          onClick={() => setLocation(`/sales-invoices/${invoice.id}`)}
                           className="text-blue-600 hover:underline cursor-pointer"
                         >
                           {invoice.invoiceNumber}
@@ -293,7 +294,7 @@ export default function SalesInvoices() {
 
       {/* 创建发票对话框 */}
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle>创建销售发票</DialogTitle>
           </DialogHeader>
@@ -477,7 +478,7 @@ export default function SalesInvoices() {
       {/* 打印预览对话框 - 专业发票格式 */}
       {viewingInvoice && viewInvoiceDetails && (
         <Dialog open={!!viewingInvoice} onOpenChange={() => setViewingInvoice(null)}>
-          <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto print:max-w-full print:h-auto">
+          <DialogContent className="max-w-[1000px] max-h-[90vh] overflow-y-auto print:max-w-full print:h-auto bg-card text-card-foreground">
             <DialogHeader className="print:hidden">
               <DialogTitle>销售发票打印预览</DialogTitle>
             </DialogHeader>

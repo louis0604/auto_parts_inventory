@@ -241,6 +241,24 @@ export async function deleteCustomer(id: number): Promise<void> {
 }
 
 // ===== Parts =====
+export async function getLineCodesBySku(sku: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db
+    .select({
+      id: parts.id,
+      lineCodeId: parts.lineCodeId,
+      lineCodeName: lineCodes.code,
+      sku: parts.sku,
+      name: parts.name,
+      unitPrice: parts.unitPrice,
+    })
+    .from(parts)
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(eq(parts.sku, sku));
+  return result.filter(r => r.lineCodeName !== null);
+}
+
 export async function getAllParts(): Promise<(Part & { lineCode?: string | null })[]> {
   const db = await getDb();
   if (!db) return [];

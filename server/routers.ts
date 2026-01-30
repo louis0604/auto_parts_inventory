@@ -189,6 +189,11 @@ export const appRouter = router({
       .query(async ({ input }) => {
         return await db.searchParts(input);
       }),
+    getLineCodesBySku: protectedProcedure
+      .input(z.object({ sku: z.string() }))
+      .query(async ({ input, ctx }) => {
+        return await db.getLineCodesBySku(input.sku);
+      }),
     lowStock: protectedProcedure.query(async () => {
       return await db.getLowStockParts();
     }),

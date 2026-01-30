@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,7 @@ type CreditFormData = {
 
 export default function Credits() {
   const [, params] = useRoute("/credits/:id");
+  const [, setLocation] = useLocation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailCreditId, setDetailCreditId] = useState<number | null>(null);
 
@@ -150,7 +151,7 @@ export default function Credits() {
               <RotateCcw className="h-6 w-6" />
               退货管理
             </CardTitle>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Button onClick={() => setLocation("/credits/create")}>
               <Plus className="h-4 w-4 mr-2" />
               创建退货单
             </Button>
@@ -177,10 +178,10 @@ export default function Credits() {
                 {credits.map((credit) => (
                   <TableRow key={credit.id}>
                     <TableCell>
-                      <button
-                        onClick={() => setDetailCreditId(credit.id)}
-                        className="text-blue-600 hover:underline font-mono"
-                      >
+                        <button
+                          onClick={() => setLocation(`/credits/${credit.id}`)}
+                          className="text-blue-600 hover:underline cursor-pointer"
+                        >
                         {credit.creditNumber}
                       </button>
                     </TableCell>

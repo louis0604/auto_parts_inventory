@@ -446,3 +446,27 @@
 - [x] 清理测试数据（TEST-ARCHIVE-001等）
 - [x] 验证批量删除和归档功能正常工作
 - [x] 确认问题是前端缓存问题，刷新后正常显示
+
+## 修复采购订单页面显示问题并实现SKU多Line Code选择功能
+- [ ] 修复采购订单详情页面配件列表显示问题（Line Code、Part Number等列被截断）
+- [ ] 修复创建采购订单表单布局问题
+- [ ] 实现SKU多Line Code检测：查询SKU时检查是否有多个Line Code
+- [ ] 实现Line Code选择器：当SKU有多个Line Code时弹出选择对话框
+- [ ] 在采购订单中应用SKU多Line Code选择逻辑
+- [ ] 在销售订单中应用SKU多Line Code选择逻辑
+- [ ] 在退货管理中应用SKU多Line Code选择逻辑
+- [ ] 在保修管理中应用SKU多Line Code选择逻辑
+- [ ] 测试所有模块的SKU输入和Line Code选择功能
+
+## 创建独立页面替代Dialog并实现SKU多Line Code选择功能
+- [x] 创建CreatePurchaseOrder.tsx（采购订单创建页面）
+- [x] 创建PurchaseOrderDetailPage.tsx（采购订单详情页面）
+- [x] 创建CreateSalesInvoice.tsx（销售订单创建页面）
+- [x] 创建SalesInvoiceDetailPage.tsx（销售订单详情页面）
+- [x] 创建CreateWarranty.tsx（保修单创建页面）
+- [x] 创建WarrantyDetailPage.tsx（保修单详情页面）
+- [x] 创建CreateCredit.tsx（退货单创建页面）
+- [x] 创建CreditDetailPage.tsx（退货单详情页面）
+- [x] 实现SKU多Line Code选择功能（简化方案：在下拉列表中显示Line Code - Part Number - 名称）
+- [x] 更新所有路由和导航链接
+- [x] 测试所有新页面（采购订单、销售订单、保修单、退货单）

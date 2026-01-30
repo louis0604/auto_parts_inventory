@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,18 +47,11 @@ type OrderFormData = {
 
 export default function PurchaseOrders() {
   const [, params] = useRoute("/purchase-orders/:id");
+  const [, setLocation] = useLocation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailOrderId, setDetailOrderId] = useState<number | null>(null);
 
-  // 如果有路由参数id，自动打开详情页
-  useEffect(() => {
-    if (params?.id) {
-      const orderId = parseInt(params.id);
-      if (!isNaN(orderId)) {
-        setDetailOrderId(orderId);
-      }
-    }
-  }, [params?.id]);
+
 
   const { data: orders, isLoading, refetch } = trpc.purchaseOrders.list.useQuery();
   const { data: suppliers } = trpc.suppliers.list.useQuery();
@@ -156,24 +149,12 @@ export default function PurchaseOrders() {
               <ShoppingCart className="h-6 w-6" />
               采购订单管理
             </CardTitle>
+            <Button onClick={() => setLocation("/purchase-orders/create")}>
+              <Plus className="h-4 w-4 mr-2" />
+              创建采购订单
+            </Button>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-              <DialogTrigger asChild>
-                <Button
-                  onClick={() => {
-                    reset({
-                      orderNumber: `PO-${Date.now()}`,
-                      supplierId: 0,
-                      notes: "",
-                      items: [{ partId: 0, quantity: 1, unitPrice: "0" }],
-                    });
-                  }}
-                  className="neon-border-pink"
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  创建采购订单
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground">
                 <DialogHeader>
                   <DialogTitle className="neon-text-cyan">创建采购订单</DialogTitle>
                 </DialogHeader>
@@ -334,7 +315,7 @@ export default function PurchaseOrders() {
                       <TableRow key={order.id} className="hover:bg-card/30">
                         <TableCell className="font-mono text-sm">
                           <button
-                            onClick={() => setDetailOrderId(order.id)}
+                            onClick={() => setLocation(`/purchase-orders/${order.id}`)}
                             className="text-blue-400 hover:underline cursor-pointer"
                           >
                             {order.orderNumber}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute } from "wouter";
+import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +49,7 @@ type WarrantyFormData = {
 
 export default function Warranties() {
   const [, params] = useRoute("/warranties/:id");
+  const [, setLocation] = useLocation();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [detailWarrantyId, setDetailWarrantyId] = useState<number | null>(null);
 
@@ -152,7 +153,7 @@ export default function Warranties() {
               <Shield className="h-6 w-6" />
               保修管理
             </CardTitle>
-            <Button onClick={() => setIsAddDialogOpen(true)}>
+            <Button onClick={() => setLocation("/warranties/create")}>
               <Plus className="h-4 w-4 mr-2" />
               创建保修单
             </Button>
@@ -180,7 +181,7 @@ export default function Warranties() {
                   <TableRow key={warranty.id}>
                     <TableCell>
                       <button
-                        onClick={() => setDetailWarrantyId(warranty.id)}
+                        onClick={() => setLocation(`/warranties/${warranty.id}`)}
                         className="text-blue-600 hover:underline font-mono"
                       >
                         {warranty.warrantyNumber}
@@ -266,7 +267,7 @@ export default function Warranties() {
       />
       {/* Old Dialog - Commented out
       <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle>创建保修单</DialogTitle>
           </DialogHeader>
@@ -443,7 +444,7 @@ function WarrantyDetail({ warrantyId, onClose }: { warrantyId: number; onClose: 
   if (isLoading) {
     return (
       <Dialog open={true} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl">
+        <DialogContent className="max-w-4xl bg-card text-card-foreground">
           <DialogHeader>
             <DialogTitle>保修单详情</DialogTitle>
           </DialogHeader>
@@ -459,7 +460,7 @@ function WarrantyDetail({ warrantyId, onClose }: { warrantyId: number; onClose: 
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground">
         <DialogHeader>
           <DialogTitle>保修单详情 - {warranty.warrantyNumber}</DialogTitle>
         </DialogHeader>

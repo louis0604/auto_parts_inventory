@@ -1,0 +1,24 @@
+{
+  "query": "SELECT p.id, p.sku, p.name, lc.id as lineCodeId, lc.code as lineCodeName \nFROM parts p \nLEFT JOIN line_codes lc ON p.lineCodeId = lc.id \nWHERE p.sku = 'DL3614';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT p.id, p.sku, p.name, lc.id as lineCodeId, lc.code as lineCodeName \nFROM parts p \nLEFT JOIN line_codes lc ON p.lineCodeId = lc.id \nWHERE p.sku = 'DL3614';",
+  "rows": [
+    {
+      "id": "30001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "lineCodeId": "1",
+      "lineCodeName": "FRA"
+    },
+    {
+      "id": "120001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "lineCodeId": "30001",
+      "lineCodeName": "XTD"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tlineCodeId\tlineCodeName\n30001\tDL3614\tOil filter\t1\tFRA\n120001\tDL3614\tOil filter\t30001\tXTD\n",
+  "stderr": "",
+  "execution_time_ms": 361
+}

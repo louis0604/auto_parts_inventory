@@ -21,7 +21,15 @@ import Customers from "./pages/Customers";
 import AddCustomer from "./pages/AddCustomer";
 import EditCustomer from "./pages/EditCustomer";
 import PurchaseOrders from "./pages/PurchaseOrders";
+import CreatePurchaseOrder from "./pages/CreatePurchaseOrder";
+import PurchaseOrderDetailPage from "./pages/PurchaseOrderDetailPage";
 import SalesInvoices from "./pages/SalesInvoices";
+import CreateSalesInvoice from "./pages/CreateSalesInvoice";
+import SalesInvoiceDetailPage from "./pages/SalesInvoiceDetailPage";
+import CreateWarranty from "./pages/CreateWarranty";
+import WarrantyDetailPage from "./pages/WarrantyDetailPage";
+import CreateCredit from "./pages/CreateCredit";
+import CreditDetailPage from "./pages/CreditDetailPage";
 import InventoryLedger from "./pages/InventoryLedger";
 import AIRestocking from "./pages/AIRestocking";
 import Credits from "./pages/Credits";
@@ -47,14 +55,18 @@ function Router() {
         <Route path={"/customers/add"} component={AddCustomer} />
         <Route path={"/customers/:id/edit"} component={EditCustomer} />
         <Route path={"/customers"} component={Customers} />
-        <Route path={"/purchase-orders/:id"} component={PurchaseOrders} />
+        <Route path={"/purchase-orders/create"} component={CreatePurchaseOrder} />
+        <Route path={"/purchase-orders/:id"} component={PurchaseOrderDetailPage} />
         <Route path={"/purchase-orders"} component={PurchaseOrders} />
-        <Route path={"/sales-invoices/:id"} component={SalesInvoices} />
+        <Route path={"/sales-invoices/create"} component={CreateSalesInvoice} />
+        <Route path={"/sales-invoices/:id"} component={SalesInvoiceDetailPage} />
         <Route path={"/sales-invoices"} component={SalesInvoices} />
         <Route path={"/inventory-ledger"} component={InventoryLedger} />
-        <Route path={"/credits/:id"} component={Credits} />
+        <Route path={"/credits/create"} component={CreateCredit} />
+        <Route path={"/credits/:id"} component={CreditDetailPage} />
         <Route path={"/credits"} component={Credits} />
-        <Route path={"/warranties/:id"} component={Warranties} />
+        <Route path={"/warranties/create"} component={CreateWarranty} />
+        <Route path={"/warranties/:id"} component={WarrantyDetailPage} />
         <Route path={"/warranties"} component={Warranties} />
         <Route path={"/operation-history/:partId?"} component={OperationHistory} />
         <Route path={"/operation-history"} component={OperationHistory} />
