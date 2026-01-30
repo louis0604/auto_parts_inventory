@@ -394,3 +394,9 @@
 - [x] 修夏Line Code字段传递
 - [x] 修复价格字段（listPrice, retail, replCost等）传递
 - [x] 测试批量导入功能
+
+## 添加配件删除功能
+- [x] 检查Parts页面的表格结构
+- [x] 在Order Point列后添加删除按钮列
+- [x] 实现删除确认对话框
+- [x] 测试删除功能
