@@ -259,6 +259,25 @@ export async function getLineCodesBySku(sku: string) {
   return result.filter(r => r.lineCodeName !== null);
 }
 
+export async function getPartsBySku(sku: string) {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db
+    .select({
+      id: parts.id,
+      lineCodeId: parts.lineCodeId,
+      lineCodeName: lineCodes.code,
+      sku: parts.sku,
+      name: parts.name,
+      cost: parts.cost,
+      unitPrice: parts.unitPrice,
+    })
+    .from(parts)
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(and(eq(parts.sku, sku), eq(parts.isArchived, false)));
+  return result;
+}
+
 export async function getAllParts(): Promise<(Part & { lineCode?: string | null })[]> {
   const db = await getDb();
   if (!db) return [];
@@ -732,6 +751,7 @@ export async function getPurchaseOrderById(id: number) {
 export async function createPurchaseOrder(data: {
   orderNumber: string;
   supplierId: number;
+  type?: "purchase" | "return";
   totalAmount: string;
   notes?: string;
   createdBy: number;

@@ -470,3 +470,13 @@
 - [x] 实现SKU多Line Code选择功能（简化方案：在下拉列表中显示Line Code - Part Number - 名称）
 - [x] 更新所有路由和导航链接
 - [x] 测试所有新页面（采购订单、销售订单、保修单、退货单）
+
+## 修改采购订单功能：使用purchase/return类型
+- [x] 修改CreatePurchaseOrder.tsx：添加订单类型选择（purchase/return）
+- [x] 修改配件输入方式：从下拉选择改为直接输入配件号
+- [x] 实现配件号输入后自动查询并填充信息
+- [x] 自动填入单价（cost）
+- [x] 自动计算小计和总计
+- [x] 添加后端API: parts.getBySku
+- [x] 修改后端API：支持purchase增加库存、return减少库存
+- [ ] 测试purchase和return功能，验证库存更新正确

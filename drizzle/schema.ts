@@ -145,7 +145,7 @@ export const purchaseOrders = mysqlTable("purchase_orders", {
   supplierId: int("supplierId").notNull().references(() => suppliers.id),
   orderDate: timestamp("orderDate").defaultNow().notNull(),
   orderTime: varchar("orderTime", { length: 10 }), // Time in HH:MM:SS format
-  type: mysqlEnum("type", ["purchase", "return"]).default("purchase").notNull(), // Purchase or Return
+  type: mysqlEnum("type", ["inbound", "outbound"]).default("inbound").notNull(), // Inbound (入库) or Outbound (出库)
   totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(),
   status: mysqlEnum("status", ["pending", "received", "cancelled"]).default("pending").notNull(),
   notes: text("notes"),

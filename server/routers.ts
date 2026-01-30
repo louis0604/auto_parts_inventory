@@ -191,8 +191,13 @@ export const appRouter = router({
       }),
     getLineCodesBySku: protectedProcedure
       .input(z.object({ sku: z.string() }))
-      .query(async ({ input, ctx }) => {
+      .query(async ({ input }) => {
         return await db.getLineCodesBySku(input.sku);
+      }),
+    getBySku: protectedProcedure
+      .input(z.object({ sku: z.string() }))
+      .query(async ({ input }) => {
+        return await db.getPartsBySku(input.sku);
       }),
     lowStock: protectedProcedure.query(async () => {
       return await db.getLowStockParts();
@@ -496,6 +501,7 @@ export const appRouter = router({
       .input(z.object({
         orderNumber: z.string().min(1),
         supplierId: z.number(),
+        type: z.enum(["purchase", "return"]).default("purchase"),
         items: z.array(z.object({
           partId: z.number(),
           quantity: z.number().min(1),
@@ -511,6 +517,7 @@ export const appRouter = router({
         const order = await db.createPurchaseOrder({
           orderNumber: input.orderNumber,
           supplierId: input.supplierId,
+          type: input.type,
           totalAmount,
           notes: input.notes,
           createdBy: ctx.user.id,
@@ -525,6 +532,15 @@ export const appRouter = router({
             unitPrice: item.unitPrice,
             subtotal,
           });
+          
+          // Update stock based on order type
+          if (input.type === "purchase") {
+            // Inbound: increase stock
+            await db.adjustStock(item.partId, item.quantity);
+          } else if (input.type === "return") {
+            // Outbound: decrease stock
+            await db.adjustStock(item.partId, -item.quantity);
+          }
         }
         
         return order;

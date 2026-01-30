@@ -7,14 +7,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Plus, Trash2, Search } from "lucide-react";
+import { useState } from "react";
 
 type OrderFormData = {
   orderNumber: string;
   supplierId?: number;
+  type: "purchase" | "return";
   notes?: string;
   items: Array<{
     partId: number;
+    sku: string;
+    lineCode: string;
+    name: string;
     quantity: number;
     unitPrice: string;
   }>;
@@ -22,9 +27,9 @@ type OrderFormData = {
 
 export default function CreatePurchaseOrder() {
   const [, setLocation] = useLocation();
+  const [searchingIndex, setSearchingIndex] = useState<number | null>(null);
   
   const { data: suppliers } = trpc.suppliers.list.useQuery();
-  const { data: parts } = trpc.parts.list.useQuery();
   
   const createMutation = trpc.purchaseOrders.create.useMutation({
     onSuccess: () => {
@@ -39,7 +44,8 @@ export default function CreatePurchaseOrder() {
   const { register, handleSubmit, control, watch, setValue } = useForm<OrderFormData>({
     defaultValues: {
       orderNumber: `PO-${Date.now()}`,
-      items: [{ partId: 0, quantity: 1, unitPrice: "0" }],
+      type: "purchase",
+      items: [{ partId: 0, sku: "", lineCode: "", name: "", quantity: 1, unitPrice: "0" }],
     },
   });
 
@@ -49,6 +55,53 @@ export default function CreatePurchaseOrder() {
   });
 
   const watchItems = watch("items");
+  const watchType = watch("type");
+
+  const handleSearchPart = async (index: number) => {
+    const sku = watchItems[index].sku.trim();
+    if (!sku) {
+      toast.error("请输入配件号");
+      return;
+    }
+
+    setSearchingIndex(index);
+    
+    try {
+      // 查询配件信息
+      const response = await fetch(`/api/trpc/parts.getBySku?input=${encodeURIComponent(JSON.stringify({ sku }))}`);
+      const result = await response.json();
+      
+      if (result.result?.data) {
+        const parts = result.result.data;
+        
+        if (parts.length === 0) {
+          toast.error(`未找到配件号: ${sku}`);
+        } else if (parts.length === 1) {
+          // 只有一个配件，直接填充
+          const part = parts[0];
+          setValue(`items.${index}.partId`, part.id);
+          setValue(`items.${index}.lineCode`, part.lineCodeName || "N/A");
+          setValue(`items.${index}.name`, part.name);
+          setValue(`items.${index}.unitPrice`, part.cost || "0");
+          toast.success("配件信息已填充");
+        } else {
+          // 多个配件（不同Line Code），选择第一个
+          const part = parts[0];
+          setValue(`items.${index}.partId`, part.id);
+          setValue(`items.${index}.lineCode`, part.lineCodeName || "N/A");
+          setValue(`items.${index}.name`, part.name);
+          setValue(`items.${index}.unitPrice`, part.cost || "0");
+          toast.info(`找到${parts.length}个相同配件号的配件，已选择第一个（Line Code: ${part.lineCodeName}）`);
+        }
+      } else {
+        toast.error("查询失败");
+      }
+    } catch (error) {
+      toast.error("查询配件失败");
+    } finally {
+      setSearchingIndex(null);
+    }
+  };
 
   const onSubmit = (data: OrderFormData) => {
     if (!data.supplierId) {
@@ -63,25 +116,34 @@ export default function CreatePurchaseOrder() {
     }
 
     createMutation.mutate({
-      ...data,
+      orderNumber: data.orderNumber,
+      supplierId: data.supplierId,
+      type: data.type,
+      notes: data.notes,
       items: validItems.map(item => ({
-        ...item,
+        partId: item.partId,
+        quantity: item.quantity,
         unitPrice: parseFloat(item.unitPrice) || 0,
       })),
     });
   };
 
+  const calculateSubtotal = (index: number) => {
+    const item = watchItems[index];
+    const price = parseFloat(item.unitPrice) || 0;
+    return (price * item.quantity).toFixed(2);
+  };
+
   const calculateTotal = () => {
     return watchItems.reduce((sum, item) => {
-      const part = parts?.find(p => p.id === item.partId);
-      const price = parseFloat(item.unitPrice) || (part?.unitPrice ? parseFloat(part.unitPrice) : 0);
+      const price = parseFloat(item.unitPrice) || 0;
       return sum + (price * item.quantity);
-    }, 0);
+    }, 0).toFixed(2);
   };
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container max-w-4xl py-8">
+      <div className="container max-w-6xl py-8">
         <div className="mb-6">
           <Button
             variant="ghost"
@@ -95,20 +157,39 @@ export default function CreatePurchaseOrder() {
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div>
               <Label htmlFor="orderNumber">订单号 *</Label>
               <Input
                 id="orderNumber"
                 {...register("orderNumber", { required: true })}
+                className="mt-1"
               />
             </div>
+
             <div>
-              <Label>供应商 *</Label>
+              <Label htmlFor="type">订单类型 *</Label>
               <Select
+                value={watchType}
+                onValueChange={(value) => setValue("type", value as "purchase" | "return")}
+              >
+                <SelectTrigger className="mt-1">
+                  <SelectValue placeholder="选择订单类型" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="purchase">入库 (Purchase)</SelectItem>
+                  <SelectItem value="return">出库 (Return)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="supplier">供应商 *</Label>
+              <Select
+                value={watch("supplierId")?.toString()}
                 onValueChange={(value) => setValue("supplierId", parseInt(value))}
               >
-                <SelectTrigger>
+                <SelectTrigger className="mt-1">
                   <SelectValue placeholder="选择供应商" />
                 </SelectTrigger>
                 <SelectContent>
@@ -127,101 +208,102 @@ export default function CreatePurchaseOrder() {
             <Textarea
               id="notes"
               {...register("notes")}
+              className="mt-1"
               rows={3}
             />
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-4">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold">配件明细</h2>
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => append({ partId: 0, quantity: 1, unitPrice: "0" })}
+                onClick={() => append({ partId: 0, sku: "", lineCode: "", name: "", quantity: 1, unitPrice: "0" })}
               >
                 <Plus className="mr-2 h-4 w-4" />
                 添加配件
               </Button>
             </div>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 font-medium text-sm">
-                <div>配件</div>
-                <div>数量</div>
-                <div>单价</div>
-                <div>小计</div>
-                <div>操作</div>
-              </div>
-
-              {fields.map((field, index) => {
-                const selectedPart = parts?.find(p => p.id === watchItems[index]?.partId);
-                const unitPrice = parseFloat(watchItems[index]?.unitPrice) || 
-                                (selectedPart?.unitPrice ? parseFloat(selectedPart.unitPrice) : 0);
-                const subtotal = unitPrice * watchItems[index]?.quantity;
-
-                return (
-                  <div key={field.id} className="grid grid-cols-[2fr,1fr,1fr,1fr,auto] gap-4 items-center">
-                    <Select
-                      value={watchItems[index]?.partId?.toString()}
-                      onValueChange={(value) => {
-                        const partId = parseInt(value);
-                        setValue(`items.${index}.partId`, partId);
-                        const part = parts?.find(p => p.id === partId);
-                        if (part?.unitPrice) {
-                          setValue(`items.${index}.unitPrice`, part.unitPrice);
-                        }
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择配件" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {parts?.map((part) => (
-                          <SelectItem key={part.id} value={part.id.toString()}>
-                            {part.lineCode?.name || "N/A"} - {part.partNumber} - {part.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-
-                    <Input
-                      type="number"
-                      min="1"
-                      {...register(`items.${index}.quantity` as const, {
-                        valueAsNumber: true,
-                        min: 1,
-                      })}
-                    />
-
-                    <Input
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      {...register(`items.${index}.unitPrice` as const)}
-                    />
-
-                    <div className="font-medium">
-                      ¥{subtotal.toFixed(2)}
-                    </div>
-
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => remove(index)}
-                      disabled={fields.length === 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                );
-              })}
+            <div className="border rounded-lg overflow-hidden">
+              <table className="w-full">
+                <thead className="bg-muted">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-sm font-medium">#</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">配件号 (SKU)</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">Line Code</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">配件名称</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">数量</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">单价</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">小计</th>
+                    <th className="px-4 py-3 text-left text-sm font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {fields.map((field, index) => (
+                    <tr key={field.id} className="border-t">
+                      <td className="px-4 py-3 text-sm">{index + 1}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Input
+                            {...register(`items.${index}.sku`)}
+                            placeholder="输入配件号"
+                            className="w-32"
+                          />
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleSearchPart(index)}
+                            disabled={searchingIndex === index}
+                          >
+                            <Search className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm">{watchItems[index].lineCode || "-"}</td>
+                      <td className="px-4 py-3 text-sm">{watchItems[index].name || "-"}</td>
+                      <td className="px-4 py-3">
+                        <Input
+                          type="number"
+                          {...register(`items.${index}.quantity`, { valueAsNumber: true })}
+                          min="1"
+                          className="w-20"
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <Input
+                          type="number"
+                          step="0.01"
+                          {...register(`items.${index}.unitPrice`)}
+                          className="w-24"
+                        />
+                      </td>
+                      <td className="px-4 py-3 text-sm">¥{calculateSubtotal(index)}</td>
+                      <td className="px-4 py-3">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => remove(index)}
+                          disabled={fields.length === 1}
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
 
-            <div className="mt-6 flex justify-end">
-              <div className="text-xl font-bold">
-                总计: ¥{calculateTotal().toFixed(2)}
+            <div className="flex justify-end">
+              <div className="text-right">
+                <div className="text-lg font-semibold">
+                  总计: <span className="text-2xl">¥{calculateTotal()}</span>
+                </div>
               </div>
             </div>
           </div>
