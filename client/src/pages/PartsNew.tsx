@@ -185,8 +185,14 @@ export default function PartsNew() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm("确定要删除这个配件吗？")) {
-      deleteMutation.mutate(id);
+    // If there are selected items, delete all selected items
+    if (selectedPartIds.size > 0) {
+      setIsBulkDeleteDialogOpen(true);
+    } else {
+      // Single delete
+      if (confirm("确定要删除这个配件吗？")) {
+        deleteMutation.mutate(id);
+      }
     }
   };
 
