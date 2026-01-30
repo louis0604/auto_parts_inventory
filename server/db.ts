@@ -271,6 +271,7 @@ export async function getPartsBySku(sku: string) {
       name: parts.name,
       cost: parts.cost,
       unitPrice: parts.unitPrice,
+      replCost: parts.replCost,
     })
     .from(parts)
     .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))

@@ -12,6 +12,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogOverlay,
 } from "@/components/ui/dialog";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
@@ -39,6 +40,7 @@ type PartOption = {
   lineCodeName: string | null;
   name: string;
   cost: string | null;
+  replCost: string | null;
 };
 
 export default function CreatePurchaseOrder() {
@@ -99,7 +101,7 @@ export default function CreatePurchaseOrder() {
           setValue(`items.${index}.partId`, part.id);
           setValue(`items.${index}.lineCode`, part.lineCodeName || "N/A");
           setValue(`items.${index}.name`, part.name);
-          setValue(`items.${index}.unitPrice`, part.cost || "0");
+          setValue(`items.${index}.unitPrice`, part.replCost || part.cost || "0");
           toast.success("配件信息已填充");
         } else {
           // 多个配件（不同Line Code），显示选择对话框
@@ -340,7 +342,7 @@ export default function CreatePurchaseOrder() {
 
     {/* Line Code 选择对话框 */}
     <Dialog open={selectingForIndex !== null} onOpenChange={(open) => !open && setSelectingForIndex(null)}>
-      <DialogContent>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>选择Line Code</DialogTitle>
           <DialogDescription>
@@ -354,7 +356,7 @@ export default function CreatePurchaseOrder() {
               setValue(`items.${selectingForIndex}.partId`, selectedPart.id);
               setValue(`items.${selectingForIndex}.lineCode`, selectedPart.lineCodeName || "N/A");
               setValue(`items.${selectingForIndex}.name`, selectedPart.name);
-              setValue(`items.${selectingForIndex}.unitPrice`, selectedPart.cost || "0");
+              setValue(`items.${selectingForIndex}.unitPrice`, selectedPart.replCost || selectedPart.cost || "0");
               toast.success("配件信息已填充");
               setSelectingForIndex(null);
               setPartOptions([]);
@@ -373,7 +375,7 @@ export default function CreatePurchaseOrder() {
                     {part.name}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    单价: ¥{part.cost || "0"}
+                    单价: ${part.replCost || part.cost || "0"}
                   </div>
                 </label>
               </div>

@@ -493,3 +493,10 @@
 - [x] 实现RadioGroup选择器，显示Line Code、配件名称和单价
 - [x] 选择后自动填充配件信息到表单
 - [x] 测试DL3614配件（3个不同Line Code）的选择功能
+
+## 采购订单价格显示错误和Dialog背景问题修复
+- [x] 诊断价格字段映射问题（DL3614 XTD显示$3.5，实际Repl Cost是$3.0）
+- [x] 检查parts.getBySku返回的价格字段
+- [x] 修复CreatePurchaseOrder.tsx中的价格字段映射（使用replCost而不是unitPrice）
+- [x] 增强Line Code选择Dialog的背景对比度（DialogContent已自动包含bg-black/80背景）
+- [x] 测试价格显示和Dialog背景效果（XTD现在显示$3.00，背景对比度明显）
