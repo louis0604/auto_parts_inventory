@@ -65,6 +65,8 @@ export default function PartsNew() {
   const [selectedLineCodeFilter, setSelectedLineCodeFilter] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editingPart, setEditingPart] = useState<number | null>(null);
+  const [selectedPartIds, setSelectedPartIds] = useState<Set<number>>(new Set());
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
 
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
 
@@ -106,6 +108,22 @@ export default function PartsNew() {
     },
     onError: (error) => {
       toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const bulkDeleteMutation = trpc.parts.bulkDelete.useMutation({
+    onSuccess: (result: { deleted: number; failed: number; total: number }) => {
+      if (result.failed > 0) {
+        toast.warning(`批量删除完成：${result.deleted}个成功，${result.failed}个失败`);
+      } else {
+        toast.success(`批量删除成功：${result.deleted}个配件已删除`);
+      }
+      setSelectedPartIds(new Set());
+      setIsBulkDeleteDialogOpen(false);
+      utils.parts.list.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(`批量删除失败: ${error.message}`);
     },
   });
 
@@ -172,6 +190,37 @@ export default function PartsNew() {
     }
   };
 
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      const allIds = new Set(filteredParts.map((part) => part.id));
+      setSelectedPartIds(allIds);
+    } else {
+      setSelectedPartIds(new Set());
+    }
+  };
+
+  const handleSelectPart = (id: number, checked: boolean) => {
+    const newSelected = new Set(selectedPartIds);
+    if (checked) {
+      newSelected.add(id);
+    } else {
+      newSelected.delete(id);
+    }
+    setSelectedPartIds(newSelected);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedPartIds.size === 0) {
+      toast.error("请至少选择一个配件");
+      return;
+    }
+    setIsBulkDeleteDialogOpen(true);
+  };
+
+  const confirmBulkDelete = () => {
+    bulkDeleteMutation.mutate(Array.from(selectedPartIds));
+  };
+
   // Filter parts
   const filteredParts = parts.filter((part) => {
     const matchesSearch =
@@ -188,6 +237,16 @@ export default function PartsNew() {
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">配件管理</h1>
         <div className="flex gap-2">
+          {selectedPartIds.size > 0 && (
+            <Button
+              variant="destructive"
+              onClick={handleBulkDelete}
+              disabled={bulkDeleteMutation.isPending}
+            >
+              <Trash2 className="w-4 h-4 mr-2" />
+              删除选中 ({selectedPartIds.size})
+            </Button>
+          )}
           <Link href="/parts/import">
             <Button variant="outline">
               <Upload className="w-4 h-4 mr-2" />
@@ -233,6 +292,14 @@ export default function PartsNew() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-12">
+                <input
+                  type="checkbox"
+                  checked={selectedPartIds.size === filteredParts.length && filteredParts.length > 0}
+                  onChange={(e) => handleSelectAll(e.target.checked)}
+                  className="w-4 h-4 cursor-pointer"
+                />
+              </TableHead>
               <TableHead className="w-20">图片</TableHead>
               <TableHead className="w-24">Line</TableHead>
               <TableHead className="w-32">Part Number</TableHead>
@@ -249,6 +316,14 @@ export default function PartsNew() {
               const lineCode = lineCodes.find((lc) => lc.id === part.lineCodeId);
               return (
                 <TableRow key={part.id}>
+                  <TableCell>
+                    <input
+                      type="checkbox"
+                      checked={selectedPartIds.has(part.id)}
+                      onChange={(e) => handleSelectPart(part.id, e.target.checked)}
+                      className="w-4 h-4 cursor-pointer"
+                    />
+                  </TableCell>
                   <TableCell>
                     {part.imageUrl ? (
                       <img
@@ -406,6 +481,40 @@ export default function PartsNew() {
         </DialogContent>
       </Dialog>
 
+      {/* Bulk Delete Confirmation Dialog */}
+      <Dialog open={isBulkDeleteDialogOpen} onOpenChange={setIsBulkDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>确认批量删除</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <p className="text-gray-700 mb-4">
+              您即将删除 <span className="font-bold text-red-600">{selectedPartIds.size}</span> 个配件。
+            </p>
+            <p className="text-sm text-gray-500">
+              此操作将同时删除相关的库存记录和历史数据，且不可恢复。请确认您要继续吗？
+            </p>
+          </div>
+          <div className="flex gap-2 justify-end">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsBulkDeleteDialogOpen(false)}
+              disabled={bulkDeleteMutation.isPending}
+            >
+              取消
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              onClick={confirmBulkDelete}
+              disabled={bulkDeleteMutation.isPending}
+            >
+              {bulkDeleteMutation.isPending ? "删除中..." : "确认删除"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </div>
   );

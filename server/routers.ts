@@ -346,6 +346,22 @@ export const appRouter = router({
         await db.forceDeletePart(input);
         return { success: true };
       }),
+    bulkDelete: protectedProcedure
+      .input(z.array(z.number()))
+      .mutation(async ({ input: partIds }) => {
+        let deleted = 0;
+        let failed = 0;
+        for (const id of partIds) {
+          try {
+            await db.forceDeletePart(id);
+            deleted++;
+          } catch (error) {
+            failed++;
+            console.error(`Failed to delete part ${id}:`, error);
+          }
+        }
+        return { deleted, failed, total: partIds.length };
+      }),
     getHistory: protectedProcedure
       .input(z.number())
       .query(async ({ input: partId }) => {
