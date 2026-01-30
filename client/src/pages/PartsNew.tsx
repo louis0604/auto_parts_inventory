@@ -274,15 +274,7 @@ export default function PartsNew() {
                   <TableCell className="text-right">${part.listPrice || "-"}</TableCell>
                   <TableCell className="text-right">{part.orderPoint || 0}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleEdit(part)}
-                        className="h-7 px-2 hover:bg-blue-50"
-                      >
-                        <Edit className="h-4 w-4 text-blue-600" />
-                      </Button>
+                    <div className="flex items-center justify-center">
                       <Button
                         variant="ghost"
                         size="sm"
