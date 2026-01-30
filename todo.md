@@ -480,3 +480,16 @@
 - [x] 添加后端API: parts.getBySku
 - [x] 修改后端API：支持purchase增加库存、return减少库存
 - [ ] 测试purchase和return功能，验证库存更新正确
+
+## 修复采购订单配件号查询失败问题
+- [x] 调试parts.getBySku API调用
+- [x] 检查前端查询逻辑和错误处理
+- [x] 修复查询失败的根本原因（使用trpc.useUtils().client调用）
+- [x] 测试DL3614配件号查询功能
+
+## 实现SKU多Line Code选择功能
+- [x] 修复parts.getBySku API调用方式（从手动fetch改为trpc.useUtils().client）
+- [x] 添加多Line Code选择Dialog组件
+- [x] 实现RadioGroup选择器，显示Line Code、配件名称和单价
+- [x] 选择后自动填充配件信息到表单
+- [x] 测试DL3614配件（3个不同Line Code）的选择功能

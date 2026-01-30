@@ -6,6 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { ArrowLeft, Plus, Trash2, Search } from "lucide-react";
 import { useState } from "react";
@@ -25,9 +33,20 @@ type OrderFormData = {
   }>;
 };
 
+type PartOption = {
+  id: number;
+  sku: string;
+  lineCodeName: string | null;
+  name: string;
+  cost: string | null;
+};
+
 export default function CreatePurchaseOrder() {
   const [, setLocation] = useLocation();
   const [searchingIndex, setSearchingIndex] = useState<number | null>(null);
+  const [partOptions, setPartOptions] = useState<PartOption[]>([]);
+  const [selectingForIndex, setSelectingForIndex] = useState<number | null>(null);
+  const utils = trpc.useUtils();
   
   const { data: suppliers } = trpc.suppliers.list.useQuery();
   
@@ -68,11 +87,9 @@ export default function CreatePurchaseOrder() {
     
     try {
       // 查询配件信息
-      const response = await fetch(`/api/trpc/parts.getBySku?input=${encodeURIComponent(JSON.stringify({ sku }))}`);
-      const result = await response.json();
+      const parts = await utils.client.parts.getBySku.query({ sku });
       
-      if (result.result?.data) {
-        const parts = result.result.data;
+      if (parts) {
         
         if (parts.length === 0) {
           toast.error(`未找到配件号: ${sku}`);
@@ -85,13 +102,9 @@ export default function CreatePurchaseOrder() {
           setValue(`items.${index}.unitPrice`, part.cost || "0");
           toast.success("配件信息已填充");
         } else {
-          // 多个配件（不同Line Code），选择第一个
-          const part = parts[0];
-          setValue(`items.${index}.partId`, part.id);
-          setValue(`items.${index}.lineCode`, part.lineCodeName || "N/A");
-          setValue(`items.${index}.name`, part.name);
-          setValue(`items.${index}.unitPrice`, part.cost || "0");
-          toast.info(`找到${parts.length}个相同配件号的配件，已选择第一个（Line Code: ${part.lineCodeName}）`);
+          // 多个配件（不同Line Code），显示选择对话框
+          setPartOptions(parts);
+          setSelectingForIndex(index);
         }
       } else {
         toast.error("查询失败");
@@ -142,6 +155,7 @@ export default function CreatePurchaseOrder() {
   };
 
   return (
+    <>
     <div className="min-h-screen bg-background">
       <div className="container max-w-6xl py-8">
         <div className="mb-6">
@@ -323,5 +337,51 @@ export default function CreatePurchaseOrder() {
         </form>
       </div>
     </div>
+
+    {/* Line Code 选择对话框 */}
+    <Dialog open={selectingForIndex !== null} onOpenChange={(open) => !open && setSelectingForIndex(null)}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>选择Line Code</DialogTitle>
+          <DialogDescription>
+            找到{partOptions.length}个相同配件号的配件，请选择正确的Line Code：
+          </DialogDescription>
+        </DialogHeader>
+        <RadioGroup
+          onValueChange={(value) => {
+            const selectedPart = partOptions.find(p => p.id === parseInt(value));
+            if (selectedPart && selectingForIndex !== null) {
+              setValue(`items.${selectingForIndex}.partId`, selectedPart.id);
+              setValue(`items.${selectingForIndex}.lineCode`, selectedPart.lineCodeName || "N/A");
+              setValue(`items.${selectingForIndex}.name`, selectedPart.name);
+              setValue(`items.${selectingForIndex}.unitPrice`, selectedPart.cost || "0");
+              toast.success("配件信息已填充");
+              setSelectingForIndex(null);
+              setPartOptions([]);
+            }
+          }}
+        >
+          <div className="space-y-3">
+            {partOptions.map((part) => (
+              <div key={part.id} className="flex items-center space-x-2 border rounded-lg p-3 hover:bg-accent cursor-pointer">
+                <RadioGroupItem value={part.id.toString()} id={`part-${part.id}`} />
+                <label htmlFor={`part-${part.id}`} className="flex-1 cursor-pointer">
+                  <div className="font-medium">
+                    Line Code: {part.lineCodeName || "N/A"}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {part.name}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    单价: ¥{part.cost || "0"}
+                  </div>
+                </label>
+              </div>
+            ))}
+          </div>
+        </RadioGroup>
+      </DialogContent>
+    </Dialog>
+    </>
   );
 }

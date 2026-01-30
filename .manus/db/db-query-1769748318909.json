@@ -1,0 +1,40 @@
+{
+  "query": "SELECT p.id, p.sku, p.name, p.cost, p.retail, p.listPrice, p.lineCodeId, lc.code as lineCode \nFROM parts p \nLEFT JOIN line_codes lc ON p.lineCodeId = lc.id \nWHERE p.sku = 'DL3614' AND p.isArchived = 0;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT p.id, p.sku, p.name, p.cost, p.retail, p.listPrice, p.lineCodeId, lc.code as lineCode \nFROM parts p \nLEFT JOIN line_codes lc ON p.lineCodeId = lc.id \nWHERE p.sku = 'DL3614' AND p.isArchived = 0;",
+  "rows": [
+    {
+      "id": "30001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "cost": "NULL",
+      "retail": "8.00",
+      "listPrice": "6.50",
+      "lineCodeId": "1",
+      "lineCode": "FRA"
+    },
+    {
+      "id": "120001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "cost": "3.50",
+      "retail": "7.00",
+      "listPrice": "9.00",
+      "lineCodeId": "30001",
+      "lineCode": "XTD"
+    },
+    {
+      "id": "180001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "cost": "NULL",
+      "retail": "11.00",
+      "listPrice": "20.00",
+      "lineCodeId": "60008",
+      "lineCode": "ACL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tcost\tretail\tlistPrice\tlineCodeId\tlineCode\n30001\tDL3614\tOil filter\tNULL\t8.00\t6.50\t1\tFRA\n120001\tDL3614\tOil filter\t3.50\t7.00\t9.00\t30001\tXTD\n180001\tDL3614\tOil filter\tNULL\t11.00\t20.00\t60008\tACL\n",
+  "stderr": "",
+  "execution_time_ms": 345
+}
