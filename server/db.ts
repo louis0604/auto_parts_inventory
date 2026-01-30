@@ -1436,3 +1436,59 @@ export async function getPartHistory(partId: number) {
   
   return allHistory;
 }
+
+/**
+ * Adjust stock quantity for a part
+ * @param partId - The ID of the part
+ * @param quantityChange - The quantity to add (positive) or subtract (negative)
+ * @param options - Optional parameters for the adjustment
+ * @returns The updated part with new stock quantity
+ */
+export async function adjustStock(
+  partId: number,
+  quantityChange: number,
+  options?: {
+    referenceType?: string;
+    referenceId?: number;
+    notes?: string;
+    operatedBy?: number;
+  }
+) {
+  // Get current part
+  const part = await getPartById(partId);
+  if (!part) {
+    throw new Error(`Part with ID ${partId} not found`);
+  }
+
+  // Calculate new stock quantity
+  const newStock = part.stockQuantity + quantityChange;
+  if (newStock < 0) {
+    throw new Error(`Insufficient stock for part ${part.sku}. Current: ${part.stockQuantity}, Requested: ${Math.abs(quantityChange)}`);
+  }
+
+  // Update part stock quantity
+  await updatePart(partId, { stockQuantity: newStock });
+
+  // Create inventory ledger entry
+  await createInventoryLedgerEntry({
+    partId,
+    transactionType: "adjustment",
+    quantity: quantityChange,
+    balanceAfter: newStock,
+    referenceType: options?.referenceType || "adjustment",
+    referenceId: options?.referenceId,
+    notes: options?.notes || "库存调整",
+    operatedBy: options?.operatedBy || 1, // Default to system user
+  });
+
+  // Check for low stock and create alert if needed
+  if (newStock < part.minStockThreshold) {
+    await createLowStockAlert({
+      partId,
+      currentStock: newStock,
+      minThreshold: part.minStockThreshold,
+    });
+  }
+
+  return await getPartById(partId);
+}

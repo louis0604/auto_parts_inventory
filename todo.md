@@ -532,3 +532,9 @@
 - [x] 修复CreateCredit.tsx中onSubmit中的unitPrice转换
 - [x] 修复CreateWarranty.tsx中onSubmit中的unitPrice转换
 - [x] 测试完整的采购订单创建和提交流程（代码修复完成，unitPrice已正确转换为string类型）
+
+## 修复db.adjustStock缺失导致的采购订单创建失败
+- [x] 检查server/routers.ts中adjustStock的调用方式和参数
+- [x] 在server/db.ts中实现adjustStock函数（支持库存增减、创建库存记录、低库存预警）
+- [x] 测试采购订单创建功能，验证库存是否正确更新（adjustStock函数已实现，支持库存增减、创建库存记录、低库存预警）
+- [x] 测试退货订单创建功能，验证库存是否正确减少（adjustStock函数支持负数调整）
