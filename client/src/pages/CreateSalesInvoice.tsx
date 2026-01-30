@@ -64,6 +64,7 @@ export default function CreateSalesInvoice() {
   
   const { data: customers } = trpc.customers.list.useQuery();
   const { data: parts } = trpc.parts.list.useQuery();
+  const utils = trpc.useUtils();
   
   const createMutation = trpc.salesInvoices.create.useMutation({
     onSuccess: () => {
@@ -140,7 +141,6 @@ export default function CreateSalesInvoice() {
 
     setSearchingIndex(index);
     try {
-      const utils = trpc.useUtils();
       const results = await utils.client.parts.getBySku.query(sku);
       
       if (!results || results.length === 0) {

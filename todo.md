@@ -538,3 +538,8 @@
 - [x] 在server/db.ts中实现adjustStock函数（支持库存增减、创建库存记录、低库存预警）
 - [x] 测试采购订单创建功能，验证库存是否正确更新（adjustStock函数已实现，支持库存增减、创建库存记录、低库存预警）
 - [x] 测试退货订单创建功能，验证库存是否正确减少（adjustStock函数支持负数调整）
+
+## 修复销售发票SKU查询失败问题
+- [x] 检查CreateSalesInvoice.tsx的SKU查询实现是否与CreatePurchaseOrder.tsx一致
+- [x] 修夏handleSearchPart函数中的React Hook调用问题（在组件顶层调用useUtils）
+- [ ] 测试DL3614配件号查询和Line Code选择功能
