@@ -500,3 +500,8 @@
 - [x] 修复CreatePurchaseOrder.tsx中的价格字段映射（使用replCost而不是unitPrice）
 - [x] 增强Line Code选择Dialog的背景对比度（DialogContent已自动包含bg-black/80背景）
 - [x] 测试价格显示和Dialog背景效果（XTD现在显示$3.00，背景对比度明显）
+
+## 将Line Code选择Dialog背景改为纯白色
+- [x] 修改dialog.tsx中 DialogOverlay的默认背景从 bg-black/80 改为 bg-white
+- [x] 移除CreatePurchaseOrder.tsx中手动添加的DialogPortal和DialogOverlay，恢复默认结构
+- [x] 测试白色背景效果，确认选择框在纯白背景上清晰可见
