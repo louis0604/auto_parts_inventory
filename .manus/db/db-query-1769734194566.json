@@ -1,0 +1,45 @@
+{
+  "query": "SELECT id, sku, name, isArchived, FROM_UNIXTIME(archivedAt/1000) as archived_time FROM parts WHERE isArchived = 1 ORDER BY archivedAt DESC LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, sku, name, isArchived, FROM_UNIXTIME(archivedAt/1000) as archived_time FROM parts WHERE isArchived = 1 ORDER BY archivedAt DESC LIMIT 10;",
+  "rows": [
+    {
+      "id": "150060",
+      "sku": "TEST-ACTIVE-001",
+      "name": "Active Part",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:24.4420"
+    },
+    {
+      "id": "150062",
+      "sku": "TEST-ARCHIVE-001",
+      "name": "Test Part for Archive",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:24.4420"
+    },
+    {
+      "id": "150063",
+      "sku": "TEST-ARCHIVE-001",
+      "name": "Test Part for Archive",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:24.4420"
+    },
+    {
+      "id": "150067",
+      "sku": "TEST-ACTIVE-001",
+      "name": "Active Part",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:24.4420"
+    },
+    {
+      "id": "150055",
+      "sku": "TEST-ARCHIVE-001",
+      "name": "Test Part for Archive",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:24.4420"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tisArchived\tarchived_time\n150060\tTEST-ACTIVE-001\tActive Part\t1\t2612-01-08 05:53:24.4420\n150062\tTEST-ARCHIVE-001\tTest Part for Archive\t1\t2612-01-08 05:53:24.4420\n150063\tTEST-ARCHIVE-001\tTest Part for Archive\t1\t2612-01-08 05:53:24.4420\n150067\tTEST-ACTIVE-001\tActive Part\t1\t2612-01-08 05:53:24.4420\n150055\tTEST-ARCHIVE-001\tTest Part for Archive\t1\t2612-01-08 05:53:24.4420\n",
+  "stderr": "",
+  "execution_time_ms": 356
+}

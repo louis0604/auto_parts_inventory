@@ -1,0 +1,282 @@
+{
+  "query": "DESCRIBE parts;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute DESCRIBE parts;",
+  "rows": [
+    {
+      "Field": "id",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "PRI",
+      "Default": "NULL",
+      "Extra": "auto_increment"
+    },
+    {
+      "Field": "sku",
+      "Type": "varchar(100)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "name",
+      "Type": "varchar(200)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "categoryId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "supplierId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "description",
+      "Type": "text",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "unitPrice",
+      "Type": "decimal(15,2)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "stockQuantity",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "minStockThreshold",
+      "Type": "int(11)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "10",
+      "Extra": ""
+    },
+    {
+      "Field": "unit",
+      "Type": "varchar(50)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "件",
+      "Extra": ""
+    },
+    {
+      "Field": "createdAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": ""
+    },
+    {
+      "Field": "updatedAt",
+      "Type": "timestamp",
+      "Null": "NO",
+      "Key": "",
+      "Default": "CURRENT_TIMESTAMP",
+      "Extra": "DEFAULT_GENERATED on update CURRENT_TIMESTAMP"
+    },
+    {
+      "Field": "lineCodeId",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "MUL",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "listPrice",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "cost",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "retail",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "coreCost",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "coreRetail",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "orderQty",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "orderMultiple",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "1",
+      "Extra": ""
+    },
+    {
+      "Field": "stockingUnit",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "EA",
+      "Extra": ""
+    },
+    {
+      "Field": "purchaseUnit",
+      "Type": "varchar(20)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "EA",
+      "Extra": ""
+    },
+    {
+      "Field": "manufacturer",
+      "Type": "varchar(200)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "mfgPartNumber",
+      "Type": "varchar(100)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "weight",
+      "Type": "decimal(10,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "imageUrl",
+      "Type": "varchar(500)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "replCost",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "avgCost",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "price1",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "price2",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "price3",
+      "Type": "decimal(15,2)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    },
+    {
+      "Field": "orderPoint",
+      "Type": "int(11)",
+      "Null": "YES",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "isArchived",
+      "Type": "tinyint(1)",
+      "Null": "NO",
+      "Key": "",
+      "Default": "0",
+      "Extra": ""
+    },
+    {
+      "Field": "archivedAt",
+      "Type": "timestamp",
+      "Null": "YES",
+      "Key": "",
+      "Default": "NULL",
+      "Extra": ""
+    }
+  ],
+  "messages": [],
+  "stdout": "Field\tType\tNull\tKey\tDefault\tExtra\nid\tint(11)\tNO\tPRI\tNULL\tauto_increment\nsku\tvarchar(100)\tNO\t\tNULL\t\nname\tvarchar(200)\tNO\t\tNULL\t\ncategoryId\tint(11)\tYES\tMUL\tNULL\t\nsupplierId\tint(11)\tYES\tMUL\tNULL\t\ndescription\ttext\tYES\t\tNULL\t\nunitPrice\tdecimal(15,2)\tNO\t\tNULL\t\nstockQuantity\tint(11)\tNO\t\t0\t\nminStockThreshold\tint(11)\tNO\t\t10\t\nunit\tvarchar(50)\tNO\t\t件\t\ncreatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\t\nupdatedAt\ttimestamp\tNO\t\tCURRENT_TIMESTAMP\tDEFAULT_GENERATED on update CURRENT_TIMESTAMP\nlineCodeId\tint(11)\tYES\tMUL\tNULL\t\nlistPrice\tdecimal(15,2)\tYES\t\tNULL\t\ncost\tdecimal(15,2)\tYES\t\tNULL\t\nretail\tdecimal(15,2)\tYES\t\tNULL\t\ncoreCost\tdecimal(15,2)\tYES\t\tNULL\t\ncoreRetail\tdecimal(15,2)\tYES\t\tNULL\t\norderQty\tint(11)\tYES\t\t0\t\norderMultiple\tint(11)\tYES\t\t1\t\nstockingUnit\tvarchar(20)\tYES\t\tEA\t\npurchaseUnit\tvarchar(20)\tYES\t\tEA\t\nmanufacturer\tvarchar(200)\tYES\t\tNULL\t\nmfgPartNumber\tvarchar(100)\tYES\t\tNULL\t\nweight\tdecimal(10,2)\tYES\t\tNULL\t\nimageUrl\tvarchar(500)\tYES\t\tNULL\t\nreplCost\tdecimal(15,2)\tYES\t\tNULL\t\navgCost\tdecimal(15,2)\tYES\t\tNULL\t\nprice1\tdecimal(15,2)\tYES\t\tNULL\t\nprice2\tdecimal(15,2)\tYES\t\tNULL\t\nprice3\tdecimal(15,2)\tYES\t\tNULL\t\norderPoint\tint(11)\tYES\t\t0\t\nisArchived\ttinyint(1)\tNO\t\t0\t\narchivedAt\ttimestamp\tYES\t\tNULL\t\n",
+  "stderr": "",
+  "execution_time_ms": 342
+}

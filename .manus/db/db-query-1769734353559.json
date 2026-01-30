@@ -1,0 +1,17 @@
+{
+  "query": "SELECT id, sku, name, isArchived, FROM_UNIXTIME(archivedAt/1000) as archived_time FROM parts WHERE isArchived = 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, sku, name, isArchived, FROM_UNIXTIME(archivedAt/1000) as archived_time FROM parts WHERE isArchived = 1;",
+  "rows": [
+    {
+      "id": "120001",
+      "sku": "DL3614",
+      "name": "Oil filter",
+      "isArchived": "1",
+      "archived_time": "2612-01-08 05:53:25.2000"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tisArchived\tarchived_time\n120001\tDL3614\tOil filter\t1\t2612-01-08 05:53:25.2000\n",
+  "stderr": "",
+  "execution_time_ms": 350
+}
