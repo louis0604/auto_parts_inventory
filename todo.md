@@ -505,3 +505,14 @@
 - [x] 修改dialog.tsx中 DialogOverlay的默认背景从 bg-black/80 改为 bg-white
 - [x] 移除CreatePurchaseOrder.tsx中手动添加的DialogPortal和DialogOverlay，恢复默认结构
 - [x] 测试白色背景效果，确认选择框在纯白背景上清晰可见
+
+## 在销售订单、退货单和保修单创建页面实现SKU查询和Line Code选择功能
+- [x] 检查CreateSalesInvoice.tsx（销售订单）的当前SKU查询实现
+- [x] 检查CreateCredit.tsx（退货单）的当前SKU查询实现
+- [x] 检查CreateWarranty.tsx（保修单）的当前SKU查询实现
+- [x] 在CreateSalesInvoice.tsx中实现SKU输入框、搜索按钮和多Line Code选择Dialog
+- [x] 在CreateCredit.tsx中实现SKU输入框、搜索按钮和多Line Code选择Dialog
+- [x] 在CreateWarranty.tsx中实现SKU输入框、搜索按钮和多Line Code选择Dialog
+- [x] 测试DL3614在销售订单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
+- [x] 测试DL3614在退货单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
+- [x] 测试DL3614在保修单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
