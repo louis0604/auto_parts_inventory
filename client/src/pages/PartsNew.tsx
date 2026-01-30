@@ -140,6 +140,47 @@ export default function PartsNew() {
     },
   });
 
+  const bulkRestoreMutation = trpc.parts.bulkRestore.useMutation({
+    onSuccess: (result: { restored: number; failed: number; total: number }) => {
+      if (result.failed > 0) {
+        toast.warning(`批量恢复完成：${result.restored}个成功，${result.failed}个失败`);
+      } else {
+        toast.success(`批量恢复成功：${result.restored}个配件已恢复`);
+      }
+      setSelectedPartIds(new Set());
+      utils.parts.list.invalidate();
+      utils.parts.listArchived.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(`批量恢复失败: ${error.message}`);
+    },
+  });
+
+  const forceDeleteMutation = trpc.parts.forceDelete.useMutation({
+    onSuccess: () => {
+      toast.success("配件已永久删除");
+      utils.parts.listArchived.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`永久删除失败: ${error.message}`);
+    },
+  });
+
+  const bulkForceDeleteMutation = trpc.parts.bulkForceDelete.useMutation({
+    onSuccess: (result: { deleted: number; failed: number; total: number }) => {
+      if (result.failed > 0) {
+        toast.warning(`批量永久删除完成：${result.deleted}个成功，${result.failed}个失败`);
+      } else {
+        toast.success(`批量永久删除成功：${result.deleted}个配件已永久删除`);
+      }
+      setSelectedPartIds(new Set());
+      utils.parts.listArchived.invalidate();
+    },
+    onError: (error: any) => {
+      toast.error(`批量永久删除失败: ${error.message}`);
+    },
+  });
+
   const { register, handleSubmit, reset, setValue, watch } = useForm<PartFormData>({
     defaultValues: {
       stockQuantity: 0,
@@ -408,14 +449,50 @@ export default function PartsNew() {
                           <Trash2 className="h-4 w-4 text-red-600" />
                         </Button>
                       ) : (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => restoreMutation.mutate(part.id)}
-                          className="h-7 px-2 hover:bg-green-50"
-                        >
-                          <span className="text-sm text-green-600">恢复</span>
-                        </Button>
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (selectedPartIds.size > 0) {
+                                // 批量恢复
+                                const count = selectedPartIds.size;
+                                if (window.confirm(`是否确认恢复选中的 ${count} 个配件？`)) {
+                                  bulkRestoreMutation.mutate(Array.from(selectedPartIds));
+                                }
+                              } else {
+                                // 单个恢复
+                                if (window.confirm(`确认恢复该配件？`)) {
+                                  restoreMutation.mutate(part.id);
+                                }
+                              }
+                            }}
+                            className="h-7 px-2 hover:bg-green-50"
+                          >
+                            <span className="text-sm text-green-600">恢复</span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              if (selectedPartIds.size > 0) {
+                                // 批量永久删除
+                                const count = selectedPartIds.size;
+                                if (window.confirm(`警告：您即将永久删除选中的 ${count} 个配件，此操作不可恢复！是否继续？`)) {
+                                  bulkForceDeleteMutation.mutate(Array.from(selectedPartIds));
+                                }
+                              } else {
+                                // 单个永久删除
+                                if (window.confirm(`警告：您即将永久删除该配件，此操作不可恢复！是否继续？`)) {
+                                  forceDeleteMutation.mutate(part.id);
+                                }
+                              }
+                            }}
+                            className="h-7 px-2 hover:bg-red-50"
+                          >
+                            <Trash2 className="h-4 w-4 text-red-600" />
+                          </Button>
+                        </>
                       )}
                     </div>
                   </TableCell>

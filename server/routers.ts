@@ -360,6 +360,23 @@ export const appRouter = router({
         await db.restorePart(input);
         return { success: true };
       }),
+    // Bulk restore
+    bulkRestore: protectedProcedure
+      .input(z.array(z.number()))
+      .mutation(async ({ input: partIds }) => {
+        let restored = 0;
+        let failed = 0;
+        for (const id of partIds) {
+          try {
+            await db.restorePart(id);
+            restored++;
+          } catch (error) {
+            failed++;
+            console.error(`Failed to restore part ${id}:`, error);
+          }
+        }
+        return { restored, failed, total: partIds.length };
+      }),
     // List archived parts
     listArchived: protectedProcedure.query(async () => {
       return await db.getArchivedParts();
