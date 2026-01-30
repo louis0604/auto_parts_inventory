@@ -125,6 +125,10 @@ export const parts = mysqlTable("parts", {
   weight: decimal("weight", { precision: 10, scale: 2 }), // Weight
   imageUrl: varchar("imageUrl", { length: 500 }), // Part Image URL
   
+  // Soft delete
+  isArchived: boolean("isArchived").default(false).notNull(),
+  archivedAt: timestamp("archivedAt"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });

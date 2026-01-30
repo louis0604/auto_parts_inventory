@@ -280,6 +280,7 @@ export async function getAllParts(): Promise<(Part & { lineCode?: string | null 
     })
     .from(parts)
     .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(eq(parts.isArchived, false))
     .orderBy(desc(parts.createdAt));
   return result as any;
 }
@@ -504,6 +505,67 @@ export async function forceDeleteCustomer(customerId: number): Promise<void> {
   
   // 删除客户
   await db.delete(customers).where(eq(customers.id, customerId));
+}
+
+/**
+ * Archive a part (soft delete)
+ */
+export async function archivePart(partId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(parts)
+    .set({ isArchived: true, archivedAt: new Date() })
+    .where(eq(parts.id, partId));
+}
+
+/**
+ * Restore an archived part
+ */
+export async function restorePart(partId: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db
+    .update(parts)
+    .set({ isArchived: false, archivedAt: null })
+    .where(eq(parts.id, partId));
+}
+
+/**
+ * Get all archived parts
+ */
+export async function getArchivedParts(): Promise<(Part & { lineCode?: string | null })[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const result = await db
+    .select({
+      id: parts.id,
+      sku: parts.sku,
+      name: parts.name,
+      lineCodeId: parts.lineCodeId,
+      lineCode: lineCodes.code,
+      categoryId: parts.categoryId,
+      supplierId: parts.supplierId,
+      description: parts.description,
+      listPrice: parts.listPrice,
+      cost: parts.cost,
+      retail: parts.retail,
+      unitPrice: parts.unitPrice,
+      stockQuantity: parts.stockQuantity,
+      minStockThreshold: parts.minStockThreshold,
+      orderPoint: parts.orderPoint,
+      unit: parts.unit,
+      imageUrl: parts.imageUrl,
+      isArchived: parts.isArchived,
+      archivedAt: parts.archivedAt,
+      createdAt: parts.createdAt,
+      updatedAt: parts.updatedAt,
+    })
+    .from(parts)
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .where(eq(parts.isArchived, true))
+    .orderBy(desc(parts.archivedAt));
+  return result as any;
 }
 
 /**

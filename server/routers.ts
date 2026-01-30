@@ -329,26 +329,59 @@ export const appRouter = router({
         await db.updatePart(input.id, input.data);
         return { success: true };
       }),
-    delete: protectedProcedure
+    // Archive (soft delete)
+    archive: protectedProcedure
       .input(z.number())
       .mutation(async ({ input }) => {
-        // Use forceDelete to handle all related records
-        await db.forceDeletePart(input);
+        await db.archivePart(input);
         return { success: true };
       }),
+    // Bulk archive
+    bulkArchive: protectedProcedure
+      .input(z.array(z.number()))
+      .mutation(async ({ input: partIds }) => {
+        let archived = 0;
+        let failed = 0;
+        for (const id of partIds) {
+          try {
+            await db.archivePart(id);
+            archived++;
+          } catch (error) {
+            failed++;
+            console.error(`Failed to archive part ${id}:`, error);
+          }
+        }
+        return { archived, failed, total: partIds.length };
+      }),
+    // Restore archived part
+    restore: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.restorePart(input);
+        return { success: true };
+      }),
+    // List archived parts
+    listArchived: protectedProcedure.query(async () => {
+      return await db.getArchivedParts();
+    }),
+    // Permanent delete (admin only)
     forceDelete: protectedProcedure
       .input(z.number())
       .mutation(async ({ input, ctx }) => {
         // Only admin can force delete
         if (ctx.user.role !== 'admin') {
-          throw new Error("只有管理员才能强制删除配件");
+          throw new Error("只有管理员才能永久删除配件");
         }
         await db.forceDeletePart(input);
         return { success: true };
       }),
-    bulkDelete: protectedProcedure
+    // Bulk permanent delete (admin only)
+    bulkForceDelete: protectedProcedure
       .input(z.array(z.number()))
-      .mutation(async ({ input: partIds }) => {
+      .mutation(async ({ input: partIds, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new Error("只有管理员才能永久删除配件");
+        }
         let deleted = 0;
         let failed = 0;
         for (const id of partIds) {
@@ -357,7 +390,7 @@ export const appRouter = router({
             deleted++;
           } catch (error) {
             failed++;
-            console.error(`Failed to delete part ${id}:`, error);
+            console.error(`Failed to permanently delete part ${id}:`, error);
           }
         }
         return { deleted, failed, total: partIds.length };

@@ -61,6 +61,7 @@ type PartFormData = {
 };
 
 export default function PartsNew() {
+  const [activeTab, setActiveTab] = useState<"active" | "archived">("active");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLineCodeFilter, setSelectedLineCodeFilter] = useState<string>("all");
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -71,6 +72,7 @@ export default function PartsNew() {
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>("");
 
   const { data: parts = [], refetch } = trpc.parts.list.useQuery();
+  const { data: archivedParts = [] } = trpc.parts.listArchived.useQuery();
   const { data: lineCodes = [] } = trpc.lineCodes.list.useQuery();
   
   const utils = trpc.useUtils();
@@ -101,29 +103,40 @@ export default function PartsNew() {
     },
   });
 
-  const deleteMutation = trpc.parts.delete.useMutation({
+  const archiveMutation = trpc.parts.archive.useMutation({
     onSuccess: () => {
-      toast.success("配件删除成功");
+      toast.success("配件已归档");
       utils.parts.list.invalidate();
     },
     onError: (error) => {
-      toast.error(`删除失败: ${error.message}`);
+      toast.error(`归档失败: ${error.message}`);
     },
   });
 
-  const bulkDeleteMutation = trpc.parts.bulkDelete.useMutation({
-    onSuccess: (result: { deleted: number; failed: number; total: number }) => {
+  const bulkArchiveMutation = trpc.parts.bulkArchive.useMutation({
+    onSuccess: (result: { archived: number; failed: number; total: number }) => {
       if (result.failed > 0) {
-        toast.warning(`批量删除完成：${result.deleted}个成功，${result.failed}个失败`);
+        toast.warning(`批量归档完成：${result.archived}个成功，${result.failed}个失败`);
       } else {
-        toast.success(`批量删除成功：${result.deleted}个配件已删除`);
+        toast.success(`批量归档成功：${result.archived}个配件已归档`);
       }
       setSelectedPartIds(new Set());
       setIsBulkDeleteDialogOpen(false);
       utils.parts.list.invalidate();
     },
     onError: (error: any) => {
-      toast.error(`批量删除失败: ${error.message}`);
+      toast.error(`批量归档失败: ${error.message}`);
+    },
+  });
+
+  const restoreMutation = trpc.parts.restore.useMutation({
+    onSuccess: () => {
+      toast.success("配件已恢复");
+      utils.parts.list.invalidate();
+      utils.parts.listArchived.invalidate();
+    },
+    onError: (error) => {
+      toast.error(`恢复失败: ${error.message}`);
     },
   });
 
@@ -191,7 +204,7 @@ export default function PartsNew() {
     } else {
       // Single delete
       if (confirm("确定要删除这个配件吗？")) {
-        deleteMutation.mutate(id);
+        archiveMutation.mutate(id);
       }
     }
   };
@@ -224,11 +237,12 @@ export default function PartsNew() {
   };
 
   const confirmBulkDelete = () => {
-    bulkDeleteMutation.mutate(Array.from(selectedPartIds));
+    bulkArchiveMutation.mutate(Array.from(selectedPartIds));
   };
 
-  // Filter parts
-  const filteredParts = parts.filter((part) => {
+  // Filter parts based on active tab
+  const currentParts = activeTab === "active" ? parts : archivedParts;
+  const filteredParts = currentParts.filter((part) => {
     const matchesSearch =
       part.sku.toLowerCase().includes(searchQuery.toLowerCase()) ||
       part.name.toLowerCase().includes(searchQuery.toLowerCase());
@@ -242,12 +256,40 @@ export default function PartsNew() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-3xl font-bold">配件管理</h1>
+      </div>
+      
+      {/* 标签页切换 */}
+      <div className="flex gap-4 mb-6 border-b">
+        <button
+          className={`pb-2 px-4 font-medium transition-colors ${
+            activeTab === "active"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          onClick={() => setActiveTab("active")}
+        >
+          活跃配件 ({parts.length})
+        </button>
+        <button
+          className={`pb-2 px-4 font-medium transition-colors ${
+            activeTab === "archived"
+              ? "border-b-2 border-primary text-primary"
+              : "text-muted-foreground hover:text-foreground"
+          }`}
+          onClick={() => setActiveTab("archived")}
+        >
+          已归档 ({archivedParts.length})
+        </button>
+      </div>
+
+      <div className="flex items-center justify-between mb-6">
+        <div />
         <div className="flex gap-2">
           {selectedPartIds.size > 0 && (
             <Button
               variant="destructive"
               onClick={handleBulkDelete}
-              disabled={bulkDeleteMutation.isPending}
+              disabled={bulkArchiveMutation.isPending}
             >
               <Trash2 className="w-4 h-4 mr-2" />
               删除选中 ({selectedPartIds.size})
@@ -355,15 +397,26 @@ export default function PartsNew() {
                   <TableCell className="text-right">${part.listPrice || "-"}</TableCell>
                   <TableCell className="text-right">{part.orderPoint || 0}</TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleDelete(part.id)}
-                        className="h-7 px-2 hover:bg-red-50"
-                      >
-                        <Trash2 className="h-4 w-4 text-red-600" />
-                      </Button>
+                    <div className="flex items-center justify-center gap-2">
+                      {activeTab === "active" ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(part.id)}
+                          className="h-7 px-2 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4 text-red-600" />
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => restoreMutation.mutate(part.id)}
+                          className="h-7 px-2 hover:bg-green-50"
+                        >
+                          <span className="text-sm text-green-600">恢复</span>
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -506,7 +559,7 @@ export default function PartsNew() {
               type="button"
               variant="outline"
               onClick={() => setIsBulkDeleteDialogOpen(false)}
-              disabled={bulkDeleteMutation.isPending}
+              disabled={bulkArchiveMutation.isPending}
             >
               取消
             </Button>
@@ -514,9 +567,9 @@ export default function PartsNew() {
               type="button"
               variant="destructive"
               onClick={confirmBulkDelete}
-              disabled={bulkDeleteMutation.isPending}
+              disabled={bulkArchiveMutation.isPending}
             >
-              {bulkDeleteMutation.isPending ? "删除中..." : "确认删除"}
+              {bulkArchiveMutation.isPending ? "删除中..." : "确认删除"}
             </Button>
           </div>
         </DialogContent>
