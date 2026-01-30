@@ -196,17 +196,31 @@ export const appRouter = router({
       .input(z.array(z.object({
         sku: z.string().min(1),
         name: z.string().min(1),
+        lineCodeId: z.number().nullable().optional(),
         categoryId: z.number().nullable().optional(),
         supplierId: z.number().nullable().optional(),
         description: z.string().optional(),
         unitPrice: z.string(),
-        currentStock: z.number().optional(),
-        minStock: z.number().optional(),
+        unit: z.string().optional(),
+        stockQuantity: z.number().optional(),
+        minStockThreshold: z.number().optional(),
+        orderPoint: z.number().optional(),
+        // 价格字段
+        listPrice: z.string().optional(),
+        replCost: z.string().optional(),
+        retail: z.string().optional(),
+        price1: z.string().optional(),
+        price2: z.string().optional(),
+        price3: z.string().optional(),
+        // 图片
         imageBase64: z.object({
           data: z.string(),
           extension: z.string()
         }).nullable().optional(),
         imageUrl: z.string().optional(),
+        // 兼容旧字段名
+        currentStock: z.number().optional(),
+        minStock: z.number().optional(),
       })))
       .mutation(async ({ input }) => {
         return await db.bulkCreateParts(input);

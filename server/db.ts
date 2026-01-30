@@ -347,14 +347,26 @@ export async function createPart(data: {
 export async function bulkCreateParts(partsData: Array<{
   sku: string;
   name: string;
+  lineCodeId?: number | null;
   categoryId?: number | null;
   supplierId?: number | null;
   description?: string;
   unitPrice: string;
-  currentStock?: number;
-  minStock?: number;
+  unit?: string;
+  stockQuantity?: number;
+  minStockThreshold?: number;
+  orderPoint?: number;
+  listPrice?: string;
+  replCost?: string;
+  retail?: string;
+  price1?: string;
+  price2?: string;
+  price3?: string;
   imageBase64?: { data: string; extension: string } | null;
   imageUrl?: string;
+  // 兼容旧字段名
+  currentStock?: number;
+  minStock?: number;
 }>): Promise<{ success: number; failed: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -387,13 +399,18 @@ export async function bulkCreateParts(partsData: Array<{
       await db.insert(parts).values({
         sku: partData.sku,
         name: partData.name,
+        lineCodeId: partData.lineCodeId || undefined,
         categoryId: partData.categoryId || undefined,
         supplierId: partData.supplierId || undefined,
         description: partData.description || "",
         unitPrice: partData.unitPrice,
-        stockQuantity: partData.currentStock || 0,
-        minStockThreshold: partData.minStock || 0,
-        unit: "个",
+        unit: partData.unit || "个",
+        stockQuantity: partData.stockQuantity ?? partData.currentStock ?? 0,
+        minStockThreshold: partData.minStockThreshold ?? partData.minStock ?? 0,
+        orderQty: partData.orderPoint || undefined,
+        listPrice: partData.listPrice || undefined,
+        cost: partData.replCost || undefined,
+        retail: partData.retail || undefined,
         imageUrl: finalImageUrl || undefined,
       });
       success++;
