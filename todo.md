@@ -516,3 +516,10 @@
 - [x] 测试DL3614在销售订单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
 - [x] 测试DL3614在退货单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
 - [x] 测试DL3614在保修单页面的SKU查询和Line Code选择（代码实现完成，逻辑与采购订单一致）
+
+## 修复采购订单创建时unitPrice类型错误
+- [x] 诊断unitPrice类型错误的根本原因（API期望string但收到number）
+- [x] 检查CreatePurchaseOrder.tsx中handleSearchPart和选择Line Code时的unitPrice赋值
+- [x] 确保所有unitPrice赋值都转换为string类型（使用String()）
+- [x] 同样修复CreateSalesInvoice.tsx、CreateCredit.tsx和CreateWarranty.tsx中的unitPrice类型问题
+- [x] 测试创建采购订单验证unitPrice类型修复（成功填充DL3614 XTD，单价显示3.00，类型为string）

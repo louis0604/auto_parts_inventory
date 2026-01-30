@@ -178,7 +178,7 @@ export default function CreateWarranty() {
         const part = results[0];
         setValue(`items.${index}.partId`, part.id);
         if (part.unitPrice) {
-          setValue(`items.${index}.unitPrice`, part.unitPrice);
+          setValue(`items.${index}.unitPrice`, String(part.unitPrice));
         }
         toast.success(`已填充配件: ${part.lineCodeName} - ${part.sku} - ${part.name}`);
       } else {
@@ -482,7 +482,7 @@ export default function CreateWarranty() {
               if (selectedPart && selectingForIndex !== null) {
                 setValue(`items.${selectingForIndex}.partId`, selectedPart.id);
                 if (selectedPart.unitPrice) {
-                  setValue(`items.${selectingForIndex}.unitPrice`, selectedPart.unitPrice);
+                  setValue(`items.${selectingForIndex}.unitPrice`, String(selectedPart.unitPrice));
                 }
                 toast.success(`已选择: ${selectedPart.lineCodeName} - ${selectedPart.sku}`);
                 setSelectingForIndex(null);

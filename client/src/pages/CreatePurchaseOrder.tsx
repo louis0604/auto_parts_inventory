@@ -102,7 +102,7 @@ export default function CreatePurchaseOrder() {
           setValue(`items.${index}.partId`, part.id);
           setValue(`items.${index}.lineCode`, part.lineCodeName || "N/A");
           setValue(`items.${index}.name`, part.name);
-          setValue(`items.${index}.unitPrice`, part.replCost || part.cost || "0");
+          setValue(`items.${index}.unitPrice`, String(part.replCost || part.cost || "0"));
           toast.success("配件信息已填充");
         } else {
           // 多个配件（不同Line Code），显示选择对话框
@@ -357,7 +357,7 @@ export default function CreatePurchaseOrder() {
               setValue(`items.${selectingForIndex}.partId`, selectedPart.id);
               setValue(`items.${selectingForIndex}.lineCode`, selectedPart.lineCodeName || "N/A");
               setValue(`items.${selectingForIndex}.name`, selectedPart.name);
-              setValue(`items.${selectingForIndex}.unitPrice`, selectedPart.replCost || selectedPart.cost || "0");
+              setValue(`items.${selectingForIndex}.unitPrice`, String(selectedPart.replCost || selectedPart.cost || "0"));
               toast.success("配件信息已填充");
               setSelectingForIndex(null);
               setPartOptions([]);
