@@ -143,7 +143,7 @@ export default function CreateWarranty() {
       ...data,
       items: validItems.map(item => ({
         ...item,
-        unitPrice: parseFloat(item.unitPrice) || 0,
+        unitPrice: String(item.unitPrice || "0"),
       })),
     });
   };

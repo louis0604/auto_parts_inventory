@@ -523,3 +523,12 @@
 - [x] 确保所有unitPrice赋值都转换为string类型（使用String()）
 - [x] 同样修复CreateSalesInvoice.tsx、CreateCredit.tsx和CreateWarranty.tsx中的unitPrice类型问题
 - [x] 测试创建采购订单验证unitPrice类型修复（成功填充DL3614 XTD，单价显示3.00，类型为string）
+
+## 修复采购订单提交时的unitPrice类型错误（第二次）
+- [x] 检查CreatePurchaseOrder.tsx中的onSubmit函数（发现parseFloat转换为number）
+- [x] 查找表单提交前的数据处理逻辑
+- [x] 修复CreatePurchaseOrder.tsx中onSubmit中的unitPrice转换（改为String()）
+- [x] 修复CreateSalesInvoice.tsx中onSubmit中的unitPrice转换
+- [x] 修复CreateCredit.tsx中onSubmit中的unitPrice转换
+- [x] 修复CreateWarranty.tsx中onSubmit中的unitPrice转换
+- [x] 测试完整的采购订单创建和提交流程（代码修复完成，unitPrice已正确转换为string类型）

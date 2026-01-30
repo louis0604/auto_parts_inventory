@@ -139,7 +139,7 @@ export default function CreatePurchaseOrder() {
       items: validItems.map(item => ({
         partId: item.partId,
         quantity: item.quantity,
-        unitPrice: parseFloat(item.unitPrice) || 0,
+        unitPrice: String(item.unitPrice || "0"),
       })),
     });
   };
