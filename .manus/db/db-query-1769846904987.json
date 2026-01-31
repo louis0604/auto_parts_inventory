@@ -1,0 +1,22 @@
+{
+  "query": "SELECT id, sku, name, isArchived FROM parts WHERE sku LIKE 'TEST%';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, sku, name, isArchived FROM parts WHERE sku LIKE 'TEST%';",
+  "rows": [
+    {
+      "id": "210008",
+      "sku": "TEST-004",
+      "name": "测试配件4",
+      "isArchived": "NULL"
+    },
+    {
+      "id": "210010",
+      "sku": "TEST-005",
+      "name": "测试配件5",
+      "isArchived": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tisArchived\n210008\tTEST-004\t测试配件4\tNULL\n210010\tTEST-005\t测试配件5\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 348
+}

@@ -1,0 +1,18 @@
+{
+  "query": "SELECT id, sku, name, lineCodeId, retail, replCost FROM parts WHERE sku = 'TEST-004';",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute SELECT id, sku, name, lineCodeId, retail, replCost FROM parts WHERE sku = 'TEST-004';",
+  "rows": [
+    {
+      "id": "210008",
+      "sku": "TEST-004",
+      "name": "测试配件4",
+      "lineCodeId": "90003",
+      "retail": "30.00",
+      "replCost": "20.00"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tlineCodeId\tretail\treplCost\n210008\tTEST-004\t测试配件4\t90003\t30.00\t20.00\n",
+  "stderr": "",
+  "execution_time_ms": 375
+}

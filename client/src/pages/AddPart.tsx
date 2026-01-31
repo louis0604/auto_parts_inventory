@@ -70,6 +70,8 @@ export default function AddPart() {
   const createMutation = trpc.parts.create.useMutation({
     onSuccess: () => {
       toast.success("配件添加成功");
+      // 失效缓存，确保列表页面显示最新数据
+      utils.parts.list.invalidate();
       navigate("/parts");
     },
     onError: (error) => {

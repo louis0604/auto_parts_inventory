@@ -394,6 +394,8 @@ export async function createPart(data: {
     lineCodeId: data.lineCodeId,
     retail: data.retail,
     replCost: data.replCost,
+    // 显式设置isArchived为false，确保配件在列表中显示
+    isArchived: false,
   };
   
   // 添加用户提供的可选字段
