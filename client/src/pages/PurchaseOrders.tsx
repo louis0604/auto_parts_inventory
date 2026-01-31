@@ -89,6 +89,18 @@ export default function PurchaseOrders() {
     },
   });
 
+  const deleteMutation = trpc.purchaseOrders.delete.useMutation({
+    onSuccess: () => {
+      toast.success("订单已删除");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
+
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<OrderFormData>({
     defaultValues: {
       orderNumber: `PO-${Date.now()}`,
@@ -122,8 +134,19 @@ export default function PurchaseOrders() {
   };
 
   const handleCancel = (id: number) => {
-    if (confirm("确定要取消这个订单吗？")) {
+    if (confirm("确认取消此订单吗？")) {
       cancelMutation.mutate(id);
+    }
+  };
+
+  const handleDelete = (id: number) => {
+    setDeleteOrderId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteOrderId !== null) {
+      deleteMutation.mutate(deleteOrderId);
+      setDeleteOrderId(null);
     }
   };
 
@@ -347,6 +370,14 @@ export default function PurchaseOrders() {
                                 </Button>
                               </>
                             )}
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleDelete(order.id)}
+                              className="hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -367,6 +398,26 @@ export default function PurchaseOrders() {
         open={detailOrderId !== null}
         onClose={() => setDetailOrderId(null)}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteOrderId !== null} onOpenChange={() => setDeleteOrderId(null)}>
+        <DialogContent className="bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>确定要删除这个采购订单吗？此操作无法撤销。</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDeleteOrderId(null)}>
+                取消
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+                删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

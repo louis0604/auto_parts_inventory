@@ -90,6 +90,29 @@ export default function SalesInvoices() {
     },
   });
 
+  const deleteMutation = trpc.salesInvoices.delete.useMutation({
+    onSuccess: () => {
+      toast.success("发票已删除");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const [deleteInvoiceId, setDeleteInvoiceId] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => {
+    setDeleteInvoiceId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteInvoiceId !== null) {
+      deleteMutation.mutate(deleteInvoiceId);
+      setDeleteInvoiceId(null);
+    }
+  };
+
   const updateStatusMutation = trpc.salesInvoices.updateStatus.useMutation({
     onSuccess: () => {
       toast.success("状态已更新");
@@ -263,20 +286,14 @@ export default function SalesInvoices() {
                           <Printer className="h-4 w-4 mr-1" />
                           打印
                         </Button>
-                        {invoice.status === "completed" && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => {
-                              if (confirm("确定要取消此发票吗？")) {
-                                cancelMutation.mutate(invoice.id);
-                              }
-                            }}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            取消
-                          </Button>
-                        )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(invoice.id)}
+                          className="hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
@@ -638,6 +655,26 @@ export default function SalesInvoices() {
         open={detailInvoiceId !== null}
         onClose={() => setDetailInvoiceId(null)}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteInvoiceId !== null} onOpenChange={() => setDeleteInvoiceId(null)}>
+        <DialogContent className="bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>确定要删除这个销售发票吗？此操作无法撤销。</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDeleteInvoiceId(null)}>
+                取消
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+                删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

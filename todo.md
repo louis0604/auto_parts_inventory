@@ -564,3 +564,14 @@
 - [x] 修改CreateCredit.tsx的SKU输入框添加onKeyDown事件
 - [x] 修改CreateWarranty.tsx的SKU输入框添加onKeyDown事件
 - [x] 测试回车键快捷查询功能（代码实现完成）
+
+## 添加删除订单功能
+- [x] 后端：在server/routers.ts中添加purchaseOrders.delete API
+- [x] 后端：在server/routers.ts中添加salesInvoices.delete API
+- [x] 后端：在server/routers.ts中添加credits.delete API
+- [x] 后端：在server/routers.ts中添加warranties.delete API
+- [x] 前端：在采购订单列表页面添加删除按钮和确认对话框
+- [x] 前端：在销售发票列表页面添加删除按钮和确认对话框
+- [x] 前端：在退货单列表页面添加删除按钮和确认对话框
+- [x] 前端：在保修单列表页面添加删除按钮和确认对话框
+- [x] 测试所有删除功能

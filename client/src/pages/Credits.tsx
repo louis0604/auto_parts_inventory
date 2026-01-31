@@ -89,6 +89,29 @@ export default function Credits() {
     },
   });
 
+  const deleteMutation = trpc.credits.delete.useMutation({
+    onSuccess: () => {
+      toast.success("退货单已删除");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const [deleteCreditId, setDeleteCreditId] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => {
+    setDeleteCreditId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteCreditId !== null) {
+      deleteMutation.mutate(deleteCreditId);
+      setDeleteCreditId(null);
+    }
+  };
+
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<CreditFormData>({
     defaultValues: {
       creditNumber: `CR-${Date.now()}`,
@@ -215,6 +238,14 @@ export default function Credits() {
                             取消
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(credit.id)}
+                          className="hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -243,6 +274,26 @@ export default function Credits() {
           onClose={() => setDetailCreditId(null)}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteCreditId !== null} onOpenChange={() => setDeleteCreditId(null)}>
+        <DialogContent className="bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>确定要删除这个退货单吗？此操作无法撤销。</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDeleteCreditId(null)}>
+                取消
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+                删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

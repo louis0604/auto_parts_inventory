@@ -89,6 +89,29 @@ export default function Warranties() {
     },
   });
 
+  const deleteMutation = trpc.warranties.delete.useMutation({
+    onSuccess: () => {
+      toast.success("保修单已删除");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`删除失败: ${error.message}`);
+    },
+  });
+
+  const [deleteWarrantyId, setDeleteWarrantyId] = useState<number | null>(null);
+
+  const handleDelete = (id: number) => {
+    setDeleteWarrantyId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteWarrantyId !== null) {
+      deleteMutation.mutate(deleteWarrantyId);
+      setDeleteWarrantyId(null);
+    }
+  };
+
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<WarrantyFormData>({
     defaultValues: {
       warrantyNumber: `WR-${Date.now()}`,
@@ -245,6 +268,14 @@ export default function Warranties() {
                             完成
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDelete(warranty.id)}
+                          className="hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -433,6 +464,26 @@ export default function Warranties() {
           onClose={() => setDetailWarrantyId(null)}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteWarrantyId !== null} onOpenChange={() => setDeleteWarrantyId(null)}>
+        <DialogContent className="bg-card text-card-foreground">
+          <DialogHeader>
+            <DialogTitle>确认删除</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p>确定要删除这个保修单吗？此操作无法撤销。</p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setDeleteWarrantyId(null)}>
+                取消
+              </Button>
+              <Button variant="destructive" onClick={confirmDelete} disabled={deleteMutation.isPending}>
+                删除
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
