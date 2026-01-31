@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO line_codes (id, code, description) VALUES \n(90001, 'DOR', 'Dorman'),\n(90002, 'BLU', 'Blue Streak'),\n(90003, 'MON', 'Monroe'),\n(90004, 'ACE', 'ACDelco'),\n(90005, 'WAI', 'WAI'),\n(90006, 'ECO', 'Economy'),\n(90007, 'MPA', 'Motorcraft'),\n(90008, 'DNS', 'Denso'),\n(90009, 'DEN', 'Delphi'),\n(90010, 'BAW', 'BWD');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute INSERT INTO line_codes (id, code, description) VALUES \n(90001, 'DOR', 'Dorman'),\n(90002, 'BLU', 'Blue Streak'),\n(90003, 'MON', 'Monroe'),\n(90004, 'ACE', 'ACDelco'),\n(90005, 'WAI', 'WAI'),\n(90006, 'ECO', 'Economy'),\n(90007, 'MPA', 'Motorcraft'),\n(90008, 'DNS', 'Denso'),\n(90009, 'DEN', 'Delphi'),\n(90010, 'BAW', 'BWD');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 359
+}
