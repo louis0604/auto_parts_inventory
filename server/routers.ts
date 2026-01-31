@@ -282,7 +282,7 @@ export const appRouter = router({
         const part = await db.createPart(input);
         
         // Create initial inventory ledger entry if stock > 0
-        if (input.stockQuantity > 0) {
+        if (input.stockQuantity && input.stockQuantity > 0) {
           await db.createInventoryLedgerEntry({
             partId: part.id,
             transactionType: "purchase",
@@ -343,6 +343,13 @@ export const appRouter = router({
       }))
       .mutation(async ({ input }) => {
         await db.updatePart(input.id, input.data);
+        return { success: true };
+      }),
+    // Delete (alias for archive)
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.archivePart(input);
         return { success: true };
       }),
     // Archive (soft delete)
@@ -443,7 +450,7 @@ export const appRouter = router({
         const part = await db.getPartById(input.partId);
         if (!part) throw new Error("配件不存在");
         
-        const newStock = part.stockQuantity + input.quantity;
+        const newStock = (part.stockQuantity ?? 0) + input.quantity;
         if (newStock < 0) throw new Error("库存不足");
         
         await db.updatePart(input.partId, { stockQuantity: newStock });
@@ -459,11 +466,11 @@ export const appRouter = router({
         });
         
         // Check for low stock
-        if (newStock < part.minStockThreshold) {
+        if (part.minStockThreshold !== null && newStock < part.minStockThreshold) {
           await db.createLowStockAlert({
             partId: input.partId,
             currentStock: newStock,
-            minThreshold: part.minStockThreshold,
+            minThreshold: part.minStockThreshold ?? 0,
           });
         }
         
@@ -563,7 +570,7 @@ export const appRouter = router({
           const part = await db.getPartById(item.partId);
           if (!part) continue;
           
-          const newStock = part.stockQuantity + item.quantity;
+          const newStock = (part.stockQuantity ?? 0) + item.quantity;
           await db.updatePart(item.partId, { stockQuantity: newStock });
           
           await db.createInventoryLedgerEntry({
@@ -621,7 +628,7 @@ export const appRouter = router({
         for (const item of input.items) {
           const part = await db.getPartById(item.partId);
           if (!part) throw new Error(`配件 ID ${item.partId} 不存在`);
-          if (part.stockQuantity < item.quantity) {
+          if ((part.stockQuantity ?? 0) < item.quantity) {
             throw new Error(`配件 ${part.name} 库存不足`);
           }
         }
@@ -651,7 +658,7 @@ export const appRouter = router({
           // Update stock
           const part = await db.getPartById(item.partId);
           if (part) {
-            const newStock = part.stockQuantity - item.quantity;
+            const newStock = (part.stockQuantity ?? 0) - item.quantity;
             await db.updatePart(item.partId, { stockQuantity: newStock });
             
             await db.createInventoryLedgerEntry({
@@ -666,11 +673,11 @@ export const appRouter = router({
             });
             
             // Check for low stock
-            if (newStock < part.minStockThreshold) {
+            if (part.minStockThreshold !== null && newStock < part.minStockThreshold) {
               await db.createLowStockAlert({
                 partId: item.partId,
                 currentStock: newStock,
-                minThreshold: part.minStockThreshold,
+                minThreshold: part.minStockThreshold ?? 0,
               });
             }
           }
@@ -725,9 +732,9 @@ export const appRouter = router({
       const partsData = lowStockParts.map(part => ({
         name: part.name,
         sku: part.sku,
-        currentStock: part.stockQuantity,
-        minThreshold: part.minStockThreshold,
-        unitPrice: parseFloat(part.unitPrice),
+        currentStock: part.stockQuantity ?? 0,
+        minThreshold: part.minStockThreshold ?? 0,
+        unitPrice: parseFloat(part.unitPrice ?? '0'),
         unit: part.unit,
       }));
 
@@ -859,7 +866,7 @@ ${JSON.stringify(partsData, null, 2)}
           // Update stock (return to inventory)
           const part = await db.getPartById(item.partId);
           if (part) {
-            const newStock = part.stockQuantity + item.quantity;
+            const newStock = (part.stockQuantity ?? 0) + item.quantity;
             await db.updatePart(item.partId, { stockQuantity: newStock });
             
             await db.createInventoryLedgerEntry({
@@ -935,7 +942,7 @@ ${JSON.stringify(partsData, null, 2)}
         for (const item of input.items) {
           const part = await db.getPartById(item.partId);
           if (!part) throw new Error(`配件 ID ${item.partId} 不存在`);
-          if (part.stockQuantity < item.quantity) {
+          if ((part.stockQuantity ?? 0) < item.quantity) {
             throw new Error(`配件 ${part.name} 库存不足，无法提供保修替换`);
           }
         }
@@ -968,7 +975,7 @@ ${JSON.stringify(partsData, null, 2)}
           // Update stock (warranty replacement reduces inventory)
           const part = await db.getPartById(item.partId);
           if (part) {
-            const newStock = part.stockQuantity - item.quantity;
+            const newStock = (part.stockQuantity ?? 0) - item.quantity;
             await db.updatePart(item.partId, { stockQuantity: newStock });
             
             await db.createInventoryLedgerEntry({
@@ -983,11 +990,11 @@ ${JSON.stringify(partsData, null, 2)}
             });
             
             // Check for low stock
-            if (newStock < part.minStockThreshold) {
+            if (part.minStockThreshold !== null && newStock < part.minStockThreshold) {
               await db.createLowStockAlert({
                 partId: item.partId,
                 currentStock: newStock,
-                minThreshold: part.minStockThreshold,
+                minThreshold: part.minStockThreshold ?? 0,
               });
             }
           }

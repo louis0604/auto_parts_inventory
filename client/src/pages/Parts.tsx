@@ -90,7 +90,7 @@ export default function Parts() {
       utils.parts.list.invalidate(); // 强制失效缓存
       reset();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`添加失败: ${error.message}`);
     },
   });
@@ -103,7 +103,7 @@ export default function Parts() {
       setIsAddDialogOpen(false);
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`更新失败: ${error.message}`);
     },
   });
@@ -114,7 +114,7 @@ export default function Parts() {
       utils.parts.list.invalidate();
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`删除失败: ${error.message}`);
     },
   });
@@ -126,7 +126,7 @@ export default function Parts() {
       setPartToDelete(null);
       refetch();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast.error(`强制删除失败: ${error.message}`);
     },
   });
@@ -211,7 +211,7 @@ export default function Parts() {
   const handleDelete = (part: any) => {
     if (confirm("确定要删除这个配件吗？此操作无法撤销。")) {
       deleteMutation.mutate(part.id, {
-        onError: (error) => {
+        onError: (error: any) => {
           // If delete fails due to references, offer force delete option
           if (error.message.includes("库存变动记录") || error.message.includes("引用")) {
             setPartToDelete({ id: part.id, name: part.name, sku: part.sku });
@@ -364,10 +364,10 @@ export default function Parts() {
                         <td className="text-gray-600">
                           {suppliers?.find((s) => s.id === part.supplierId)?.name || "-"}
                         </td>
-                        <td className={`text-right ${part.stockQuantity < part.minStockThreshold ? "text-red-600 font-bold" : ""}`}>
-                          {part.stockQuantity}
+                        <td className={`text-right ${((part.stockQuantity ?? 0) < (part.minStockThreshold ?? 0)) ? "text-red-600 font-bold" : ""}`}>
+                          {part.stockQuantity ?? 0}
                         </td>
-                        <td className="text-right text-gray-600">{part.minStockThreshold}</td>
+                        <td className="text-right text-gray-600">{part.minStockThreshold ?? 0}</td>
                         <td className="text-center">{part.unit}</td>
                         <td className="text-right">${part.unitPrice}</td>
                         <td>

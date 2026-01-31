@@ -1506,9 +1506,9 @@ export async function adjustStock(
   }
 
   // Calculate new stock quantity
-  const newStock = part.stockQuantity + quantityChange;
+  const newStock = (part.stockQuantity ?? 0) + quantityChange;
   if (newStock < 0) {
-    throw new Error(`Insufficient stock for part ${part.sku}. Current: ${part.stockQuantity}, Requested: ${Math.abs(quantityChange)}`);
+    throw new Error(`Insufficient stock for part ${part.sku}. Current: ${part.stockQuantity ?? 0}, Requested: ${Math.abs(quantityChange)}`);
   }
 
   // Update part stock quantity
@@ -1527,11 +1527,11 @@ export async function adjustStock(
   });
 
   // Check for low stock and create alert if needed
-  if (newStock < part.minStockThreshold) {
+  if (part.minStockThreshold !== null && newStock < part.minStockThreshold) {
     await createLowStockAlert({
       partId,
       currentStock: newStock,
-      minThreshold: part.minStockThreshold,
+      minThreshold: part.minStockThreshold ?? 0,
     });
   }
 

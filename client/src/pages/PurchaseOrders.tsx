@@ -247,7 +247,7 @@ export default function PurchaseOrders() {
                                 setValue(`items.${index}.partId`, partId);
                                 const part = parts?.find(p => p.id === partId);
                                 if (part) {
-                                  setValue(`items.${index}.unitPrice`, part.unitPrice);
+                                  setValue(`items.${index}.unitPrice`, part.unitPrice ?? '0');
                                 }
                               }}
                             >
