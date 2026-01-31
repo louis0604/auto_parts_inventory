@@ -498,6 +498,12 @@
 - [x] 诊断价格字段映射问题（DL3614 XTD显示$3.5，实际Repl Cost是$3.0）
 - [x] 检查parts.getBySku返回的价格字段
 - [x] 修复CreatePurchaseOrder.tsx中的价格字段映射（使用replCost而不是unitPrice）
+
+## 添加配件Drizzle ORM default关键字问题修复
+- [x] 诊断Drizzle ORM生成SQL使用default关键字导致插入失败的问题
+- [x] 修改createPart函数，只插入必填字段和用户提供的字段
+- [x] 让数据库自动应用默认值，避免Drizzle生成default关键字
+- [x] 测试添加配件功能，验证成功添加
 - [x] 增强Line Code选择Dialog的背景对比度（DialogContent已自动包含bg-black/80背景）
 - [x] 测试价格显示和Dialog背景效果（XTD现在显示$3.00，背景对比度明显）
 

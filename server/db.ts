@@ -386,45 +386,41 @@ export async function createPart(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  // 确保所有字段都有明确的值，不依赖数据库默认值
+  // 只插入必填字段和用户提供的字段，其他由数据库默认值处理
   const insertData: any = {
-    // 基本信息
+    // 必填字段
     sku: data.sku,
     name: data.name,
     lineCodeId: data.lineCodeId,
-    categoryId: data.categoryId ?? null,
-    supplierId: data.supplierId ?? null,
-    description: data.description ?? null,
-    // 价格字段
-    listPrice: data.listPrice ?? null,
-    cost: data.cost ?? null,
     retail: data.retail,
     replCost: data.replCost,
-    avgCost: data.avgCost ?? null,
-    price1: data.price1 ?? null,
-    price2: data.price2 ?? null,
-    price3: data.price3 ?? null,
-    coreCost: data.coreCost ?? null,
-    coreRetail: data.coreRetail ?? null,
-    unitPrice: data.unitPrice ?? data.retail, // 默认使用retail价格
-    // 库存字段
-    stockQuantity: data.stockQuantity ?? 0,
-    minStockThreshold: data.minStockThreshold ?? 10,
-    orderPoint: data.orderPoint ?? 0,
-    orderQty: data.orderQty ?? 0,
-    orderMultiple: data.orderMultiple ?? 1,
-    // 单位字段
-    stockingUnit: data.stockingUnit ?? "EA",
-    purchaseUnit: data.purchaseUnit ?? "EA",
-    unit: data.unit || "件",
-    // 额外字段
-    manufacturer: data.manufacturer ?? null,
-    mfgPartNumber: data.mfgPartNumber ?? null,
-    weight: data.weight ?? null,
-    imageUrl: data.imageUrl ?? null,
-    // 软删除字段
-    isArchived: false,
   };
+  
+  // 添加用户提供的可选字段
+  if (data.categoryId !== undefined && data.categoryId !== null) insertData.categoryId = data.categoryId;
+  if (data.supplierId !== undefined && data.supplierId !== null) insertData.supplierId = data.supplierId;
+  if (data.description) insertData.description = data.description;
+  if (data.listPrice) insertData.listPrice = data.listPrice;
+  if (data.cost) insertData.cost = data.cost;
+  if (data.avgCost) insertData.avgCost = data.avgCost;
+  if (data.price1) insertData.price1 = data.price1;
+  if (data.price2) insertData.price2 = data.price2;
+  if (data.price3) insertData.price3 = data.price3;
+  if (data.coreCost) insertData.coreCost = data.coreCost;
+  if (data.coreRetail) insertData.coreRetail = data.coreRetail;
+  if (data.unitPrice) insertData.unitPrice = data.unitPrice;
+  if (data.stockQuantity !== undefined) insertData.stockQuantity = data.stockQuantity;
+  if (data.minStockThreshold !== undefined) insertData.minStockThreshold = data.minStockThreshold;
+  if (data.orderPoint !== undefined) insertData.orderPoint = data.orderPoint;
+  if (data.orderQty !== undefined) insertData.orderQty = data.orderQty;
+  if (data.orderMultiple !== undefined) insertData.orderMultiple = data.orderMultiple;
+  if (data.stockingUnit) insertData.stockingUnit = data.stockingUnit;
+  if (data.purchaseUnit) insertData.purchaseUnit = data.purchaseUnit;
+  if (data.unit) insertData.unit = data.unit;
+  if (data.manufacturer) insertData.manufacturer = data.manufacturer;
+  if (data.mfgPartNumber) insertData.mfgPartNumber = data.mfgPartNumber;
+  if (data.weight) insertData.weight = data.weight;
+  if (data.imageUrl) insertData.imageUrl = data.imageUrl;
   
   const [result] = await db.insert(parts).values(insertData);
   return (await db.select().from(parts).where(eq(parts.id, Number(result.insertId))))[0]!;
