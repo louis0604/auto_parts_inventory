@@ -113,6 +113,27 @@
       "when": 1769810272610,
       "tag": "0015_conscious_excalibur",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1769844496050,
+      "tag": "0016_common_mojo",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1769845366104,
+      "tag": "0017_nasty_strong_guy",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1769845516026,
+      "tag": "0018_skinny_galactus",
+      "breakpoints": true
     }
   ]
 }

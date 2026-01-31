@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO parts (sku, name, lineCodeId, retail, replCost, unitPrice, stockQuantity, minStockThreshold, unit, isArchived)\nSELECT 'TEST-MANUAL', '手动测试配件', id, 25.00, 18.00, 25.00, 0, 10, '件', false\nFROM line_codes WHERE code = 'BSH' LIMIT 1;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute INSERT INTO parts (sku, name, lineCodeId, retail, replCost, unitPrice, stockQuantity, minStockThreshold, unit, isArchived)\nSELECT 'TEST-MANUAL', '手动测试配件', id, 25.00, 18.00, 25.00, 0, 10, '件', false\nFROM line_codes WHERE code = 'BSH' LIMIT 1;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 353
+}

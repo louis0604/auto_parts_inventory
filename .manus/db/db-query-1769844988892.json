@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO parts (sku, name, lineCodeId, retail, replCost, unitPrice, stockQuantity, minStockThreshold, unit) VALUES ('TEST-SQL', '测试配件SQL', 90007, 25.00, 15.00, 25.00, 0, 10, '件');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute INSERT INTO parts (sku, name, lineCodeId, retail, replCost, unitPrice, stockQuantity, minStockThreshold, unit) VALUES ('TEST-SQL', '测试配件SQL', 90007, 25.00, 15.00, 25.00, 0, 10, '件');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 395
+}

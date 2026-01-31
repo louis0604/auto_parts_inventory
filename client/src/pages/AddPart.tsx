@@ -128,6 +128,7 @@ export default function AddPart() {
     createMutation.mutate({
       ...data,
       lineCodeId: lineCodeId === 0 ? undefined : lineCodeId,
+      unitPrice: data.retail || "0", // 使用retail作为unitPrice的默认值
       imageUrl: uploadedImageUrl || data.imageUrl || undefined,
     });
   };
@@ -171,18 +172,18 @@ export default function AddPart() {
                 />
               </div>
               <div className="col-span-2">
-                <Label htmlFor="lineCodeId">产品线 (Line)</Label>
+                <Label htmlFor="lineCodeId">产品线 (Line) *</Label>
                 <Select
-                  value={lineCodeId === undefined ? "none" : String(lineCodeId)}
+                  value={lineCodeId === undefined ? "" : String(lineCodeId)}
                   onValueChange={(value) => {
-                    setValue("lineCodeId", value === "none" ? undefined : Number(value));
+                    setValue("lineCodeId", value === "" ? undefined : Number(value));
                   }}
+                  required
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="选择产品线" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">无</SelectItem>
                     {lineCodes.map((lineCode) => (
                       <SelectItem key={lineCode.id} value={String(lineCode.id)}>
                         {lineCode.code} - {lineCode.description}
@@ -261,10 +262,10 @@ export default function AddPart() {
             <h2 className="text-lg font-semibold mb-4">成本信息</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="replCost">Repl Cost</Label>
+                <Label htmlFor="replCost">Repl Cost *</Label>
                 <Input
                   id="replCost"
-                  {...register("replCost")}
+                  {...register("replCost", { required: true })}
                   placeholder="0.00"
                 />
               </div>
@@ -308,10 +309,10 @@ export default function AddPart() {
                 />
               </div>
               <div>
-                <Label htmlFor="retail">零售价 (Retail)</Label>
+                <Label htmlFor="retail">零售价 (Retail) *</Label>
                 <Input
                   id="retail"
-                  {...register("retail")}
+                  {...register("retail", { required: true })}
                   placeholder="0.00"
                 />
               </div>

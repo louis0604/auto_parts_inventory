@@ -342,24 +342,30 @@ export async function searchParts(query: string): Promise<Part[]> {
 }
 
 export async function createPart(data: {
-  // Basic info
-  lineCodeId?: number | null;
-  sku: string;
-  name: string;
-  description?: string;
+  // Basic info - 保疙5个必填项
+  lineCodeId: number; // Line (必填)
+  sku: string; // Part Number (必填)
+  name: string; // Description (必填)
+  description?: string | null;
   categoryId?: number | null;
   supplierId?: number | null;
   
   // Inventory
-  stockQuantity?: number;
-  minStockThreshold?: number;
+  stockQuantity?: number | null;
+  minStockThreshold?: number | null;
+  orderPoint?: number | null;
   orderQty?: number | null;
   
   // Pricing
   listPrice?: string | null;
   cost?: string | null;
-  retail?: string | null;
-  unitPrice: string;
+  retail: string; // Retail (必填)
+  replCost: string; // Repl Cost (必填)
+  avgCost?: string | null;
+  price1?: string | null;
+  price2?: string | null;
+  price3?: string | null;
+  unitPrice?: string | null;
   coreCost?: string | null;
   coreRetail?: string | null;
   
@@ -369,7 +375,7 @@ export async function createPart(data: {
   // Units
   stockingUnit?: string | null;
   purchaseUnit?: string | null;
-  unit?: string;
+  unit?: string | null;
   
   // Additional
   manufacturer?: string | null;
@@ -379,7 +385,48 @@ export async function createPart(data: {
 }): Promise<Part> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  const [result] = await db.insert(parts).values(data);
+  
+  // 确保所有字段都有明确的值，不依赖数据库默认值
+  const insertData: any = {
+    // 基本信息
+    sku: data.sku,
+    name: data.name,
+    lineCodeId: data.lineCodeId,
+    categoryId: data.categoryId ?? null,
+    supplierId: data.supplierId ?? null,
+    description: data.description ?? null,
+    // 价格字段
+    listPrice: data.listPrice ?? null,
+    cost: data.cost ?? null,
+    retail: data.retail,
+    replCost: data.replCost,
+    avgCost: data.avgCost ?? null,
+    price1: data.price1 ?? null,
+    price2: data.price2 ?? null,
+    price3: data.price3 ?? null,
+    coreCost: data.coreCost ?? null,
+    coreRetail: data.coreRetail ?? null,
+    unitPrice: data.unitPrice ?? data.retail, // 默认使用retail价格
+    // 库存字段
+    stockQuantity: data.stockQuantity ?? 0,
+    minStockThreshold: data.minStockThreshold ?? 10,
+    orderPoint: data.orderPoint ?? 0,
+    orderQty: data.orderQty ?? 0,
+    orderMultiple: data.orderMultiple ?? 1,
+    // 单位字段
+    stockingUnit: data.stockingUnit ?? "EA",
+    purchaseUnit: data.purchaseUnit ?? "EA",
+    unit: data.unit || "件",
+    // 额外字段
+    manufacturer: data.manufacturer ?? null,
+    mfgPartNumber: data.mfgPartNumber ?? null,
+    weight: data.weight ?? null,
+    imageUrl: data.imageUrl ?? null,
+    // 软删除字段
+    isArchived: false,
+  };
+  
+  const [result] = await db.insert(parts).values(insertData);
   return (await db.select().from(parts).where(eq(parts.id, Number(result.insertId))))[0]!;
 }
 

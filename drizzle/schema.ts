@@ -87,46 +87,46 @@ export type InsertCustomer = typeof customers.$inferInsert;
  */
 export const parts = mysqlTable("parts", {
   id: int("id").autoincrement().primaryKey(),
-  sku: varchar("sku", { length: 100 }).notNull(), // Part
-  name: varchar("name", { length: 200 }).notNull(), // Description
-  lineCodeId: int("lineCodeId").references(() => lineCodes.id), // Line
-  categoryId: int("categoryId").references(() => partCategories.id),
-  supplierId: int("supplierId").references(() => suppliers.id), // Vendor
-  description: text("description"),
+  sku: varchar("sku", { length: 100 }).notNull(), // Part Number (必填)
+  name: varchar("name", { length: 200 }).notNull(), // Description (必填)
+  lineCodeId: int("lineCodeId").notNull().references(() => lineCodes.id), // Line (必填)
+  categoryId: int("categoryId").references(() => partCategories.id), // 可选
+  supplierId: int("supplierId").references(() => suppliers.id), // Vendor (可选)
+  description: text("description"), // 可选
   
   // Pricing fields
-  listPrice: decimal("listPrice", { precision: 15, scale: 2 }), // List
-  cost: decimal("cost", { precision: 15, scale: 2 }), // Cost
-  retail: decimal("retail", { precision: 15, scale: 2 }), // Retail
-  replCost: decimal("replCost", { precision: 15, scale: 2 }), // Replacement Cost
-  avgCost: decimal("avgCost", { precision: 15, scale: 2 }), // Average Cost
-  price1: decimal("price1", { precision: 15, scale: 2 }), // Price 1
-  price2: decimal("price2", { precision: 15, scale: 2 }), // Price 2
-  price3: decimal("price3", { precision: 15, scale: 2 }), // Price 3
-  coreCost: decimal("coreCost", { precision: 15, scale: 2 }), // Core Cost
-  coreRetail: decimal("coreRetail", { precision: 15, scale: 2 }), // Core Retail
-  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(), // 保留兼容性
+  listPrice: decimal("listPrice", { precision: 15, scale: 2 }), // List (可选)
+  cost: decimal("cost", { precision: 15, scale: 2 }), // Cost (可选)
+  retail: decimal("retail", { precision: 15, scale: 2 }).notNull(), // Retail (必填)
+  replCost: decimal("replCost", { precision: 15, scale: 2 }).notNull(), // Repl Cost (必填)
+  avgCost: decimal("avgCost", { precision: 15, scale: 2 }), // Average Cost (可选)
+  price1: decimal("price1", { precision: 15, scale: 2 }), // Price 1 (可选)
+  price2: decimal("price2", { precision: 15, scale: 2 }), // Price 2 (可选)
+  price3: decimal("price3", { precision: 15, scale: 2 }), // Price 3 (可选)
+  coreCost: decimal("coreCost", { precision: 15, scale: 2 }), // Core Cost (可选)
+  coreRetail: decimal("coreRetail", { precision: 15, scale: 2 }), // Core Retail (可选)
+  unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }), // 保留兼容性(可选)
   
   // Inventory fields
-  stockQuantity: int("stockQuantity").default(0).notNull(),
-  minStockThreshold: int("minStockThreshold").default(10).notNull(),
-  orderPoint: int("orderPoint").default(0), // Order Point (reorder threshold)
-  orderQty: int("orderQty").default(0), // Order Qty
-  orderMultiple: int("orderMultiple").default(1), // Order Multiple
+  stockQuantity: int("stockQuantity").default(0),
+  minStockThreshold: int("minStockThreshold").default(10),
+  orderPoint: int("orderPoint").default(0), // Order Point (可选)
+  orderQty: int("orderQty").default(0), // Order Qty (可选)
+  orderMultiple: int("orderMultiple").default(1), // Order Multiple (可选)
   
   // Units
-  stockingUnit: varchar("stockingUnit", { length: 20 }).default("EA"), // Stocking Unit
-  purchaseUnit: varchar("purchaseUnit", { length: 20 }).default("EA"), // Purchase Unit
-  unit: varchar("unit", { length: 50 }).default("件").notNull(), // 保留兼容性
+  stockingUnit: varchar("stockingUnit", { length: 20 }).default("EA"), // Stocking Unit (可选)
+  purchaseUnit: varchar("purchaseUnit", { length: 20 }).default("EA"), // Purchase Unit (可选)
+  unit: varchar("unit", { length: 50 }).default("件"), // 保留兼容性(可选)
   
   // Additional fields
-  manufacturer: varchar("manufacturer", { length: 200 }), // Manufacturer
-  mfgPartNumber: varchar("mfgPartNumber", { length: 100 }), // Mfg Part #
-  weight: decimal("weight", { precision: 10, scale: 2 }), // Weight
-  imageUrl: varchar("imageUrl", { length: 500 }), // Part Image URL
+  manufacturer: varchar("manufacturer", { length: 200 }), // Manufacturer (可选)
+  mfgPartNumber: varchar("mfgPartNumber", { length: 100 }), // Mfg Part # (可选)
+  weight: decimal("weight", { precision: 10, scale: 2 }), // Weight (可选)
+  imageUrl: varchar("imageUrl", { length: 500 }), // Part Image URL (可选)
   
   // Soft delete
-  isArchived: boolean("isArchived").default(false).notNull(),
+  isArchived: boolean("isArchived").default(false),
   archivedAt: timestamp("archivedAt"),
   
   createdAt: timestamp("createdAt").defaultNow().notNull(),

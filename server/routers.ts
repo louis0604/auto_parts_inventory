@@ -237,24 +237,30 @@ export const appRouter = router({
       }),
     create: protectedProcedure
       .input(z.object({
-        // Basic info
-        lineCodeId: z.number().nullable().optional(),
-        sku: z.string().min(1),
-        name: z.string().min(1),
-        description: z.string().optional(),
+        // Basic info - 保疙5个必填项
+        lineCodeId: z.number(), // Line (必填)
+        sku: z.string().min(1), // Part Number (必填)
+        name: z.string().min(1), // Description (必填)
+        description: z.string().nullable().optional(),
         categoryId: z.number().nullable().optional(),
         supplierId: z.number().nullable().optional(),
         
         // Inventory
-        stockQuantity: z.number().default(0),
-        minStockThreshold: z.number().default(10),
+        stockQuantity: z.number().nullable().optional(),
+        minStockThreshold: z.number().nullable().optional(),
         orderQty: z.number().nullable().optional(),
+        orderPoint: z.number().nullable().optional(),
         
         // Pricing
         listPrice: z.string().nullable().optional(),
         cost: z.string().nullable().optional(),
-        retail: z.string().nullable().optional(),
-        unitPrice: z.string(),
+        retail: z.string(), // Retail (必填)
+        replCost: z.string(), // Repl Cost (必填)
+        avgCost: z.string().nullable().optional(),
+        price1: z.string().nullable().optional(),
+        price2: z.string().nullable().optional(),
+        price3: z.string().nullable().optional(),
+        unitPrice: z.string().nullable().optional(),
         coreCost: z.string().nullable().optional(),
         coreRetail: z.string().nullable().optional(),
         
@@ -264,7 +270,7 @@ export const appRouter = router({
         // Units
         stockingUnit: z.string().nullable().optional(),
         purchaseUnit: z.string().nullable().optional(),
-        unit: z.string().default("件"),
+        unit: z.string().nullable().optional(),
         
         // Additional
         manufacturer: z.string().nullable().optional(),
@@ -295,7 +301,7 @@ export const appRouter = router({
         id: z.number(),
         data: z.object({
           // Basic info
-          lineCodeId: z.number().nullable().optional(),
+          lineCodeId: z.number().optional(), // 可选，但不能为null
           sku: z.string().min(1).optional(),
           name: z.string().min(1).optional(),
           description: z.string().optional(),
@@ -308,31 +314,31 @@ export const appRouter = router({
           orderQty: z.number().nullable().optional(),
           
           // Pricing
-          listPrice: z.string().nullable().optional(),
-          cost: z.string().nullable().optional(),
-          retail: z.string().nullable().optional(),
+          listPrice: z.string().optional(),
+          cost: z.string().optional(),
+          retail: z.string().optional(),
           unitPrice: z.string().optional(),
-          coreCost: z.string().nullable().optional(),
-          coreRetail: z.string().nullable().optional(),
-          replCost: z.string().nullable().optional(),
-          avgCost: z.string().nullable().optional(),
-          price1: z.string().nullable().optional(),
-          price2: z.string().nullable().optional(),
-          price3: z.string().nullable().optional(),
+          coreCost: z.string().optional(),
+          coreRetail: z.string().optional(),
+          replCost: z.string().optional(),
+          avgCost: z.string().optional(),
+          price1: z.string().optional(),
+          price2: z.string().optional(),
+          price3: z.string().optional(),
           
           // Order info
           orderMultiple: z.number().nullable().optional(),
           
           // Units
-          stockingUnit: z.string().nullable().optional(),
-          purchaseUnit: z.string().nullable().optional(),
+          stockingUnit: z.string().optional(),
+          purchaseUnit: z.string().optional(),
           unit: z.string().optional(),
           
           // Additional
-          manufacturer: z.string().nullable().optional(),
-          mfgPartNumber: z.string().nullable().optional(),
-          weight: z.string().nullable().optional(),
-          imageUrl: z.string().nullable().optional(),
+          manufacturer: z.string().optional(),
+          mfgPartNumber: z.string().optional(),
+          weight: z.string().optional(),
+          imageUrl: z.string().optional(),
         }),
       }))
       .mutation(async ({ input }) => {

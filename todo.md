@@ -575,3 +575,17 @@
 - [x] 前端：在退货单列表页面添加删除按钮和确认对话框
 - [x] 前端：在保修单列表页面添加删除按钮和确认对话框
 - [x] 测试所有删除功能
+
+## 简化配件添加必填字段
+- [x] 修改数据库schema：将parts表中除Part Number、Description、Line、Repl Cost、Retail之外的字段改为可选
+- [x] 推送数据库schema变更到数据库
+- [x] 修改前端AddPartDialog表单验证，移除非必填字段的required属性
+- [x] 测试配件添加功能，确保只填写必填字段即可成功添加
+
+## 移除添加配件的所有必填字段限制
+- [x] 修改数据库schema：将parts表的所有字段改为可选，包括sku、name、lineCodeId等
+- [x] 推送数据库schema变更
+- [ ] 修改后端routers.ts：移除parts.create的所有必填验证
+- [ ] 修改后端db.ts：调整createPart函数，所有参数改为可选
+- [ ] 修改前端AddPart页面：移除所有字段的required属性
+- [ ] 测试：验证可以在不填写任何信息的情况下成功添加配件
