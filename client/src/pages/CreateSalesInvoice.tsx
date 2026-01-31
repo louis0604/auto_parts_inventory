@@ -141,7 +141,7 @@ export default function CreateSalesInvoice() {
 
     setSearchingIndex(index);
     try {
-      const results = await utils.client.parts.getBySku.query(sku);
+      const results = await utils.client.parts.getBySku.query({ sku });
       
       if (!results || results.length === 0) {
         toast.error(`未找到配件号 ${sku}`);
@@ -153,9 +153,8 @@ export default function CreateSalesInvoice() {
         // 只有一个结果，直接填充
         const part = results[0];
         setValue(`items.${index}.partId`, part.id);
-        if (part.unitPrice) {
-          setValue(`items.${index}.unitPrice`, String(part.unitPrice));
-        }
+        // 默认使用零售价unitPrice，用户可以自由修改
+        setValue(`items.${index}.unitPrice`, String(part.unitPrice || "0"));
         toast.success(`已填充配件: ${part.lineCodeName} - ${part.sku} - ${part.name}`);
       } else {
         // 多个结果，显示选择对话框

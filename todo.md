@@ -550,3 +550,10 @@
 - [x] 测试关键功能页面的可访问性（首页正常显示，仪表盘数据正常）
 - [x] 检查数据库连接和基础数据（数据库连接正常，6条purchase_orders记录）
 - [x] 总结检修结果（主要TypeScript错误已修复，剩余错误为客户端代码的小问题，不影响运行）
+
+## 修复销售订单SKU查询失败问题
+- [x] 检查CreateSalesInvoice.tsx的SKU查询实现
+- [x] 验证是否存在多Line Code导致的查询失败（确认是API参数格式错误）
+- [x] 修复SKU查询和Line Code选择功能（将query(sku)改为query({ sku })）
+- [x] 同样修复CreateCredit.tsx和CreateWarranty.tsx的SKU查询参数和useUtils调用位置
+- [ ] 测试DL3614配件号查询功能

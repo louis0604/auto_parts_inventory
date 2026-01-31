@@ -67,6 +67,7 @@ export default function CreateWarranty() {
   
   const { data: customers } = trpc.customers.list.useQuery();
   const { data: parts } = trpc.parts.list.useQuery();
+  const utils = trpc.useUtils();
   
   const createMutation = trpc.warranties.create.useMutation({
     onSuccess: () => {
@@ -165,8 +166,7 @@ export default function CreateWarranty() {
 
     setSearchingIndex(index);
     try {
-      const utils = trpc.useUtils();
-      const results = await utils.client.parts.getBySku.query(sku);
+      const results = await utils.client.parts.getBySku.query({ sku });
       
       if (!results || results.length === 0) {
         toast.error(`未找到配件号 ${sku}`);
