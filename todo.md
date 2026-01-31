@@ -557,3 +557,10 @@
 - [x] 修复SKU查询和Line Code选择功能（将query(sku)改为query({ sku })）
 - [x] 同样修复CreateCredit.tsx和CreateWarranty.tsx的SKU查询参数和useUtils调用位置
 - [ ] 测试DL3614配件号查询功能
+
+## 添加SKU输入框回车键快捷查询功能
+- [x] 修改CreatePurchaseOrder.tsx的SKU输入框添加onKeyDown事件
+- [x] 修改CreateSalesInvoice.tsx的SKU输入框添加onKeyDown事件
+- [x] 修改CreateCredit.tsx的SKU输入框添加onKeyDown事件
+- [x] 修改CreateWarranty.tsx的SKU输入框添加onKeyDown事件
+- [x] 测试回车键快捷查询功能（代码实现完成）

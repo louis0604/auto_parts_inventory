@@ -317,6 +317,12 @@ export default function CreateCredit() {
                               value={skuInputs[index] || ""}
                               onChange={(e) => setSkuInputs({ ...skuInputs, [index]: e.target.value })}
                               className="w-32"
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                  e.preventDefault();
+                                  handleSearchPart(index);
+                                }
+                              }}
                             />
                             <Button
                               type="button"

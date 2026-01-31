@@ -268,6 +268,12 @@ export default function CreatePurchaseOrder() {
                             {...register(`items.${index}.sku`)}
                             placeholder="输入配件号"
                             className="w-32"
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.preventDefault();
+                                handleSearchPart(index);
+                              }
+                            }}
                           />
                           <Button
                             type="button"
