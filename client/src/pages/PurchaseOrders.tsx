@@ -28,8 +28,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, ShoppingCart, Trash2, Check, X } from "lucide-react";
+import { Plus, ShoppingCart, Trash2, Check, X, Download } from "lucide-react";
 import { toast } from "sonner";
+import { downloadBase64File } from "@/lib/download";
 import { useForm, useFieldArray } from "react-hook-form";
 import { Badge } from "@/components/ui/badge";
 import { PurchaseOrderDetail } from "@/components/PurchaseOrderDetail";
@@ -172,10 +173,27 @@ export default function PurchaseOrders() {
               <ShoppingCart className="h-6 w-6" />
               采购订单管理
             </CardTitle>
-            <Button onClick={() => setLocation("/purchase-orders/create")}>
-              <Plus className="h-4 w-4 mr-2" />
-              创建采购订单
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const report = await trpc.reports.purchases.mutate();
+                    downloadBase64File(report);
+                    toast.success("采购报表已导出");
+                  } catch (error: unknown) {
+                    toast.error("导出失败: " + (error instanceof Error ? error.message : String(error)));
+                  }
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                导出采购报表
+              </Button>
+              <Button onClick={() => setLocation("/purchase-orders/create")}>
+                <Plus className="h-4 w-4 mr-2" />
+                创建采购订单
+              </Button>
+            </div>
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground">
                 <DialogHeader>

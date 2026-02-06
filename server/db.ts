@@ -323,6 +323,51 @@ export async function getAllParts(): Promise<(Part & { lineCode?: string | null 
   return result as any;
 }
 
+export async function getInventoryReportData() {
+  const db = await getDb();
+  if (!db) return [];
+  return await db
+    .select({
+      id: parts.id,
+      sku: parts.sku,
+      name: parts.name,
+      lineCode: lineCodes.code,
+      categoryName: partCategories.name,
+      supplierName: suppliers.name,
+      description: parts.description,
+      stockQuantity: parts.stockQuantity,
+      minStockThreshold: parts.minStockThreshold,
+      orderPoint: parts.orderPoint,
+      orderQty: parts.orderQty,
+      orderMultiple: parts.orderMultiple,
+      listPrice: parts.listPrice,
+      cost: parts.cost,
+      retail: parts.retail,
+      replCost: parts.replCost,
+      avgCost: parts.avgCost,
+      price1: parts.price1,
+      price2: parts.price2,
+      price3: parts.price3,
+      coreCost: parts.coreCost,
+      coreRetail: parts.coreRetail,
+      unitPrice: parts.unitPrice,
+      stockingUnit: parts.stockingUnit,
+      purchaseUnit: parts.purchaseUnit,
+      unit: parts.unit,
+      manufacturer: parts.manufacturer,
+      mfgPartNumber: parts.mfgPartNumber,
+      weight: parts.weight,
+      isArchived: parts.isArchived,
+      createdAt: parts.createdAt,
+      updatedAt: parts.updatedAt,
+    })
+    .from(parts)
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .leftJoin(partCategories, eq(parts.categoryId, partCategories.id))
+    .leftJoin(suppliers, eq(parts.supplierId, suppliers.id))
+    .orderBy(desc(parts.createdAt));
+}
+
 export async function getPartById(id: number): Promise<Part | undefined> {
   const db = await getDb();
   if (!db) return undefined;
@@ -742,6 +787,52 @@ export async function getAllPurchaseOrders(): Promise<PurchaseOrder[]> {
   return await db.select().from(purchaseOrders).orderBy(desc(purchaseOrders.createdAt));
 }
 
+export async function getPurchaseOrderReportData() {
+  const db = await getDb();
+  if (!db) {
+    return { orders: [], items: [] };
+  }
+
+  const orders = await db
+    .select({
+      id: purchaseOrders.id,
+      orderNumber: purchaseOrders.orderNumber,
+      supplierName: suppliers.name,
+      orderDate: purchaseOrders.orderDate,
+      type: purchaseOrders.type,
+      totalAmount: purchaseOrders.totalAmount,
+      status: purchaseOrders.status,
+      notes: purchaseOrders.notes,
+      createdByName: users.name,
+      createdAt: purchaseOrders.createdAt,
+    })
+    .from(purchaseOrders)
+    .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+    .leftJoin(users, eq(purchaseOrders.createdBy, users.id))
+    .orderBy(desc(purchaseOrders.createdAt));
+
+  const items = await db
+    .select({
+      orderNumber: purchaseOrders.orderNumber,
+      supplierName: suppliers.name,
+      partSku: parts.sku,
+      partName: parts.name,
+      lineCode: lineCodes.code,
+      quantity: purchaseOrderItems.quantity,
+      unitPrice: purchaseOrderItems.unitPrice,
+      subtotal: purchaseOrderItems.subtotal,
+      createdAt: purchaseOrderItems.createdAt,
+    })
+    .from(purchaseOrderItems)
+    .leftJoin(purchaseOrders, eq(purchaseOrderItems.purchaseOrderId, purchaseOrders.id))
+    .leftJoin(suppliers, eq(purchaseOrders.supplierId, suppliers.id))
+    .leftJoin(parts, eq(purchaseOrderItems.partId, parts.id))
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .orderBy(desc(purchaseOrderItems.createdAt));
+
+  return { orders, items };
+}
+
 export async function getPurchaseOrderById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
@@ -831,6 +922,52 @@ export async function getAllSalesInvoices(): Promise<SalesInvoice[]> {
   const db = await getDb();
   if (!db) return [];
   return await db.select().from(salesInvoices).orderBy(desc(salesInvoices.createdAt));
+}
+
+export async function getSalesInvoiceReportData() {
+  const db = await getDb();
+  if (!db) {
+    return { invoices: [], items: [] };
+  }
+
+  const invoices = await db
+    .select({
+      id: salesInvoices.id,
+      invoiceNumber: salesInvoices.invoiceNumber,
+      customerName: customers.name,
+      invoiceDate: salesInvoices.invoiceDate,
+      type: salesInvoices.type,
+      totalAmount: salesInvoices.totalAmount,
+      status: salesInvoices.status,
+      notes: salesInvoices.notes,
+      createdByName: users.name,
+      createdAt: salesInvoices.createdAt,
+    })
+    .from(salesInvoices)
+    .leftJoin(customers, eq(salesInvoices.customerId, customers.id))
+    .leftJoin(users, eq(salesInvoices.createdBy, users.id))
+    .orderBy(desc(salesInvoices.createdAt));
+
+  const items = await db
+    .select({
+      invoiceNumber: salesInvoices.invoiceNumber,
+      customerName: customers.name,
+      partSku: parts.sku,
+      partName: parts.name,
+      lineCode: lineCodes.code,
+      quantity: salesInvoiceItems.quantity,
+      unitPrice: salesInvoiceItems.unitPrice,
+      subtotal: salesInvoiceItems.subtotal,
+      createdAt: salesInvoiceItems.createdAt,
+    })
+    .from(salesInvoiceItems)
+    .leftJoin(salesInvoices, eq(salesInvoiceItems.salesInvoiceId, salesInvoices.id))
+    .leftJoin(customers, eq(salesInvoices.customerId, customers.id))
+    .leftJoin(parts, eq(salesInvoiceItems.partId, parts.id))
+    .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
+    .orderBy(desc(salesInvoiceItems.createdAt));
+
+  return { invoices, items };
 }
 
 export async function getSalesInvoiceById(id: number) {

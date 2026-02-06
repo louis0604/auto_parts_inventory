@@ -29,7 +29,8 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 
 import { ImageUpload } from "@/components/ImageUpload";
-import { Edit, Trash2, Upload, Search } from "lucide-react";
+import { Edit, Trash2, Upload, Search, Download } from "lucide-react";
+import { downloadBase64File } from "@/lib/download";
 
 type PartFormData = {
   // Basic info
@@ -342,6 +343,21 @@ export default function PartsNew() {
               批量导入
             </Button>
           </Link>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              try {
+                const report = await trpc.reports.inventory.mutate();
+                downloadBase64File(report);
+                toast.success("库存报表已导出");
+              } catch (error: unknown) {
+                toast.error("导出失败: " + (error instanceof Error ? error.message : String(error)));
+              }
+            }}
+          >
+            <Download className="mr-2 h-4 w-4" />
+            导出库存报表
+          </Button>
           <Link href="/parts/add">
             <Button>
               添加配件
