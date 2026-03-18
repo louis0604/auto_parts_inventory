@@ -141,6 +141,13 @@
       "when": 1773867254419,
       "tag": "0019_colorful_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1773869559799,
+      "tag": "0020_concerned_salo",
+      "breakpoints": true
     }
   ]
 }

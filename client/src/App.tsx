@@ -37,6 +37,7 @@ import Warranties from "./pages/Warranties";
 import OperationHistory from "./pages/OperationHistory";
 import VehicleLookup from "./pages/VehicleLookup";
 import PartCategories from "./pages/PartCategories";
+import PartLookup from "./pages/PartLookup";
 
 function Router() {
   return (
@@ -74,6 +75,7 @@ function Router() {
         <Route path={"/operation-history"} component={OperationHistory} />
         <Route path={"/vehicle-lookup"} component={VehicleLookup} />
         <Route path={"/part-categories"} component={PartCategories} />
+        <Route path={"/part-lookup"} component={PartLookup} />
         <Route path={"/ai-restocking"} component={AIRestocking} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />

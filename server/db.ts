@@ -1,4 +1,4 @@
-import { eq, desc, sql, and, or, like, lt } from "drizzle-orm";
+import { eq, desc, sql, and, or, like, lt, gte, lte, inArray, isNull } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import { 
   InsertUser, 
@@ -23,6 +23,7 @@ import {
   vehicleModels,
   vehicleEngines,
   partGroups,
+  partVehicleFitments,
   type Part,
   type Supplier,
   type Customer,
@@ -41,6 +42,8 @@ import {
   type VehicleModel,
   type VehicleEngine,
   type PartGroup,
+  type PartVehicleFitment,
+  type InsertPartVehicleFitment,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -1782,4 +1785,185 @@ export async function deletePartGroup(id: number): Promise<void> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.delete(partGroups).where(eq(partGroups.id, id));
+}
+
+// ===== Part Vehicle Fitments =====
+
+export async function addPartFitment(data: InsertPartVehicleFitment): Promise<PartVehicleFitment> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(partVehicleFitments).values(data);
+  return (await db.select().from(partVehicleFitments).where(eq(partVehicleFitments.id, Number(result.insertId))))[0]!;
+}
+
+export async function deletePartFitment(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(partVehicleFitments).where(eq(partVehicleFitments.id, id));
+}
+
+export async function getPartFitments(partId: number): Promise<PartVehicleFitment[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(partVehicleFitments).where(eq(partVehicleFitments.partId, partId));
+}
+
+// ===== Part Lookup (by vehicle + category + group) =====
+
+export interface PartLookupResult {
+  id: number;
+  sku: string;
+  name: string;
+  manufacturer: string | null;
+  lineCode: string | null;
+  stockQuantity: number | null;
+  retail: string | null;
+  listPrice: string | null;
+  replCost: string | null;
+  partGroupId: number | null;
+  partGroupName: string | null;
+  categoryId: number | null;
+  categoryName: string | null;
+  yearRange: string | null; // e.g. "19-24"
+  fitmentNotes: string | null;
+}
+
+export async function lookupParts(params: {
+  year?: number;
+  makeId?: number;
+  modelId?: number;
+  categoryId?: number;
+  groupId?: number;
+  searchText?: string;
+}): Promise<PartLookupResult[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { year, makeId, modelId, categoryId, groupId, searchText } = params;
+
+  // Build base query joining parts with line_codes, part_groups, part_categories
+  // and optionally filtering by vehicle fitment
+  const conditions: ReturnType<typeof eq>[] = [];
+
+  // Always exclude archived
+  conditions.push(eq(parts.isArchived, false));
+
+  if (groupId) {
+    conditions.push(eq(parts.partGroupId, groupId));
+  } else if (categoryId) {
+    // Filter by category via partGroups join
+    const groupsInCategory = await db
+      .select({ id: partGroups.id })
+      .from(partGroups)
+      .where(eq(partGroups.categoryId, categoryId));
+    if (groupsInCategory.length > 0) {
+      const groupIds = groupsInCategory.map((g) => g.id);
+      conditions.push(inArray(parts.partGroupId, groupIds));
+    }
+  }
+
+  if (searchText) {
+    conditions.push(
+      or(
+        like(parts.sku, `%${searchText}%`),
+        like(parts.name, `%${searchText}%`),
+        like(parts.manufacturer, `%${searchText}%`)
+      ) as ReturnType<typeof eq>
+    );
+  }
+
+  // Get parts matching conditions
+  const matchingParts = await db
+    .select({
+      id: parts.id,
+      sku: parts.sku,
+      name: parts.name,
+      manufacturer: parts.manufacturer,
+      lineCodeId: parts.lineCodeId,
+      stockQuantity: parts.stockQuantity,
+      retail: parts.retail,
+      listPrice: parts.listPrice,
+      replCost: parts.replCost,
+      partGroupId: parts.partGroupId,
+    })
+    .from(parts)
+    .where(and(...conditions))
+    .orderBy(parts.name);
+
+  if (matchingParts.length === 0) return [];
+
+  // Get line codes
+  const allLineCodes = await db.select().from(lineCodes);
+  const lineCodeMap = new Map(allLineCodes.map((lc) => [lc.id, lc.code]));
+
+  // Get part groups and categories
+  const allGroups = await db.select().from(partGroups);
+  const allCategories = await db.select().from(partCategories);
+  const groupMap = new Map(allGroups.map((g) => [g.id, g]));
+  const categoryMap = new Map(allCategories.map((c) => [c.id, c]));
+
+  // If vehicle filter is specified, get fitments
+  let fitmentPartIds: Set<number> | null = null;
+  let fitmentMap = new Map<number, { yearFrom: number | null; yearTo: number | null; notes: string | null }>();
+
+  if (year || makeId || modelId) {
+    const fitmentConditions: ReturnType<typeof eq>[] = [];
+    if (makeId) fitmentConditions.push(eq(partVehicleFitments.makeId, makeId));
+    if (modelId) fitmentConditions.push(eq(partVehicleFitments.modelId, modelId));
+    if (year) {
+      fitmentConditions.push(
+        and(
+          or(isNull(partVehicleFitments.yearFrom), lte(partVehicleFitments.yearFrom, year)),
+          or(isNull(partVehicleFitments.yearTo), gte(partVehicleFitments.yearTo, year))
+        ) as ReturnType<typeof eq>
+      );
+    }
+
+    const fitments = await db
+      .select()
+      .from(partVehicleFitments)
+      .where(fitmentConditions.length > 0 ? and(...fitmentConditions) : undefined);
+
+    fitmentPartIds = new Set(fitments.map((f) => f.partId));
+    for (const f of fitments) {
+      fitmentMap.set(f.partId, { yearFrom: f.yearFrom, yearTo: f.yearTo, notes: f.notes });
+    }
+  }
+
+  const results: PartLookupResult[] = [];
+  for (const part of matchingParts) {
+    // If vehicle filter active, skip parts without fitment
+    if (fitmentPartIds !== null && !fitmentPartIds.has(part.id)) continue;
+
+    const group = part.partGroupId ? groupMap.get(part.partGroupId) : null;
+    const category = group ? categoryMap.get(group.categoryId) : null;
+    const fitment = fitmentMap.get(part.id);
+
+    let yearRange: string | null = null;
+    if (fitment?.yearFrom || fitment?.yearTo) {
+      const from = fitment.yearFrom ? String(fitment.yearFrom).slice(-2) : "??";
+      const to = fitment.yearTo ? String(fitment.yearTo).slice(-2) : "??";
+      yearRange = `${from}-${to}`;
+    }
+
+    results.push({
+      id: part.id,
+      sku: part.sku,
+      name: part.name,
+      manufacturer: part.manufacturer,
+      lineCode: part.lineCodeId ? (lineCodeMap.get(part.lineCodeId) ?? null) : null,
+      stockQuantity: part.stockQuantity,
+      retail: part.retail,
+      listPrice: part.listPrice,
+      replCost: part.replCost,
+      partGroupId: part.partGroupId,
+      partGroupName: group?.name ?? null,
+      categoryId: category?.id ?? null,
+      categoryName: category?.name ?? null,
+      yearRange,
+      fitmentNotes: fitment?.notes ?? null,
+    });
+  }
+
+  return results;
 }

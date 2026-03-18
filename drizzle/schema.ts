@@ -125,6 +125,9 @@ export const parts = mysqlTable("parts", {
   weight: decimal("weight", { precision: 10, scale: 2 }), // Weight (可选)
   imageUrl: varchar("imageUrl", { length: 500 }), // Part Image URL (可选)
   
+  // Category/Group classification
+  partGroupId: int("partGroupId").references(() => partGroups.id), // Part group (e.g. Front Disc Brake Rotor)
+  
   // Soft delete
   isArchived: boolean("isArchived").default(false),
   archivedAt: timestamp("archivedAt"),
@@ -412,3 +415,23 @@ export const partGroups = mysqlTable("part_groups", {
 
 export type PartGroup = typeof partGroups.$inferSelect;
 export type InsertPartGroup = typeof partGroups.$inferInsert;
+
+/**
+ * Part vehicle fitments table - which parts fit which vehicles
+ */
+export const partVehicleFitments = mysqlTable("part_vehicle_fitments", {
+  id: int("id").autoincrement().primaryKey(),
+  partId: int("partId").notNull().references(() => parts.id, { onDelete: "cascade" }),
+  vehicleEngineId: int("vehicleEngineId").references(() => vehicleEngines.id, { onDelete: "cascade" }),
+  // Denormalized for flexible lookup without requiring full vehicle record
+  yearFrom: int("yearFrom"), // e.g. 2019
+  yearTo: int("yearTo"),   // e.g. 2024
+  makeId: int("makeId").references(() => vehicleMakes.id, { onDelete: "cascade" }),
+  modelId: int("modelId").references(() => vehicleModels.id, { onDelete: "cascade" }),
+  engineNote: varchar("engineNote", { length: 200 }), // e.g. "2.5L DOHC"
+  notes: text("notes"), // fitment notes
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PartVehicleFitment = typeof partVehicleFitments.$inferSelect;
+export type InsertPartVehicleFitment = typeof partVehicleFitments.$inferInsert;

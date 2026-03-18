@@ -659,3 +659,16 @@
 - [x] 销售发票明细添加Sugg Price字段（建议价格）
 - [x] 更新数据库schema并推送迁移
 - [x] TypeScript编译通过（0个错误）
+
+## 配件查询系统（PartLookup - 参考LaserCat POS）
+- [x] 数据库：创建part_vehicle_fitments表（配件与车辆适配关系）
+- [x] 数据库：在parts表添加partGroupId字段（关联分组）
+- [x] 数据库：推送schema迁移（成功）
+- [x] 后端：实现partLookup.search API（按年份/品牌/型号+分类+分组查询）
+- [x] 后端：实现partLookup.addFitment/removeFitment/getFitments API
+- [x] 前端：创建PartLookup.tsx页面
+- [x] 前端：顶部筛选栏（年份/品牌/型号级联选择 + 分类/分组下拉 + 关键字搜索）
+- [x] 前端：配件列表按分组标题（红色行）展示，支持折叠/展开
+- [x] 前端：每行显示制造商/Line Code/配件号/库存/售价/定价/年份范围
+- [x] 前端：在侧边栏添加"配件查询"导航入口
+- [x] TypeScript编译通过（0个错误）

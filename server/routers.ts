@@ -1120,6 +1120,50 @@ ${JSON.stringify(partsData, null, 2)}
       }),
   }),
 
+  // Part Lookup (vehicle-based part search)
+  partLookup: router({
+    // Search parts by vehicle + category + group
+    search: protectedProcedure
+      .input(z.object({
+        year: z.number().optional(),
+        makeId: z.number().optional(),
+        modelId: z.number().optional(),
+        categoryId: z.number().optional(),
+        groupId: z.number().optional(),
+        searchText: z.string().optional(),
+      }))
+      .query(async ({ input }) => {
+        return await db.lookupParts(input);
+      }),
+    // Add fitment to a part
+    addFitment: protectedProcedure
+      .input(z.object({
+        partId: z.number(),
+        makeId: z.number().optional(),
+        modelId: z.number().optional(),
+        yearFrom: z.number().optional(),
+        yearTo: z.number().optional(),
+        engineNote: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.addPartFitment(input);
+      }),
+    // Remove fitment
+    removeFitment: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deletePartFitment(input);
+        return { success: true };
+      }),
+    // Get fitments for a part
+    getFitments: protectedProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        return await db.getPartFitments(input);
+      }),
+  }),
+
   // Storage (Image Upload)
   storage: router({
     uploadImage: protectedProcedure
