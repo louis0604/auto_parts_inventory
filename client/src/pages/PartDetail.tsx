@@ -65,7 +65,7 @@ export default function PartDetail() {
         sku: part.sku,
         name: part.name,
         lineCodeId: part.lineCodeId || undefined,
-        stockQuantity: part.stockQuantity,
+        stockQuantity: part.stockQuantity ?? 0,
         replCost: part.replCost || undefined,
         avgCost: part.avgCost || undefined,
         price1: part.price1 || undefined,

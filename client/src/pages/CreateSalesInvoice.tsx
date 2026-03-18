@@ -318,7 +318,7 @@ export default function CreateSalesInvoice() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {selectedPart?.lineCode?.name || "-"}
+                          {(selectedPart as any)?.lineCode?.name || (selectedPart as any)?.lineCodeName || "-"}
                         </TableCell>
                         <TableCell>
                           {selectedPart?.name || "-"}

@@ -101,6 +101,16 @@ export default function SalesInvoices() {
     },
   });
 
+  const exportSalesMutation = trpc.reports.sales.useMutation({
+    onSuccess: (report) => {
+      downloadBase64File(report);
+      toast.success("销售报表已导出");
+    },
+    onError: (error) => {
+      toast.error(`导出失败: ${error.message}`);
+    },
+  });
+
   const [deleteInvoiceId, setDeleteInvoiceId] = useState<number | null>(null);
 
   const handleDelete = (id: number) => {
@@ -217,15 +227,8 @@ export default function SalesInvoices() {
             <CardTitle>发票列表</CardTitle>
             <Button
               variant="outline"
-              onClick={async () => {
-                try {
-                  const report = await trpc.reports.sales.mutate();
-                  downloadBase64File(report);
-                  toast.success("销售报表已导出");
-                } catch (error: unknown) {
-                  toast.error("导出失败: " + (error instanceof Error ? error.message : String(error)));
-                }
-              }}
+              onClick={() => exportSalesMutation.mutate()}
+              disabled={exportSalesMutation.isPending}
             >
               <Download className="h-4 w-4 mr-2" />
               导出销售报表
@@ -430,7 +433,7 @@ export default function SalesInvoices() {
                                   setValue(`items.${index}.partId`, partId);
                                   const part = parts?.find(p => p.id === partId);
                                   if (part) {
-                                    setValue(`items.${index}.unitPrice`, part.unitPrice);
+                                    setValue(`items.${index}.unitPrice`, part.unitPrice ?? "0");
                                   }
                                 }}
                               >

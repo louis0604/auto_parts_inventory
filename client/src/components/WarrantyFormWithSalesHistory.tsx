@@ -372,7 +372,7 @@ export function WarrantyFormWithSalesHistory({ open, onClose, onSuccess }: Warra
                             setValue(`items.${index}.partId`, partId);
                             const part = parts?.find(p => p.id === partId);
                             if (part) {
-                              setValue(`items.${index}.unitPrice`, part.unitPrice);
+                              setValue(`items.${index}.unitPrice`, part.unitPrice ?? "0");
                               setValue(`items.${index}.partSku`, part.sku);
                             }
                           }}

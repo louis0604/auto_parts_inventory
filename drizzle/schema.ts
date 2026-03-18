@@ -186,6 +186,15 @@ export const salesInvoices = mysqlTable("sales_invoices", {
   type: mysqlEnum("type", ["invoice", "return", "credit"]).default("invoice").notNull(), // Type: Invoice/Return/Credit
   totalAmount: decimal("totalAmount", { precision: 15, scale: 2 }).notNull(), // Total
   status: mysqlEnum("status", ["pending", "completed", "cancelled"]).default("pending").notNull(),
+  poNumber: varchar("poNumber", { length: 100 }), // P.O. # (Purchase Order reference)
+  jobNumber: varchar("jobNumber", { length: 100 }), // Job #
+  ref: varchar("ref", { length: 200 }), // Reference
+  // Vehicle info
+  vehicleYear: int("vehicleYear"),
+  vehicleMake: varchar("vehicleMake", { length: 100 }),
+  vehicleModel: varchar("vehicleModel", { length: 100 }),
+  vehicleEngine: varchar("vehicleEngine", { length: 100 }),
+  vehicleVin: varchar("vehicleVin", { length: 50 }),
   notes: text("notes"),
   createdBy: int("createdBy").notNull().references(() => users.id), // Counterman
   createdAt: timestamp("createdAt").defaultNow().notNull(),
@@ -205,6 +214,8 @@ export const salesInvoiceItems = mysqlTable("sales_invoice_items", {
   quantity: int("quantity").notNull(),
   unitPrice: decimal("unitPrice", { precision: 15, scale: 2 }).notNull(),
   subtotal: decimal("subtotal", { precision: 15, scale: 2 }).notNull(),
+  codes: varchar("codes", { length: 50 }), // Price codes (e.g. C2C, PC, QP)
+  suggPrice: decimal("suggPrice", { precision: 15, scale: 2 }), // Suggested retail price
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
@@ -345,3 +356,59 @@ export const auditLogs = mysqlTable("audit_logs", {
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
+
+/**
+ * Vehicle makes table (e.g. HONDA, FORD, TOYOTA)
+ */
+export const vehicleMakes = mysqlTable("vehicle_makes", {
+  id: int("id").autoincrement().primaryKey(),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VehicleMake = typeof vehicleMakes.$inferSelect;
+export type InsertVehicleMake = typeof vehicleMakes.$inferInsert;
+
+/**
+ * Vehicle models table (e.g. CIVIC, ACCORD)
+ */
+export const vehicleModels = mysqlTable("vehicle_models", {
+  id: int("id").autoincrement().primaryKey(),
+  makeId: int("makeId").notNull().references(() => vehicleMakes.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VehicleModel = typeof vehicleModels.$inferSelect;
+export type InsertVehicleModel = typeof vehicleModels.$inferInsert;
+
+/**
+ * Vehicle engines table (year + make + model + engine spec)
+ */
+export const vehicleEngines = mysqlTable("vehicle_engines", {
+  id: int("id").autoincrement().primaryKey(),
+  year: int("year").notNull(),
+  makeId: int("makeId").notNull().references(() => vehicleMakes.id, { onDelete: "cascade" }),
+  modelId: int("modelId").notNull().references(() => vehicleModels.id, { onDelete: "cascade" }),
+  engineCode: varchar("engineCode", { length: 50 }), // e.g. "4-1799 1.8L SOHC"
+  displacement: varchar("displacement", { length: 50 }), // e.g. "1.8L"
+  cylinders: int("cylinders"), // e.g. 4
+  fuelType: varchar("fuelType", { length: 30 }), // e.g. "Gas", "Diesel"
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type VehicleEngine = typeof vehicleEngines.$inferSelect;
+export type InsertVehicleEngine = typeof vehicleEngines.$inferInsert;
+
+/**
+ * Part groups table (sub-category within a category, e.g. "Engine Filters & PCV")
+ */
+export const partGroups = mysqlTable("part_groups", {
+  id: int("id").autoincrement().primaryKey(),
+  categoryId: int("categoryId").notNull().references(() => partCategories.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 100 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type PartGroup = typeof partGroups.$inferSelect;
+export type InsertPartGroup = typeof partGroups.$inferInsert;

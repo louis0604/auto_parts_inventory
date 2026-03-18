@@ -78,6 +78,12 @@ export const appRouter = router({
       .mutation(async ({ input }) => {
         return await db.createPartCategory(input);
       }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deletePartCategory(input);
+        return { success: true };
+      }),
   }),
 
   // Suppliers
@@ -1038,6 +1044,79 @@ ${JSON.stringify(partsData, null, 2)}
       .input(z.string())
       .query(async ({ input }) => {
         return await db.getSalesHistoryByPartSku(input);
+      }),
+  }),
+
+  // Vehicles
+  vehicles: router({
+    getMakes: protectedProcedure.query(async () => {
+      return await db.getAllVehicleMakes();
+    }),
+    getModels: protectedProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        return await db.getVehicleModelsByMake(input);
+      }),
+    getEngines: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        makeId: z.number(),
+        modelId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        return await db.getVehicleEngines(input.year, input.makeId, input.modelId);
+      }),
+    getYears: protectedProcedure.query(async () => {
+      return await db.getVehicleYears();
+    }),
+    createMake: protectedProcedure
+      .input(z.object({ name: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        return await db.createVehicleMake(input.name);
+      }),
+    createModel: protectedProcedure
+      .input(z.object({ makeId: z.number(), name: z.string().min(1) }))
+      .mutation(async ({ input }) => {
+        return await db.createVehicleModel(input.makeId, input.name);
+      }),
+    createEngine: protectedProcedure
+      .input(z.object({
+        year: z.number(),
+        makeId: z.number(),
+        modelId: z.number(),
+        engineCode: z.string().optional(),
+        displacement: z.string().optional(),
+        cylinders: z.number().optional(),
+        fuelType: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createVehicleEngine(input);
+      }),
+  }),
+
+  // Part Groups
+  partGroups: router({
+    list: protectedProcedure.query(async () => {
+      return await db.getAllPartGroups();
+    }),
+    listByCategory: protectedProcedure
+      .input(z.number())
+      .query(async ({ input }) => {
+        return await db.getPartGroupsByCategory(input);
+      }),
+    create: protectedProcedure
+      .input(z.object({
+        categoryId: z.number(),
+        name: z.string().min(1),
+      }))
+      .mutation(async ({ input }) => {
+        return await db.createPartGroup(input);
+      }),
+    delete: protectedProcedure
+      .input(z.number())
+      .mutation(async ({ input }) => {
+        await db.deletePartGroup(input);
+        return { success: true };
       }),
   }),
 

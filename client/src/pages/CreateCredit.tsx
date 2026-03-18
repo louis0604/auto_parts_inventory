@@ -336,7 +336,7 @@ export default function CreateCredit() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          {selectedPart?.lineCode?.name || "-"}
+                          {(selectedPart as any)?.lineCode?.name || (selectedPart as any)?.lineCodeName || "-"}
                         </TableCell>
                         <TableCell>
                           {selectedPart?.name || "-"}

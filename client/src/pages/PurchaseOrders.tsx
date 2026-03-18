@@ -100,6 +100,16 @@ export default function PurchaseOrders() {
     },
   });
 
+  const exportReportMutation = trpc.reports.purchases.useMutation({
+    onSuccess: (report) => {
+      downloadBase64File(report);
+      toast.success("采购报表已导出");
+    },
+    onError: (error) => {
+      toast.error(`导出失败: ${error.message}`);
+    },
+  });
+
   const [deleteOrderId, setDeleteOrderId] = useState<number | null>(null);
 
   const { register, handleSubmit, reset, control, watch, setValue } = useForm<OrderFormData>({
@@ -176,15 +186,8 @@ export default function PurchaseOrders() {
             <div className="flex gap-2">
               <Button
                 variant="outline"
-                onClick={async () => {
-                  try {
-                    const report = await trpc.reports.purchases.mutate();
-                    downloadBase64File(report);
-                    toast.success("采购报表已导出");
-                  } catch (error: unknown) {
-                    toast.error("导出失败: " + (error instanceof Error ? error.message : String(error)));
-                  }
-                }}
+                onClick={() => exportReportMutation.mutate()}
+                disabled={exportReportMutation.isPending}
               >
                 <Download className="h-4 w-4 mr-2" />
                 导出采购报表

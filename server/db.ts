@@ -19,6 +19,10 @@ import {
   warranties,
   warrantyItems,
   auditLogs,
+  vehicleMakes,
+  vehicleModels,
+  vehicleEngines,
+  partGroups,
   type Part,
   type Supplier,
   type Customer,
@@ -33,6 +37,10 @@ import {
   type Warranty,
   type AuditLog,
   type InsertAuditLog,
+  type VehicleMake,
+  type VehicleModel,
+  type VehicleEngine,
+  type PartGroup,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -160,6 +168,12 @@ export async function createPartCategory(data: { name: string; description?: str
   if (!db) throw new Error("Database not available");
   const [result] = await db.insert(partCategories).values(data);
   return (await db.select().from(partCategories).where(eq(partCategories.id, Number(result.insertId))))[0]!;
+}
+
+export async function deletePartCategory(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(partCategories).where(eq(partCategories.id, id));
 }
 
 // ===== Suppliers =====
@@ -525,23 +539,29 @@ export async function bulkCreateParts(partsData: Array<{
         }
       }
       
-      await db.insert(parts).values({
-        sku: partData.sku,
-        name: partData.name,
-        lineCodeId: partData.lineCodeId || undefined,
-        categoryId: partData.categoryId || undefined,
-        supplierId: partData.supplierId || undefined,
+      if (!partData.lineCodeId) {
+        throw new Error(`配件 ${partData.sku} 缺少 Line Code`);
+      }
+      const insertValues: Record<string, unknown> = {
+        sku: partData.sku || "",
+        name: partData.name || "",
+        lineCodeId: partData.lineCodeId,
+        retail: partData.retail || "0.00",
+        replCost: partData.replCost || "0.00",
         description: partData.description || "",
-        unitPrice: partData.unitPrice,
+        unitPrice: partData.unitPrice || "0.00",
         unit: partData.unit || "个",
         stockQuantity: partData.stockQuantity ?? partData.currentStock ?? 0,
         minStockThreshold: partData.minStockThreshold ?? partData.minStock ?? 0,
-        orderQty: partData.orderPoint || undefined,
-        listPrice: partData.listPrice || undefined,
-        cost: partData.replCost || undefined,
-        retail: partData.retail || undefined,
-        imageUrl: finalImageUrl || undefined,
-      });
+        isArchived: false,
+      };
+      if (partData.categoryId) insertValues.categoryId = partData.categoryId;
+      if (partData.supplierId) insertValues.supplierId = partData.supplierId;
+      if (partData.listPrice) insertValues.listPrice = partData.listPrice;
+      if (partData.replCost) insertValues.replCost = partData.replCost;
+      if (finalImageUrl) insertValues.imageUrl = finalImageUrl;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await db.insert(parts).values(insertValues as any);
       success++;
     } catch (error) {
       console.error(`Failed to create part ${partData.sku}:`, error);
@@ -1673,4 +1693,93 @@ export async function adjustStock(
   }
 
   return await getPartById(partId);
+}
+
+// ===== Vehicle Makes =====
+export async function getAllVehicleMakes(): Promise<VehicleMake[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(vehicleMakes).orderBy(vehicleMakes.name);
+}
+
+export async function createVehicleMake(name: string): Promise<VehicleMake> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(vehicleMakes).values({ name: name.toUpperCase() });
+  return (await db.select().from(vehicleMakes).where(eq(vehicleMakes.id, Number(result.insertId))))[0]!;
+}
+
+// ===== Vehicle Models =====
+export async function getVehicleModelsByMake(makeId: number): Promise<VehicleModel[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(vehicleModels).where(eq(vehicleModels.makeId, makeId)).orderBy(vehicleModels.name);
+}
+
+export async function createVehicleModel(makeId: number, name: string): Promise<VehicleModel> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(vehicleModels).values({ makeId, name: name.toUpperCase() });
+  return (await db.select().from(vehicleModels).where(eq(vehicleModels.id, Number(result.insertId))))[0]!;
+}
+
+// ===== Vehicle Engines =====
+export async function getVehicleYears(): Promise<number[]> {
+  const db = await getDb();
+  if (!db) return [];
+  const rows = await db.selectDistinct({ year: vehicleEngines.year }).from(vehicleEngines).orderBy(desc(vehicleEngines.year));
+  return rows.map(r => r.year);
+}
+
+export async function getVehicleEngines(year: number, makeId: number, modelId: number): Promise<VehicleEngine[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(vehicleEngines).where(
+    and(
+      eq(vehicleEngines.year, year),
+      eq(vehicleEngines.makeId, makeId),
+      eq(vehicleEngines.modelId, modelId)
+    )
+  );
+}
+
+export async function createVehicleEngine(data: {
+  year: number;
+  makeId: number;
+  modelId: number;
+  engineCode?: string;
+  displacement?: string;
+  cylinders?: number;
+  fuelType?: string;
+}): Promise<VehicleEngine> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(vehicleEngines).values(data);
+  return (await db.select().from(vehicleEngines).where(eq(vehicleEngines.id, Number(result.insertId))))[0]!;
+}
+
+// ===== Part Groups =====
+export async function getAllPartGroups(): Promise<PartGroup[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(partGroups).orderBy(partGroups.name);
+}
+
+export async function getPartGroupsByCategory(categoryId: number): Promise<PartGroup[]> {
+  const db = await getDb();
+  if (!db) return [];
+  return await db.select().from(partGroups).where(eq(partGroups.categoryId, categoryId)).orderBy(partGroups.name);
+}
+
+export async function createPartGroup(data: { categoryId: number; name: string }): Promise<PartGroup> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(partGroups).values(data);
+  return (await db.select().from(partGroups).where(eq(partGroups.id, Number(result.insertId))))[0]!;
+}
+
+export async function deletePartGroup(id: number): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(partGroups).where(eq(partGroups.id, id));
 }

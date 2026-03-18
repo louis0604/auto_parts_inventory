@@ -630,3 +630,32 @@
 - [x] 测试库存报表导出功能——测试通过✅
 - [x] 测试采购订单报表导出功能——测试通过✅
 - [x] 测试销售发票报表导出功能——测试通过✅
+
+## 参考系统截图功能补充（LaserCat POS系统）
+
+### 车辆信息系统（Vehicle Lookup）
+- [x] 数据库：创建vehicle_makes表（汽车品牌，如HONDA、FORD等）
+- [x] 数据库：创建vehicle_models表（车型，关联品牌）
+- [x] 数据库：创建vehicle_engines表（发动机，关联年份+品牌+型号）
+- [x] 数据库：推送迁移
+- [x] 后端：创建vehicles路由器（getMakes/getModels/getEngines/search）
+- [x] 前端：创建VehicleLookup页面（年份/品牌/型号/发动机级联选择）
+- [x] 前端：在侧边栏添加"车辆查询"导航入口
+- [x] 前端：在侧边栏添加"配件分类管理"导航入口
+- [x] 测试车辆查询功能（TypeScript编译通过）
+
+### 配件分类/分组查询（Category & Group Browse）
+- [x] 数据库：创建part_groups表（分组，关联分类）
+- [x] 后端：添加partGroups路由器（list/listByCategory/create/delete）
+- [x] 前端：创建PartCategories页面（支持Category/Group两级管理）
+- [x] 前端：支持导入LaserCat默认11个标准分类
+- [x] 测试分类分组功能（TypeScript编译通过）
+
+### 销售订单界面优化（参考POS系统）
+- [x] 销售发票添加P.O.#字段（采购订单号）
+- [x] 销售发票添加Job#字段（工单号）
+- [x] 销售发票添加Ref字段（参考号）
+- [x] 销售发票明细添加Codes字段（价格代码）
+- [x] 销售发票明细添加Sugg Price字段（建议价格）
+- [x] 更新数据库schema并推送迁移
+- [x] TypeScript编译通过（0个错误）

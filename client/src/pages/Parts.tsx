@@ -172,7 +172,24 @@ export default function Parts() {
         data: cleanData, // 传递所有字段
       });
     } else {
-      createMutation.mutate(cleanData);
+      if (!cleanData.lineCodeId) {
+        toast.error("请选择 Line Code");
+        return;
+      }
+      if (!cleanData.retail) {
+        toast.error("请输入零售价");
+        return;
+      }
+      if (!cleanData.replCost) {
+        toast.error("请输入替换成本");
+        return;
+      }
+      createMutation.mutate({
+        ...cleanData,
+        lineCodeId: cleanData.lineCodeId,
+        retail: cleanData.retail,
+        replCost: cleanData.replCost,
+      });
     }
   };
 

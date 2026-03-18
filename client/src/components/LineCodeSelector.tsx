@@ -17,14 +17,14 @@ interface LineCodeSelectorProps {
 }
 
 export function LineCodeSelector({ sku, onSelect, open, onClose }: LineCodeSelectorProps) {
-  const { data: lineCodes, isLoading } = trpc.parts.getLineCodesBySku.useQuery(sku, {
+  const { data: lineCodes, isLoading } = trpc.parts.getLineCodesBySku.useQuery({ sku }, {
     enabled: open && !!sku,
   });
 
   useEffect(() => {
     if (open && lineCodes && lineCodes.length === 1) {
       // 如果只有一个Line Code，自动选择
-      onSelect(lineCodes[0].partId, lineCodes[0].lineCode);
+      onSelect(lineCodes[0].id, lineCodes[0].lineCodeName ?? "");
       onClose();
     }
   }, [open, lineCodes, onSelect, onClose]);
@@ -54,14 +54,14 @@ export function LineCodeSelector({ sku, onSelect, open, onClose }: LineCodeSelec
                   variant="outline"
                   className="w-full justify-start text-left h-auto py-4"
                   onClick={() => {
-                    onSelect(item.partId, item.lineCode);
+                    onSelect(item.id, item.lineCodeName ?? "");
                     onClose();
-                    toast.success(`已选择 Line Code: ${item.lineCode}`);
+                    toast.success(`已选择 Line Code: ${item.lineCodeName}`);
                   }}
                 >
                   <div className="flex flex-col gap-1">
-                    <div className="font-mono font-semibold text-lg">{item.lineCode}</div>
-                    <div className="text-sm text-muted-foreground">{item.partName}</div>
+                    <div className="font-mono font-semibold text-lg">{item.lineCodeName}</div>
+                    <div className="text-sm text-muted-foreground">{item.name}</div>
                   </div>
                 </Button>
               ))}

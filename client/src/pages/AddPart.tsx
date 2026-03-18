@@ -126,10 +126,26 @@ export default function AddPart() {
   const onSubmit = (data: PartFormData) => {
     // Convert lineCodeId from string to number or undefined
     const lineCodeId = data.lineCodeId === undefined ? undefined : Number(data.lineCodeId);
+    const finalLineCodeId = lineCodeId === 0 ? undefined : lineCodeId;
+    
+    if (!finalLineCodeId) {
+      toast.error("请选择 Line Code");
+      return;
+    }
+    if (!data.retail) {
+      toast.error("请输入零售价");
+      return;
+    }
+    if (!data.replCost) {
+      toast.error("请输入替换成本");
+      return;
+    }
     
     createMutation.mutate({
       ...data,
-      lineCodeId: lineCodeId === 0 ? undefined : lineCodeId,
+      lineCodeId: finalLineCodeId,
+      retail: data.retail,
+      replCost: data.replCost,
       unitPrice: data.retail || "0", // 使用retail作为unitPrice的默认值
       imageUrl: uploadedImageUrl || data.imageUrl || undefined,
     });

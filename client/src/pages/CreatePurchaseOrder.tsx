@@ -23,7 +23,7 @@ import { useState } from "react";
 type OrderFormData = {
   orderNumber: string;
   supplierId?: number;
-  type: "purchase" | "return";
+  type: "inbound" | "outbound";
   notes?: string;
   items: Array<{
     partId: number;
@@ -66,7 +66,7 @@ export default function CreatePurchaseOrder() {
   const { register, handleSubmit, control, watch, setValue } = useForm<OrderFormData>({
     defaultValues: {
       orderNumber: `PO-${Date.now()}`,
-      type: "purchase",
+      type: "inbound",
       items: [{ partId: 0, sku: "", lineCode: "", name: "", quantity: 1, unitPrice: "0" }],
     },
   });
@@ -134,7 +134,7 @@ export default function CreatePurchaseOrder() {
     createMutation.mutate({
       orderNumber: data.orderNumber,
       supplierId: data.supplierId,
-      type: data.type,
+      type: data.type as "inbound" | "outbound",
       notes: data.notes,
       items: validItems.map(item => ({
         partId: item.partId,
@@ -188,14 +188,14 @@ export default function CreatePurchaseOrder() {
               <Label htmlFor="type">订单类型 *</Label>
               <Select
                 value={watchType}
-                onValueChange={(value) => setValue("type", value as "purchase" | "return")}
+                onValueChange={(value) => setValue("type", value as "inbound" | "outbound")}
               >
                 <SelectTrigger className="mt-1">
                   <SelectValue placeholder="选择订单类型" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="purchase">入库 (Purchase)</SelectItem>
-                  <SelectItem value="return">出库 (Return)</SelectItem>
+                  <SelectItem value="inbound">入库 (Inbound)</SelectItem>
+                  <SelectItem value="outbound">出库 (Outbound)</SelectItem>
                 </SelectContent>
               </Select>
             </div>

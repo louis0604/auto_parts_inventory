@@ -167,6 +167,16 @@ export default function PartsNew() {
     },
   });
 
+  const exportInventoryMutation = trpc.reports.inventory.useMutation({
+    onSuccess: (report) => {
+      downloadBase64File(report);
+      toast.success("库存报表已导出");
+    },
+    onError: (error) => {
+      toast.error(`导出失败: ${error.message}`);
+    },
+  });
+
   const bulkForceDeleteMutation = trpc.parts.bulkForceDelete.useMutation({
     onSuccess: (result: { deleted: number; failed: number; total: number }) => {
       if (result.failed > 0) {
@@ -208,10 +218,28 @@ export default function PartsNew() {
       imageUrl: uploadedImageUrl || undefined,
     };
 
+    if (!cleanData.lineCodeId) {
+      toast.error("请选择 Line Code");
+      return;
+    }
+    if (!cleanData.retail) {
+      toast.error("请输入零售价");
+      return;
+    }
+    if (!cleanData.replCost) {
+      toast.error("请输入替换成本");
+      return;
+    }
+    const validData = {
+      ...cleanData,
+      lineCodeId: cleanData.lineCodeId,
+      retail: cleanData.retail,
+      replCost: cleanData.replCost,
+    };
     if (editingPart) {
-      updateMutation.mutate({ id: editingPart, data: cleanData });
+      updateMutation.mutate({ id: editingPart, data: validData });
     } else {
-      createMutation.mutate(cleanData);
+      createMutation.mutate(validData);
     }
   };
 
@@ -345,15 +373,8 @@ export default function PartsNew() {
           </Link>
           <Button
             variant="outline"
-            onClick={async () => {
-              try {
-                const report = await trpc.reports.inventory.mutate();
-                downloadBase64File(report);
-                toast.success("库存报表已导出");
-              } catch (error: unknown) {
-                toast.error("导出失败: " + (error instanceof Error ? error.message : String(error)));
-              }
-            }}
+            onClick={() => exportInventoryMutation.mutate()}
+            disabled={exportInventoryMutation.isPending}
           >
             <Download className="mr-2 h-4 w-4" />
             导出库存报表
