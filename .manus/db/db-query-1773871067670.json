@@ -1,0 +1,38 @@
+{
+  "query": "\nSELECT 'vehicle_makes' as tbl, COUNT(*) as cnt FROM vehicle_makes\nUNION ALL SELECT 'vehicle_models', COUNT(*) FROM vehicle_models\nUNION ALL SELECT 'part_categories', COUNT(*) FROM part_categories\nUNION ALL SELECT 'part_groups', COUNT(*) FROM part_groups\nUNION ALL SELECT 'line_codes', COUNT(*) FROM line_codes\nUNION ALL SELECT 'parts', COUNT(*) FROM parts\nUNION ALL SELECT 'part_vehicle_fitments', COUNT(*) FROM part_vehicle_fitments;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute \nSELECT 'vehicle_makes' as tbl, COUNT(*) as cnt FROM vehicle_makes\nUNION ALL SELECT 'vehicle_models', COUNT(*) FROM vehicle_models\nUNION ALL SELECT 'part_categories', COUNT(*) FROM part_categories\nUNION ALL SELECT 'part_groups', COUNT(*) FROM part_groups\nUNION ALL SELECT 'line_codes', COUNT(*) FROM line_codes\nUNION ALL SELECT 'parts', COUNT(*) FROM parts\nUNION ALL SELECT 'part_vehicle_fitments', COUNT(*) FROM part_vehicle_fitments;\n",
+  "rows": [
+    {
+      "tbl": "part_categories",
+      "cnt": "23"
+    },
+    {
+      "tbl": "part_groups",
+      "cnt": "93"
+    },
+    {
+      "tbl": "vehicle_makes",
+      "cnt": "30"
+    },
+    {
+      "tbl": "line_codes",
+      "cnt": "71"
+    },
+    {
+      "tbl": "parts",
+      "cnt": "508"
+    },
+    {
+      "tbl": "vehicle_models",
+      "cnt": "2163"
+    },
+    {
+      "tbl": "part_vehicle_fitments",
+      "cnt": "2756"
+    }
+  ],
+  "messages": [],
+  "stdout": "tbl\tcnt\npart_categories\t23\npart_groups\t93\nvehicle_makes\t30\nline_codes\t71\nparts\t508\nvehicle_models\t2163\npart_vehicle_fitments\t2756\n",
+  "stderr": "",
+  "execution_time_ms": 187
+}

@@ -1,0 +1,120 @@
+{
+  "query": "\nSELECT p.sku, p.name, p.manufacturer, vm.name as make, vmo.name as model, \n       pvf.yearFrom, pvf.yearTo, pc.name as category, pg.name as part_group\nFROM part_vehicle_fitments pvf\nJOIN parts p ON pvf.partId = p.id\nJOIN vehicle_makes vm ON pvf.makeId = vm.id\nJOIN vehicle_models vmo ON pvf.modelId = vmo.id\nLEFT JOIN part_categories pc ON p.categoryId = pc.id\nLEFT JOIN part_groups pg ON p.partGroupId = pg.id\nWHERE vm.name = 'TOYOTA' AND vmo.name = 'RAV4'\nLIMIT 10;\n",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 4Z8LjiwvcvtE25n.root --database b8PSAc4GGbWJXFTqco8XmD --execute \nSELECT p.sku, p.name, p.manufacturer, vm.name as make, vmo.name as model, \n       pvf.yearFrom, pvf.yearTo, pc.name as category, pg.name as part_group\nFROM part_vehicle_fitments pvf\nJOIN parts p ON pvf.partId = p.id\nJOIN vehicle_makes vm ON pvf.makeId = vm.id\nJOIN vehicle_models vmo ON pvf.modelId = vmo.id\nLEFT JOIN part_categories pc ON p.categoryId = pc.id\nLEFT JOIN part_groups pg ON p.partGroupId = pg.id\nWHERE vm.name = 'TOYOTA' AND vmo.name = 'RAV4'\nLIMIT 10;\n",
+  "rows": [
+    {
+      "sku": "CA23979",
+      "name": "Fuel Filters",
+      "manufacturer": "FRAM",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Ignition & Engine Filters",
+      "part_group": "Fuel Filters"
+    },
+    {
+      "sku": "4053",
+      "name": "Fan Belts",
+      "manufacturer": "BOSCH",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2013",
+      "yearTo": "2018",
+      "category": "Belts & Cooling",
+      "part_group": "Fan Belts"
+    },
+    {
+      "sku": "5060572",
+      "name": "Serpentine Belts",
+      "manufacturer": "ALT:DAYCO",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2013",
+      "yearTo": "2018",
+      "category": "Belts & Cooling",
+      "part_group": "Serpentine Belts"
+    },
+    {
+      "sku": "K14944",
+      "name": "Throttle Position Sensors",
+      "manufacturer": "GATES",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Fuel & Emission",
+      "part_group": "Throttle Position Sensors"
+    },
+    {
+      "sku": "475691",
+      "name": "Fuel Injectors",
+      "manufacturer": "ALT:DENSO",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Fuel & Emission",
+      "part_group": "Fuel Injectors"
+    },
+    {
+      "sku": "699-265",
+      "name": "Tail Light Bulbs",
+      "manufacturer": "DORMAN",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Electrical",
+      "part_group": "Tail Light Bulbs"
+    },
+    {
+      "sku": "677-601",
+      "name": "Heater Cores",
+      "manufacturer": "ALT:DORMAN",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Heating & Air Conditioning",
+      "part_group": "Heater Cores"
+    },
+    {
+      "sku": "763653",
+      "name": "A/C Compressors",
+      "manufacturer": "DENSO",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2013",
+      "yearTo": "2018",
+      "category": "Heating & Air Conditioning",
+      "part_group": "A/C Compressors"
+    },
+    {
+      "sku": "675-603",
+      "name": "ABS Wheel Speed Sensors",
+      "manufacturer": "ALT:DORMAN",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2013",
+      "yearTo": "2018",
+      "category": "Brakes & Wheel Bearings",
+      "part_group": "ABS Wheel Speed Sensors"
+    },
+    {
+      "sku": "NAT70838",
+      "name": "Wheel Bearings",
+      "manufacturer": "ALT:NATIONAL",
+      "make": "TOYOTA",
+      "model": "RAV4",
+      "yearFrom": "2019",
+      "yearTo": "2024",
+      "category": "Brakes & Wheel Bearings",
+      "part_group": "Wheel Bearings"
+    }
+  ],
+  "messages": [],
+  "stdout": "sku\tname\tmanufacturer\tmake\tmodel\tyearFrom\tyearTo\tcategory\tpart_group\nCA23979\tFuel Filters\tFRAM\tTOYOTA\tRAV4\t2019\t2024\tIgnition & Engine Filters\tFuel Filters\n4053\tFan Belts\tBOSCH\tTOYOTA\tRAV4\t2013\t2018\tBelts & Cooling\tFan Belts\n5060572\tSerpentine Belts\tALT:DAYCO\tTOYOTA\tRAV4\t2013\t2018\tBelts & Cooling\tSerpentine Belts\nK14944\tThrottle Position Sensors\tGATES\tTOYOTA\tRAV4\t2019\t2024\tFuel & Emission\tThrottle Position Sensors\n475691\tFuel Injectors\tALT:DENSO\tTOYOTA\tRAV4\t2019\t2024\tFuel & Emission\tFuel Injectors\n699-265\tTail Light Bulbs\tDORMAN\tTOYOTA\tRAV4\t2019\t2024\tElectrical\tTail Light Bulbs\n677-601\tHeater Cores\tALT:DORMAN\tTOYOTA\tRAV4\t2019\t2024\tHeating & Air Conditioning\tHeater Cores\n763653\tA/C Compressors\tDENSO\tTOYOTA\tRAV4\t2013\t2018\tHeating & Air Conditioning\tA/C Compressors\n675-603\tABS Wheel Speed Sensors\tALT:DORMAN\tTOYOTA\tRAV4\t2013\t2018\tBrakes & Wheel Bearings\tABS Wheel Speed Sensors\nNAT70838\tWheel Bearings\tALT:NATIONAL\tTOYOTA\tRAV4\t2019\t2024\tBrakes & Wheel Bearings\tWheel Bearings\n",
+  "stderr": "",
+  "execution_time_ms": 72
+}
