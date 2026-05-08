@@ -19,13 +19,15 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, Package, TruckIcon, ShoppingCart, FileText, BarChart3, Sparkles, RotateCcw, Shield, Search, Tag, Car, Layers, History, SearchCheck } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { trpc } from "@/lib/trpc";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "仪表盘", path: "/" },
@@ -40,6 +42,7 @@ const menuItems = [
   { icon: Car, label: "车辆查询", path: "/vehicle-lookup" },
   { icon: Layers, label: "配件分类管理", path: "/part-categories" },
   { icon: SearchCheck, label: "配件查询", path: "/part-lookup" },
+  { icon: Search, label: "PN查询", path: "/part-number-lookup" },
   { icon: History, label: "操作历史", path: "/operation-history" },
   { icon: BarChart3, label: "库存记录", path: "/inventory-ledger" },
   { icon: Sparkles, label: "AI补货建议", path: "/ai-restocking" },
@@ -50,6 +53,33 @@ const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
+
+function LocalLoginCard() {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const loginMutation = trpc.auth.login.useMutation({
+    onSuccess: () => window.location.reload(),
+  });
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-full max-w-md rounded-lg border bg-card p-6 space-y-4">
+        <h1 className="text-xl font-semibold">本地账号登录</h1>
+        <p className="text-sm text-muted-foreground">请输入账号和密码进入系统</p>
+        <div className="space-y-2">
+          <Label>账号</Label>
+          <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="admin" />
+        </div>
+        <div className="space-y-2">
+          <Label>密码</Label>
+          <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" />
+        </div>
+        {loginMutation.error && <p className="text-sm text-destructive">{loginMutation.error.message}</p>}
+        <Button className="w-full" disabled={!username || !password || loginMutation.isPending} onClick={() => loginMutation.mutate({ username, password })}>登录</Button>
+      </div>
+    </div>
+  );
+}
 export default function DashboardLayout({
   children,
 }: {
@@ -70,29 +100,7 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Sign in to continue
-            </h1>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Access to this dashboard requires authentication. Continue to launch the login flow.
-            </p>
-          </div>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
-            }}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
-        </div>
-      </div>
-    );
+    return <LocalLoginCard />;
   }
 
   return (

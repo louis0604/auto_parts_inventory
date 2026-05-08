@@ -47,6 +47,8 @@ export function BulkImportPartsPage() {
         "Price 2": "",
         "Price 3": "",
         "Order Qty": "",
+        "Brand": "ACDelco",
+        "Replacement Number": "PF61",
       },
     ];
 
@@ -68,6 +70,8 @@ export function BulkImportPartsPage() {
       { wch: 10 }, // Price 2
       { wch: 10 }, // Price 3
       { wch: 10 }, // Order Qty
+      { wch: 15 }, // Brand
+      { wch: 20 }, // Replacement Number
     ];
 
     XLSX.writeFile(wb, "配件导入模板.xlsx");
@@ -155,6 +159,8 @@ export function BulkImportPartsPage() {
             // Inventory
             stockQuantity: Number(row["QOH "] || row["QOH"] || row["stockQuantity"] || 0),
             orderPoint: Number(row["Order Qty"] || row["orderPoint"] || 0),
+            manufacturer: String(row["Brand"] || row["manufacturer"] || ""),
+            mfgPartNumber: String(row["Replacement Number"] || row["mfgPartNumber"] || ""),
             // 图片URL（如果有）
             imageUrl: String(row["PICTURE"] || row["imageUrl"] || ""),
             // 图片base64（如果有嵌入图片）

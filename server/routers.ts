@@ -1,4 +1,4 @@
-import { COOKIE_NAME } from "@shared/const";
+import { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { buildInventoryReport, buildPurchaseReport, buildSalesReport } from "./_core/reporting";
@@ -8,12 +8,37 @@ import { z } from "zod";
 import * as db from "./db";
 import { invokeLLM } from "./_core/llm";
 import { storagePut } from "./storage";
+import { ENV } from "./_core/env";
 
 export const appRouter = router({
   system: systemRouter,
   
   auth: router({
     me: publicProcedure.query(opts => opts.ctx.user),
+    login: publicProcedure
+      .input(z.object({ username: z.string().min(1), password: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        const username = input.username.trim();
+        if (username !== ENV.localAuthUsername || input.password !== ENV.localAuthPassword) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "账号或密码错误" });
+        }
+
+        const openId = `local:${username}`;
+        await db.upsertUser({
+          openId,
+          name: username,
+          email: null,
+          loginMethod: "local",
+          lastSignedIn: new Date(),
+          role: "admin",
+        });
+
+        const sessionToken = await import("./_core/sdk").then(m => m.sdk.createSessionToken(openId, { name: username }));
+        const cookieOptions = getSessionCookieOptions(ctx.req);
+        ctx.res.cookie(COOKIE_NAME, sessionToken, { ...cookieOptions, maxAge: ONE_YEAR_MS });
+
+        return { success: true } as const;
+      }),
     logout: publicProcedure.mutation(({ ctx }) => {
       const cookieOptions = getSessionCookieOptions(ctx.req);
       ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
@@ -253,6 +278,8 @@ export const appRouter = router({
         // 兼容旧字段名
         currentStock: z.number().optional(),
         minStock: z.number().optional(),
+        manufacturer: z.string().optional(),
+        mfgPartNumber: z.string().optional(),
       })))
       .mutation(async ({ input }) => {
         return await db.bulkCreateParts(input);
