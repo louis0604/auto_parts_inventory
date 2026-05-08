@@ -45,13 +45,13 @@ async function startServer() {
       createContext,
     })
   );
-  const builtIndex = path.resolve(import.meta.dirname, "../..", "dist", "public", "index.html");
+    const builtIndex = path.resolve(import.meta.dirname, "../..", "dist", "public", "index.html");
   const hasBuiltClient = fs.existsSync(builtIndex);
   const isProduction = process.env.NODE_ENV === "production";
+  const isTsSourceRuntime = import.meta.filename?.endsWith(path.join("server", "_core", "index.ts"));
 
-  // In local/dev environments always use Vite middleware.
-  // In production, fallback to Vite if static build is missing (prevents Windows local startup crashes).
-  if (!isProduction || !hasBuiltClient) {
+  // Always use Vite when running source in tsx watch/dev.
+  if (!isProduction || isTsSourceRuntime || !hasBuiltClient) {
     await setupVite(app, server);
   } else {
     serveStatic(app);
