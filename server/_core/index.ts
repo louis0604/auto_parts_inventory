@@ -6,6 +6,8 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
+import fs from "fs";
+import path from "path";
 import { serveStatic, setupVite } from "./vite";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -43,8 +45,13 @@ async function startServer() {
       createContext,
     })
   );
-  // Default to development behavior unless explicitly running production build
-  if (process.env.NODE_ENV !== "production") {
+  const builtIndex = path.resolve(import.meta.dirname, "../..", "dist", "public", "index.html");
+  const hasBuiltClient = fs.existsSync(builtIndex);
+  const isProduction = process.env.NODE_ENV === "production";
+
+  // In local/dev environments always use Vite middleware.
+  // In production, fallback to Vite if static build is missing (prevents Windows local startup crashes).
+  if (!isProduction || !hasBuiltClient) {
     await setupVite(app, server);
   } else {
     serveStatic(app);
