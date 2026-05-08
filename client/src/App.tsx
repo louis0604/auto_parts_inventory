@@ -76,6 +76,7 @@ function Router() {
         <Route path={"/vehicle-lookup"} component={VehicleLookup} />
         <Route path={"/part-categories"} component={PartCategories} />
         <Route path={"/part-lookup"} component={PartLookup} />
+        <Route path={"/part-number-lookup"} component={PartLookup} />
         <Route path={"/ai-restocking"} component={AIRestocking} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
