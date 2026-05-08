@@ -253,6 +253,8 @@ export const appRouter = router({
         // 兼容旧字段名
         currentStock: z.number().optional(),
         minStock: z.number().optional(),
+        manufacturer: z.string().optional(),
+        mfgPartNumber: z.string().optional(),
       })))
       .mutation(async ({ input }) => {
         return await db.bulkCreateParts(input);

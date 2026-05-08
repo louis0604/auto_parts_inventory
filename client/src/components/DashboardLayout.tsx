@@ -40,6 +40,7 @@ const menuItems = [
   { icon: Car, label: "车辆查询", path: "/vehicle-lookup" },
   { icon: Layers, label: "配件分类管理", path: "/part-categories" },
   { icon: SearchCheck, label: "配件查询", path: "/part-lookup" },
+  { icon: Search, label: "PN查询", path: "/part-number-lookup" },
   { icon: History, label: "操作历史", path: "/operation-history" },
   { icon: BarChart3, label: "库存记录", path: "/inventory-ledger" },
   { icon: Sparkles, label: "AI补货建议", path: "/ai-restocking" },

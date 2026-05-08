@@ -289,6 +289,12 @@ export async function getPartsBySku(sku: string) {
       cost: parts.cost,
       unitPrice: parts.unitPrice,
       replCost: parts.replCost,
+      retail: parts.retail,
+      listPrice: parts.listPrice,
+      stockQuantity: parts.stockQuantity,
+      description: parts.description,
+      manufacturer: parts.manufacturer,
+      mfgPartNumber: parts.mfgPartNumber,
     })
     .from(parts)
     .leftJoin(lineCodes, eq(parts.lineCodeId, lineCodes.id))
@@ -513,6 +519,8 @@ export async function bulkCreateParts(partsData: Array<{
   // 兼容旧字段名
   currentStock?: number;
   minStock?: number;
+  manufacturer?: string;
+  mfgPartNumber?: string;
 }>): Promise<{ success: number; failed: number }> {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
@@ -562,6 +570,8 @@ export async function bulkCreateParts(partsData: Array<{
       if (partData.supplierId) insertValues.supplierId = partData.supplierId;
       if (partData.listPrice) insertValues.listPrice = partData.listPrice;
       if (partData.replCost) insertValues.replCost = partData.replCost;
+      if (partData.manufacturer) insertValues.manufacturer = partData.manufacturer;
+      if (partData.mfgPartNumber) insertValues.mfgPartNumber = partData.mfgPartNumber;
       if (finalImageUrl) insertValues.imageUrl = finalImageUrl;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await db.insert(parts).values(insertValues as any);
